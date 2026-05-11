@@ -17,10 +17,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------------------------------------------
-# LOGIN
-# ---------------------------------------------------
-
 USERS = {
     "comercial": {
         "name": "Comercial PayZen",
@@ -33,7 +29,6 @@ USERS = {
 }
 
 def check_password(username, password):
-
     username = username.strip().lower()
 
     if username not in USERS:
@@ -47,17 +42,10 @@ def check_password(username, password):
     )
 
 def login_screen():
-
     st.markdown("""
     <style>
-
     .stApp {
-        background: linear-gradient(
-            135deg,
-            #020617 0%,
-            #0F172A 45%,
-            #082F49 100%
-        );
+        background: linear-gradient(135deg, #020617 0%, #0F172A 45%, #082F49 100%);
         color: white;
     }
 
@@ -86,20 +74,26 @@ def login_screen():
         font-weight: 700 !important;
     }
 
-    .stButton button {
+    .stFormSubmitButton button {
         background: #374151 !important;
         color: #38BDF8 !important;
         border-radius: 12px !important;
-        border: 1px solid rgba(255,255,255,0.10) !important;
-        font-weight: 700 !important;
+        border: 1px solid rgba(56,189,248,0.50) !important;
+        font-weight: 800 !important;
         padding: 10px 28px !important;
+        min-width: 110px !important;
     }
 
-    .stButton button:hover {
+    .stFormSubmitButton button:hover {
         background: #4B5563 !important;
-        color: white !important;
+        color: #38BDF8 !important;
+        border: 1px solid rgba(56,189,248,0.90) !important;
     }
 
+    .stFormSubmitButton button p {
+        color: #38BDF8 !important;
+        font-weight: 800 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -116,27 +110,16 @@ def login_screen():
     col1, col2, col3 = st.columns([1, 1.2, 1])
 
     with col2:
-
         with st.form("login_form"):
-
             username = st.text_input("Usuario")
-
-            password = st.text_input(
-                "Contraseña",
-                type="password"
-            )
-
+            password = st.text_input("Contraseña", type="password")
             submitted = st.form_submit_button("Ingresar")
 
             if submitted:
-
                 if check_password(username, password):
-
                     st.session_state["authenticated"] = True
                     st.session_state["username"] = username.strip().lower()
-
                     st.rerun()
-
                 else:
                     st.error("Usuario o contraseña incorrecta")
 
@@ -150,10 +133,6 @@ if not st.session_state["authenticated"]:
     login_screen()
     st.stop()
 
-# ---------------------------------------------------
-# FUNCIONES
-# ---------------------------------------------------
-
 def money(v):
     return f"${v:,.0f}".replace(",", ".")
 
@@ -164,38 +143,22 @@ def number_fmt(v):
     return f"{v:,.0f}".replace(",", ".")
 
 def tarifa_adicional(tx):
-
     if tx <= 0:
         return 0
-
     if tx <= 500:
         return 506
-
     elif tx <= 1000:
         return 440
-
     elif tx <= 5000:
         return 385
-
     elif tx <= 10000:
         return 363
-
     return 319
-
-# ---------------------------------------------------
-# ESTILOS
-# ---------------------------------------------------
 
 st.markdown("""
 <style>
-
 .stApp {
-    background: linear-gradient(
-        135deg,
-        #020617 0%,
-        #0F172A 45%,
-        #082F49 100%
-    );
+    background: linear-gradient(135deg, #020617 0%, #0F172A 45%, #082F49 100%);
 }
 
 .title-main {
@@ -278,16 +241,10 @@ st.markdown("""
     margin-top: 30px;
     margin-bottom: 10px;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------
-# SIDEBAR
-# ---------------------------------------------------
-
 with st.sidebar:
-
     current_user = st.session_state.get("username", "")
 
     st.success(
@@ -329,7 +286,6 @@ with st.sidebar:
     )
 
     if activar_tc:
-
         tx_tc = st.number_input(
             "Transacciones TC",
             value=350
@@ -349,7 +305,6 @@ with st.sidebar:
             "% adquirencia banco TC",
             value=1.84
         )
-
     else:
         tx_tc = 0
         costo_fijo_actual_tc = 0
@@ -366,7 +321,6 @@ with st.sidebar:
     )
 
     if activar_pse:
-
         tx_pse = st.number_input(
             "Transacciones PSE",
             value=100
@@ -381,7 +335,6 @@ with st.sidebar:
             "Costo PayZen PSE por tx",
             value=400
         )
-
     else:
         tx_pse = 0
         costo_actual_pse = 0
@@ -397,7 +350,6 @@ with st.sidebar:
     )
 
     if activar_breb:
-
         tx_breb = st.number_input(
             "Transacciones Bre-B",
             value=100
@@ -412,17 +364,10 @@ with st.sidebar:
             "Costo PayZen Bre-B por tx",
             value=600
         )
-
     else:
         tx_breb = 0
         costo_actual_breb = 0
         costo_payzen_breb = 0
-
-# ---------------------------------------------------
-# CÁLCULOS
-# ---------------------------------------------------
-
-# ACTUAL
 
 costo_actual_tc = (
     tx_tc *
@@ -433,7 +378,6 @@ costo_actual_tc = (
 )
 
 costo_actual_pse_total = tx_pse * costo_actual_pse
-
 costo_actual_breb_total = tx_breb * costo_actual_breb
 
 costo_total_actual = (
@@ -441,8 +385,6 @@ costo_total_actual = (
     costo_actual_pse_total +
     costo_actual_breb_total
 )
-
-# PAYZEN
 
 tx_totales = tx_tc + tx_pse + tx_breb
 
@@ -452,7 +394,6 @@ tx_adicionales = max(
 )
 
 tarifa_extra = tarifa_adicional(tx_adicionales)
-
 costo_adicionales = tx_adicionales * tarifa_extra
 
 costo_tc_payzen = (
@@ -462,7 +403,6 @@ costo_tc_payzen = (
 )
 
 costo_pse_payzen_total = tx_pse * costo_payzen_pse
-
 costo_breb_payzen_total = tx_breb * costo_payzen_breb
 
 costo_total_payzen = (
@@ -476,10 +416,6 @@ costo_total_payzen = (
 ahorro = costo_total_actual - costo_total_payzen
 ahorro_anual = ahorro * 12
 
-# ---------------------------------------------------
-# HEADER
-# ---------------------------------------------------
-
 col_logo, col_title = st.columns([1, 5])
 
 with col_logo:
@@ -489,7 +425,6 @@ with col_logo:
     )
 
 with col_title:
-
     st.markdown(
         '<div class="title-main">💳 Calculadora Comercial PayZen</div>',
         unsafe_allow_html=True
@@ -500,10 +435,6 @@ with col_title:
         unsafe_allow_html=True
     )
 
-# ---------------------------------------------------
-# RESUMEN
-# ---------------------------------------------------
-
 st.markdown(
     '<div class="section-title">📊 Comparativo comercial</div>',
     unsafe_allow_html=True
@@ -512,78 +443,46 @@ st.markdown(
 c1, c2 = st.columns(2)
 
 with c1:
-
     st.markdown(
         f'''
         <div class="card">
-
-        <div class="label">
-        Pasarela actual
-        </div>
-
-        <div class="big-number-orange">
-        ${number_fmt(int(costo_fijo_actual_tc))} +
-        </div>
-
-        <div class="big-number-orange">
-        {percent(porcentaje_actual_tc)}
-        </div>
-
-        <div class="small-text">
-        por transacción
-        </div>
-
-        <br>
-
-        <div class="small-text">
-        Total actual:
-        <b>{money(costo_total_actual)}</b>
-        </div>
-
+            <div class="label">Pasarela actual</div>
+            <div class="big-number-orange">${number_fmt(int(costo_fijo_actual_tc))} +</div>
+            <div class="big-number-orange">{percent(porcentaje_actual_tc)}</div>
+            <div class="small-text">por transacción</div>
+            <br>
+            <div class="small-text">
+                Total actual:
+                <b>{money(costo_total_actual)}</b>
+            </div>
         </div>
         ''',
         unsafe_allow_html=True
     )
 
 with c2:
-
     st.markdown(
         f'''
         <div class="card-blue">
-
-        <div class="label">
-        Plan seleccionado
-        </div>
-
-        <div class="big-number">
-        {plan}
-        </div>
-
-        <div class="small-text">
-        Mensualidad:
-        <b>{money(mensualidad)}</b>
-        </div>
-
-        <div class="small-text">
-        Tx incluidas:
-        <b>{number_fmt(incluidas)}</b>
-        </div>
-
-        <br>
-
-        <div class="small-text">
-        Total PayZen:
-        <b>{money(costo_total_payzen)}</b>
-        </div>
-
+            <div class="label">Plan seleccionado</div>
+            <div class="big-number">{plan}</div>
+            <div class="small-text">
+                Mensualidad:
+                <b>{money(mensualidad)}</b>
+            </div>
+            <div class="small-text">
+                Tx incluidas:
+                <b>{number_fmt(incluidas)}</b>
+            </div>
+            <br>
+            <div class="small-text">
+                Total PayZen:
+                <b>{money(costo_total_payzen)}</b>
+            </div>
         </div>
         ''',
         unsafe_allow_html=True
     )
-
-# ---------------------------------------------------
-# AHORRO
-# ---------------------------------------------------
 
 st.markdown(
     '<div class="section-title">💰 Ahorro estimado</div>',
@@ -593,49 +492,28 @@ st.markdown(
 c3, c4 = st.columns(2)
 
 with c3:
-
     st.markdown(
         f'''
         <div class="card">
-
-        <div class="label">
-        Ahorro mensual
-        </div>
-
-        <div class="big-number-green">
-        {money(ahorro)}
-        </div>
-
+            <div class="label">Ahorro mensual</div>
+            <div class="big-number-green">{money(ahorro)}</div>
         </div>
         ''',
         unsafe_allow_html=True
     )
 
 with c4:
-
     st.markdown(
         f'''
         <div class="card">
-
-        <div class="label">
-        Ahorro anual
-        </div>
-
-        <div class="big-number-green">
-        {money(ahorro_anual)}
-        </div>
-
+            <div class="label">Ahorro anual</div>
+            <div class="big-number-green">{money(ahorro_anual)}</div>
         </div>
         ''',
         unsafe_allow_html=True
     )
 
-# ---------------------------------------------------
-# PDF
-# ---------------------------------------------------
-
 def generar_pdf():
-
     buffer = BytesIO()
 
     doc = SimpleDocTemplate(
@@ -644,7 +522,6 @@ def generar_pdf():
     )
 
     styles = getSampleStyleSheet()
-
     story = []
 
     try:
@@ -653,9 +530,7 @@ def generar_pdf():
             width=2.5*inch,
             height=1*inch
         )
-
         story.append(img)
-
     except:
         pass
 
@@ -667,7 +542,6 @@ def generar_pdf():
     )
 
     story.append(title)
-
     story.append(Spacer(1, 20))
 
     data = [
@@ -681,15 +555,14 @@ def generar_pdf():
     table = Table(data)
 
     table.setStyle(TableStyle([
-        ('BACKGROUND',(0,0),(-1,0),colors.HexColor("#2563EB")),
-        ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-        ('GRID',(0,0),(-1,-1),1,colors.black),
-        ('FONTNAME',(0,0),(-1,0),'Helvetica-Bold'),
-        ('BOTTOMPADDING',(0,0),(-1,0),12),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2563EB")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
     ]))
 
     story.append(table)
-
     story.append(Spacer(1, 25))
 
     disclaimer = Paragraph(
@@ -700,11 +573,9 @@ def generar_pdf():
     )
 
     story.append(disclaimer)
-
     doc.build(story)
 
     pdf = buffer.getvalue()
-
     buffer.close()
 
     return pdf
@@ -717,10 +588,6 @@ st.download_button(
     file_name="Resumen_Comercial_PayZen.pdf",
     mime="application/pdf"
 )
-
-# ---------------------------------------------------
-# DISCLAIMER
-# ---------------------------------------------------
 
 st.markdown(
     """
