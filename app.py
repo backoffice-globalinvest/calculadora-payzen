@@ -504,48 +504,119 @@ with st.sidebar:
 
     st.header("⚙️ Parámetros base")
 
-    ticket_promedio = st.number_input("Ticket promedio", min_value=0, value=60000, step=10000)
-    tx_actuales = st.number_input("Cantidad de transacciones actuales", min_value=0, value=350, step=50)
+    ticket_promedio = st.number_input("Ticket promedio TC", min_value=0, value=60000, step=10000)
+
+    st.divider()
+    st.subheader("Distribución de transacciones")
+
+    modo_transacciones = st.radio(
+        "¿Cómo quieres ingresar las transacciones?",
+        ["Por número de transacciones", "Por porcentaje sobre total"],
+        index=0
+    )
+
+    activar_tc = st.checkbox("Activar Tarjetas crédito / débito", value=True)
+    activar_pse = st.checkbox("Activar PSE", value=False)
+    activar_breb = st.checkbox("Activar Bre-B", value=False)
+
+    if modo_transacciones == "Por número de transacciones":
+        if activar_tc:
+            tx_tc_actual = st.number_input("Transacciones TC", min_value=0, value=350, step=50)
+        else:
+            tx_tc_actual = 0
+
+        if activar_pse:
+            tx_pse_actual = st.number_input("Transacciones PSE", min_value=0, value=0, step=50)
+        else:
+            tx_pse_actual = 0
+
+        if activar_breb:
+            tx_breb_actual = st.number_input("Transacciones Bre-B", min_value=0, value=0, step=50)
+        else:
+            tx_breb_actual = 0
+
+        total_transacciones_base = tx_tc_actual + tx_pse_actual + tx_breb_actual
+
+        pct_tc = (tx_tc_actual / total_transacciones_base * 100) if total_transacciones_base > 0 else 0
+        pct_pse = (tx_pse_actual / total_transacciones_base * 100) if total_transacciones_base > 0 else 0
+        pct_breb = (tx_breb_actual / total_transacciones_base * 100) if total_transacciones_base > 0 else 0
+
+    else:
+        total_transacciones_base = st.number_input("Total transacciones", min_value=0, value=4000, step=100)
+
+        if activar_tc:
+            pct_tc = st.number_input("% Tarjetas", min_value=0.0, max_value=100.0, value=30.0, step=1.0)
+        else:
+            pct_tc = 0.0
+
+        if activar_pse:
+            pct_pse = st.number_input("% PSE", min_value=0.0, max_value=100.0, value=70.0, step=1.0)
+        else:
+            pct_pse = 0.0
+
+        if activar_breb:
+            pct_breb = st.number_input("% Bre-B", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
+        else:
+            pct_breb = 0.0
+
+        suma_pct = pct_tc + pct_pse + pct_breb
+
+        if total_transacciones_base > 0 and abs(suma_pct - 100) > 0.01:
+            st.warning(f"Los porcentajes activos suman {suma_pct:.2f}%. Lo ideal es que sumen 100%.")
+
+        tx_tc_actual = int(round(total_transacciones_base * pct_tc / 100))
+        tx_pse_actual = int(round(total_transacciones_base * pct_pse / 100))
+        tx_breb_actual = max(total_transacciones_base - tx_tc_actual - tx_pse_actual, 0) if activar_breb else int(round(total_transacciones_base * pct_breb / 100))
+
+    st.caption(
+        f"Distribución calculada: TC {number_fmt(tx_tc_actual)} | "
+        f"PSE {number_fmt(tx_pse_actual)} | Bre-B {number_fmt(tx_breb_actual)} | "
+        f"Total {number_fmt(tx_tc_actual + tx_pse_actual + tx_breb_actual)}"
+    )
 
     proyecciones_texto = st.text_area(
-        "Proyecciones de transacciones",
+        "Proyecciones de transacciones totales",
         value="2000\n3000",
-        help="Escribe una proyección por línea. También puedes separar con comas."
+        help="Escribe el total de transacciones proyectadas por línea. La app mantendrá la distribución por canal."
     )
 
     st.divider()
-    st.subheader("Pasarela actual")
+    st.subheader("Pasarela actual - Tarjetas")
 
-    costo_fijo_actual = st.number_input("Costo fijo actual por transacción", min_value=0, value=750, step=50)
-    porcentaje_actual = st.number_input("% actual de la pasarela", min_value=0.0, value=2.90, step=0.10)
+    if activar_tc:
+        costo_fijo_actual = st.number_input("Costo fijo actual TC por transacción", min_value=0, value=750, step=50)
+        porcentaje_actual = st.number_input("% actual de la pasarela TC", min_value=0.0, value=2.90, step=0.10)
+    else:
+        costo_fijo_actual = 0
+        porcentaje_actual = 0.0
 
     st.divider()
     st.subheader("Plan PayZen")
 
     plan = st.selectbox("Selecciona el plan", ["PayZen Pro", "PayZen Basic"])
-    porcentaje_banco = st.number_input("% adquirencia banco TC", min_value=0.0, value=1.84, step=0.01)
+
+    if activar_tc:
+        porcentaje_banco = st.number_input("% adquirencia banco TC", min_value=0.0, value=1.84, step=0.01)
+    else:
+        porcentaje_banco = 0.0
 
     st.divider()
-    st.subheader("PSE")
-    activar_pse = st.checkbox("Activar PSE", value=False)
+    st.subheader("Costos PSE")
+
     if activar_pse:
-        tx_pse_actual = st.number_input("Transacciones PSE actuales", min_value=0, value=0, step=50)
         costo_pse_actual = st.number_input("Costo PSE actual por tx", min_value=0, value=700, step=50)
         costo_pse_payzen = st.number_input("Costo PSE PayZen por tx", min_value=0, value=400, step=50)
     else:
-        tx_pse_actual = 0
         costo_pse_actual = 0
         costo_pse_payzen = 0
 
     st.divider()
-    st.subheader("Bre-B")
-    activar_breb = st.checkbox("Activar Bre-B", value=False)
+    st.subheader("Costos Bre-B")
+
     if activar_breb:
-        tx_breb_actual = st.number_input("Transacciones Bre-B actuales", min_value=0, value=0, step=50)
         costo_breb_actual = st.number_input("Costo Bre-B actual por tx", min_value=0, value=700, step=50)
         costo_breb_payzen = st.number_input("Costo Bre-B PayZen por tx", min_value=0, value=600, step=50)
     else:
-        tx_breb_actual = 0
         costo_breb_actual = 0
         costo_breb_payzen = 0
 
@@ -576,7 +647,9 @@ for linea in texto_limpio.splitlines():
 
 proyecciones = list(dict.fromkeys(proyecciones))
 
-escenarios = [("Actual", tx_actuales)]
+total_tx_base = tx_tc_actual + tx_pse_actual + tx_breb_actual
+
+escenarios = [("Actual", total_tx_base)]
 
 for tx in proyecciones:
     escenarios.append((f"Proyección {number_fmt(tx)} tx", tx))
@@ -587,18 +660,54 @@ for tx in proyecciones:
 
 resultados = []
 
-tx_base_canales = max(tx_actuales + tx_pse_actual + tx_breb_actual, 1)
+tx_base_canales = max(tx_tc_actual + tx_pse_actual + tx_breb_actual, 1)
+
+def distribuir_transacciones(total_tx):
+    if total_tx <= 0:
+        return 0, 0, 0
+
+    if modo_transacciones == "Por porcentaje sobre total":
+        tc = int(round(total_tx * pct_tc / 100)) if activar_tc else 0
+        pse = int(round(total_tx * pct_pse / 100)) if activar_pse else 0
+        breb = int(round(total_tx * pct_breb / 100)) if activar_breb else 0
+
+        diferencia = total_tx - (tc + pse + breb)
+
+        if activar_breb:
+            breb += diferencia
+        elif activar_pse:
+            pse += diferencia
+        elif activar_tc:
+            tc += diferencia
+
+        return max(tc, 0), max(pse, 0), max(breb, 0)
+
+    ratio_tc = tx_tc_actual / tx_base_canales
+    ratio_pse = tx_pse_actual / tx_base_canales
+    ratio_breb = tx_breb_actual / tx_base_canales
+
+    tc = int(round(total_tx * ratio_tc)) if activar_tc else 0
+    pse = int(round(total_tx * ratio_pse)) if activar_pse else 0
+    breb = int(round(total_tx * ratio_breb)) if activar_breb else 0
+
+    diferencia = total_tx - (tc + pse + breb)
+
+    if activar_breb:
+        breb += diferencia
+    elif activar_pse:
+        pse += diferencia
+    elif activar_tc:
+        tc += diferencia
+
+    return max(tc, 0), max(pse, 0), max(breb, 0)
 
 for nombre, tx in escenarios:
     if nombre == "Actual":
-        tx_tc_calc = tx_actuales
+        tx_tc_calc = tx_tc_actual
         tx_pse_calc = tx_pse_actual
         tx_breb_calc = tx_breb_actual
     else:
-        factor = tx / max(tx_actuales, 1)
-        tx_tc_calc = tx
-        tx_pse_calc = int(round(tx_pse_actual * factor))
-        tx_breb_calc = int(round(tx_breb_actual * factor))
+        tx_tc_calc, tx_pse_calc, tx_breb_calc = distribuir_transacciones(tx)
 
     canales = calcular_costos_canales(
         ticket_promedio,
@@ -687,7 +796,7 @@ with c2:
     h(
         '<div class="card">'
         f'<div class="label">Transacciones actuales</div>'
-        f'<div class="big-number">{number_fmt(tx_actuales)}</div>'
+        f'<div class="big-number">{number_fmt(total_tx_base)}</div>'
         f'<br><div class="small-text">Escenario base del cliente.</div>'
         '</div>'
     )
