@@ -172,18 +172,26 @@ def calcular_payzen(ticket, tx, plan_mensual, tx_incluidas, porcentaje_banco):
         "total": total
     }
 
-def tarifa_por_rango(tx, r1_hasta, r1_tarifa, r2_hasta, r2_tarifa, r3_tarifa):
+def tarifa_por_rango_breb(tx, r1_ini, r1_fin, r1_tarifa, r2_ini, r2_fin, r2_tarifa, r3_ini, r3_fin, r3_tarifa):
     if tx <= 0:
         return 0
-    if tx <= r1_hasta:
+
+    if r1_ini <= tx <= r1_fin:
         return r1_tarifa
-    if tx <= r2_hasta:
+
+    if r2_ini <= tx <= r2_fin:
         return r2_tarifa
+
+    if r3_ini <= tx <= r3_fin:
+        return r3_tarifa
+
     return r3_tarifa
 
 def calcular_costos_canales(ticket, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_tc, pct_banco_tc,
                             plan_mensual, tx_incluidas, costo_pse_payzen,
-                            breb_r1_hasta, breb_r1_tarifa, breb_r2_hasta, breb_r2_tarifa, breb_r3_tarifa):
+                            breb_r1_ini, breb_r1_fin, breb_r1_tarifa,
+                            breb_r2_ini, breb_r2_fin, breb_r2_tarifa,
+                            breb_r3_ini, breb_r3_fin, breb_r3_tarifa):
     total_tx = tx_tc + tx_pse + tx_breb
 
     # Competencia / pasarela actual:
@@ -206,12 +214,16 @@ def calcular_costos_canales(ticket, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_
     costo_banco_tc = ticket * tx_tc * pct_banco_tc / 100
     costo_payzen_pse = tx_pse * costo_pse_payzen
 
-    tarifa_breb_payzen = tarifa_por_rango(
+    tarifa_breb_payzen = tarifa_por_rango_breb(
         tx_breb,
-        breb_r1_hasta,
+        breb_r1_ini,
+        breb_r1_fin,
         breb_r1_tarifa,
-        breb_r2_hasta,
+        breb_r2_ini,
+        breb_r2_fin,
         breb_r2_tarifa,
+        breb_r3_ini,
+        breb_r3_fin,
         breb_r3_tarifa
     )
     costo_payzen_breb = tx_breb * tarifa_breb_payzen
@@ -526,9 +538,24 @@ with st.sidebar:
         st.session_state["username"] = ""
         st.rerun()
 
-    st.header("⚙️ Parámetros base")
+    st.header("⚙️ Parámetros")
 
     ticket_promedio = st.number_input("Ticket promedio TC", min_value=0, value=60000, step=10000)
+
+    st.divider()
+    st.subheader("Pasarela actual")
+
+    costo_fijo_actual = st.number_input("Costo fijo actual por transacción", min_value=0, value=750, step=50)
+    porcentaje_actual = st.number_input("% actual de la pasarela", min_value=0.0, value=2.90, step=0.10)
+
+    st.caption("La pasarela actual se calcula con el esquema global: fijo + porcentaje, aplicado al total de transacciones.")
+
+    st.divider()
+    st.subheader("Plan PayZen")
+
+    plan = st.selectbox("Selecciona el plan", ["PayZen Pro", "PayZen Basic"])
+
+    porcentaje_banco = st.number_input("% adquirencia banco TC", min_value=0.0, value=1.84, step=0.01)
 
     st.divider()
     st.subheader("Distribución de transacciones")
@@ -536,7 +563,7 @@ with st.sidebar:
     modo_transacciones = st.radio(
         "¿Cómo quieres ingresar las transacciones?",
         ["Por número de transacciones", "Por porcentaje sobre total"],
-        index=0
+        horizontal=False
     )
 
     activar_tc = st.checkbox("Activar Tarjetas crédito / débito", value=True)
@@ -588,8 +615,8 @@ with st.sidebar:
         if total_transacciones_base > 0 and abs(suma_pct - 100) > 0.01:
             st.warning(f"Los porcentajes activos suman {suma_pct:.2f}%. Lo ideal es que sumen 100%.")
 
-        tx_tc_actual = int(round(total_transacciones_base * pct_tc / 100))
-        tx_pse_actual = int(round(total_transacciones_base * pct_pse / 100))
+        tx_tc_actual = int(round(total_transacciones_base * pct_tc / 100)) if activar_tc else 0
+        tx_pse_actual = int(round(total_transacciones_base * pct_pse / 100)) if activar_pse else 0
         tx_breb_actual = max(total_transacciones_base - tx_tc_actual - tx_pse_actual, 0) if activar_breb else int(round(total_transacciones_base * pct_breb / 100))
 
     st.caption(
@@ -605,31 +632,10 @@ with st.sidebar:
     )
 
     st.divider()
-    st.subheader("Pasarela actual - Tarjetas")
-
-    if activar_tc:
-        costo_fijo_actual = st.number_input("Costo fijo actual TC por transacción", min_value=0, value=750, step=50)
-        porcentaje_actual = st.number_input("% actual de la pasarela TC", min_value=0.0, value=2.90, step=0.10)
-    else:
-        costo_fijo_actual = 0
-        porcentaje_actual = 0.0
-
-    st.divider()
-    st.subheader("Plan PayZen")
-
-    plan = st.selectbox("Selecciona el plan", ["PayZen Pro", "PayZen Basic"])
-
-    if activar_tc:
-        porcentaje_banco = st.number_input("% adquirencia banco TC", min_value=0.0, value=1.84, step=0.01)
-    else:
-        porcentaje_banco = 0.0
-
-    st.divider()
     st.subheader("Costo PSE PayZen")
 
     if activar_pse:
         costo_pse_payzen = st.number_input("Costo PSE PayZen por tx", min_value=0, value=400, step=50)
-        st.caption("La pasarela actual se calcula con el esquema global: fijo + porcentaje. No se suma PSE aparte.")
     else:
         costo_pse_payzen = 0
 
@@ -637,20 +643,31 @@ with st.sidebar:
     st.subheader("Rangos Bre-B PayZen")
 
     if activar_breb:
-        st.caption("Estos rangos son editables según la negociación con cada cliente.")
+        st.caption("Rangos editables según la negociación con cada cliente.")
 
-        breb_r1_hasta = st.number_input("Rango 1 hasta tx", min_value=1, value=10000, step=1000)
-        breb_r1_tarifa = st.number_input("Tarifa Bre-B rango 1", min_value=0, value=600, step=50)
+        st.markdown("**Rango 1**")
+        breb_r1_ini = st.number_input("Rango 1 inicial", min_value=0, value=1, step=1000)
+        breb_r1_fin = st.number_input("Rango 1 final", min_value=breb_r1_ini, value=10000, step=1000)
+        breb_r1_tarifa = st.number_input("Valor rango 1", min_value=0, value=600, step=50)
 
-        breb_r2_hasta = st.number_input("Rango 2 hasta tx", min_value=breb_r1_hasta + 1, value=100000, step=5000)
-        breb_r2_tarifa = st.number_input("Tarifa Bre-B rango 2", min_value=0, value=550, step=50)
+        st.markdown("**Rango 2**")
+        breb_r2_ini = st.number_input("Rango 2 inicial", min_value=0, value=10001, step=1000)
+        breb_r2_fin = st.number_input("Rango 2 final", min_value=breb_r2_ini, value=100000, step=5000)
+        breb_r2_tarifa = st.number_input("Valor rango 2", min_value=0, value=550, step=50)
 
-        breb_r3_tarifa = st.number_input("Tarifa Bre-B desde rango 3", min_value=0, value=500, step=50)
+        st.markdown("**Rango 3**")
+        breb_r3_ini = st.number_input("Rango 3 inicial", min_value=0, value=100001, step=10000)
+        breb_r3_fin = st.number_input("Rango 3 final", min_value=breb_r3_ini, value=999999999, step=10000)
+        breb_r3_tarifa = st.number_input("Valor rango 3", min_value=0, value=500, step=50)
     else:
-        breb_r1_hasta = 10000
+        breb_r1_ini = 1
+        breb_r1_fin = 10000
         breb_r1_tarifa = 600
-        breb_r2_hasta = 100000
+        breb_r2_ini = 10001
+        breb_r2_fin = 100000
         breb_r2_tarifa = 550
+        breb_r3_ini = 100001
+        breb_r3_fin = 999999999
         breb_r3_tarifa = 500
 
 # ---------------------------------------------------
@@ -753,10 +770,14 @@ for nombre, tx in escenarios:
         plan_mensual,
         tx_incluidas,
         costo_pse_payzen,
-        breb_r1_hasta,
+        breb_r1_ini,
+        breb_r1_fin,
         breb_r1_tarifa,
-        breb_r2_hasta,
+        breb_r2_ini,
+        breb_r2_fin,
         breb_r2_tarifa,
+        breb_r3_ini,
+        breb_r3_fin,
         breb_r3_tarifa
     )
 
