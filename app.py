@@ -88,7 +88,7 @@ def login_screen():
 
     .stButton button {
         background: #374151 !important;
-        color: white !important;
+        color: #38BDF8 !important;
         border-radius: 12px !important;
         border: 1px solid rgba(255,255,255,0.10) !important;
         font-weight: 700 !important;
