@@ -187,7 +187,7 @@ def tarifa_por_rango_breb(tx, r1_ini, r1_fin, r1_tarifa, r2_ini, r2_fin, r2_tari
 
     return r3_tarifa
 
-def calcular_costos_canales(ticket, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_tc, pct_banco_tc,
+def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_tc, pct_banco_tc,
                             plan_mensual, tx_incluidas, costo_pse_payzen,
                             breb_r1_ini, breb_r1_fin, breb_r1_tarifa,
                             breb_r2_ini, breb_r2_fin, breb_r2_tarifa,
@@ -197,13 +197,19 @@ def calcular_costos_canales(ticket, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_
     # Competencia / pasarela actual:
     # Se aplica el esquema global informado por el cliente: fijo + porcentaje.
     # No se suma un costo PSE ni Bre-B aparte porque usualmente el cliente entrega una tarifa "full".
-    costo_actual_total, costo_actual_por_tx, variable_actual = calcular_pasarela_actual(
-        ticket, total_tx, fijo_tc, pct_actual_tc
+    costo_actual_tc, costo_actual_por_tx, variable_actual = calcular_pasarela_actual(
+        ticket_tc, tx_tc, fijo_tc, pct_actual_tc
     )
 
-    costo_actual_tc, _, _ = calcular_pasarela_actual(ticket, tx_tc, fijo_tc, pct_actual_tc)
-    costo_actual_pse, _, _ = calcular_pasarela_actual(ticket, tx_pse, fijo_tc, pct_actual_tc)
-    costo_actual_breb, _, _ = calcular_pasarela_actual(ticket, tx_breb, fijo_tc, pct_actual_tc)
+    costo_actual_pse, _, _ = calcular_pasarela_actual(
+        ticket_pse, tx_pse, fijo_tc, pct_actual_tc
+    )
+
+    costo_actual_breb, _, _ = calcular_pasarela_actual(
+        ticket_breb, tx_breb, fijo_tc, pct_actual_tc
+    )
+
+    costo_actual_total = costo_actual_tc + costo_actual_pse + costo_actual_breb
 
     # PayZen:
     # Mensualidad + transacciones adicionales sobre el total de canales + adquirencia/costos por canal.
@@ -211,7 +217,7 @@ def calcular_costos_canales(ticket, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_
     tarifa_adicional = tarifa_adicional_por_rango(tx_adicionales)
     costo_tx_adicionales = tx_adicionales * tarifa_adicional
 
-    costo_banco_tc = ticket * tx_tc * pct_banco_tc / 100
+    costo_banco_tc = ticket_tc * tx_tc * pct_banco_tc / 100
     costo_payzen_pse = tx_pse * costo_pse_payzen
 
     tarifa_breb_payzen = tarifa_por_rango_breb(
@@ -540,7 +546,22 @@ with st.sidebar:
 
     st.header("⚙️ Parámetros")
 
-    ticket_promedio = st.number_input("Ticket promedio TC", min_value=0, value=60000, step=10000)
+    modo_ticket = st.radio(
+        "¿Cómo quieres manejar el ticket promedio?",
+        ["Un solo ticket para todos los canales", "Ticket diferente por canal"],
+        horizontal=False
+    )
+
+    if modo_ticket == "Un solo ticket para todos los canales":
+        ticket_promedio = st.number_input("Ticket promedio general", min_value=0, value=60000, step=10000)
+        ticket_tc = ticket_promedio
+        ticket_pse = ticket_promedio
+        ticket_breb = ticket_promedio
+    else:
+        ticket_tc = st.number_input("Ticket promedio TC", min_value=0, value=60000, step=10000)
+        ticket_pse = st.number_input("Ticket promedio PSE", min_value=0, value=40000, step=10000)
+        ticket_breb = st.number_input("Ticket promedio Bre-B", min_value=0, value=40000, step=10000)
+        ticket_promedio = ticket_tc
 
     st.divider()
     st.subheader("Pasarela actual")
@@ -760,7 +781,9 @@ for nombre, tx in escenarios:
         tx_tc_calc, tx_pse_calc, tx_breb_calc = distribuir_transacciones(tx)
 
     canales = calcular_costos_canales(
-        ticket_promedio,
+        ticket_tc,
+        ticket_pse,
+        ticket_breb,
         tx_tc_calc,
         tx_pse_calc,
         tx_breb_calc,
@@ -795,6 +818,9 @@ for nombre, tx in escenarios:
         "TC": tx_tc_calc,
         "PSE": tx_pse_calc,
         "Bre-B": tx_breb_calc,
+        "Ticket TC": ticket_tc,
+        "Ticket PSE": ticket_pse,
+        "Ticket Bre-B": ticket_breb,
         "Pasarela actual": costo_actual_total,
         "Costo actual por tx": canales["costo_actual_por_tx"],
         "Variable actual por tx": canales["variable_actual"],
@@ -1025,7 +1051,7 @@ for row in resultados:
         h(
             '<div class="math-box">'
             '<div class="math-title">Pasarela actual</div>'
-            f'<div class="math-line">{number_fmt(tx)} × ({money(costo_fijo_actual)} + ({percent(porcentaje_actual)} × {money(ticket_promedio)}))</div>'
+            f'<div class="math-line">{number_fmt(tx)} × ({money(costo_fijo_actual)} + ({percent(porcentaje_actual)} × ticket por canal))</div>'
             f'<div class="math-line">{number_fmt(tx)} × ({money(costo_fijo_actual)} + {money(variable_actual)})</div>'
             f'<div class="math-result-orange">= {money(row["Pasarela actual"])}</div>'
             '</div>'
@@ -1169,6 +1195,9 @@ columnas_dinero = [
     "Costo banco",
     "Costo actual por tx",
     "Variable actual por tx",
+    "Ticket TC",
+    "Ticket PSE",
+    "Ticket Bre-B",
     "Costo PSE actual",
     "Costo PSE PayZen",
     "Costo Bre-B actual",
