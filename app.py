@@ -1,8 +1,92 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import hashlib
+import hmac
 
 st.set_page_config(page_title="Simulador PayZen", page_icon="💳", layout="wide")
+
+# ---------------------------------------------------
+# LOGIN
+# ---------------------------------------------------
+
+USERS = {
+    "comercial": {
+        "name": "Comercial PayZen",
+        "password_hash": "4d56be48304187c35b8616564f71980f17b78381ed4c27ff7b957656ca808be2"
+    },
+    "director": {
+        "name": "Director",
+        "password_hash": "ae12bd8f5543f2f2d6844dfa694fdb5570687f347d36c95be20a8ff5efa9c263"
+    }
+}
+
+def check_password(username, password):
+    username = username.strip().lower()
+    if username not in USERS:
+        return False
+
+    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    return hmac.compare_digest(password_hash, USERS[username]["password_hash"])
+
+def login_screen():
+    st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #020617 0%, #0F172A 45%, #082F49 100%);
+        color: white;
+    }
+    [data-testid="stHeader"] {
+        background: rgba(0,0,0,0);
+    }
+    .login-title {
+        font-size: 48px;
+        font-weight: 900;
+        color: white;
+        text-align: center;
+        margin-top: 80px;
+    }
+    .login-subtitle {
+        font-size: 20px;
+        color: #CBD5E1;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="login-title">💳 Calculadora Comercial PayZen</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-subtitle">Acceso interno Globalinvest Advisors</div>', unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 1.2, 1])
+
+    with col2:
+        with st.form("login_form"):
+            username = st.text_input("Usuario")
+            password = st.text_input("Contraseña", type="password")
+            submitted = st.form_submit_button("Ingresar")
+
+            if submitted:
+                if check_password(username, password):
+                    st.session_state["authenticated"] = True
+                    st.session_state["username"] = username.strip().lower()
+                    st.rerun()
+                else:
+                    st.error("Usuario o contraseña incorrecta")
+
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+if "username" not in st.session_state:
+    st.session_state["username"] = ""
+
+if not st.session_state["authenticated"]:
+    login_screen()
+    st.stop()
+
+# ---------------------------------------------------
+# FUNCIONES GENERALES
+# ---------------------------------------------------
 
 def h(code):
     st.markdown(code, unsafe_allow_html=True)
@@ -78,44 +162,6 @@ def grafica_base(fig, titulo_y="COP", altura=560):
     fig.update_xaxes(gridcolor="rgba(255,255,255,0.05)")
     return fig
 
-def grafica_torta(labels, values, colors, title):
-    fig = go.Figure(
-        data=[
-            go.Pie(
-                labels=labels,
-                values=values,
-                hole=0.58,
-                marker=dict(colors=colors),
-                textinfo="label+percent",
-                textfont=dict(color="white", size=15),
-                hovertemplate="<b>%{label}</b><br>%{value:$,.0f}<br>%{percent}<extra></extra>"
-            )
-        ]
-    )
-
-    fig.update_layout(
-        title=dict(
-            text=title,
-            x=0.5,
-            font=dict(color="white", size=22)
-        ),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="white"),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.08,
-            xanchor="center",
-            x=0.5,
-            font=dict(color="white", size=14)
-        ),
-        margin=dict(t=70, b=80, l=20, r=20),
-        height=470
-    )
-
-    return fig
-
 # ---------------------------------------------------
 # ESTILOS
 # ---------------------------------------------------
@@ -164,7 +210,7 @@ section[data-testid="stSidebar"] {
     margin-bottom: 24px;
 }
 
-.card, .card-plan, .card-compare, .card-saving, .chart-card {
+.card, .card-plan, .card-compare, .card-saving, .growth-card {
     border-radius: 24px;
     padding: 26px;
     box-shadow: 0px 8px 30px rgba(0,0,0,0.30);
@@ -191,9 +237,9 @@ section[data-testid="stSidebar"] {
     min-height: 360px;
 }
 
-.chart-card {
-    background: rgba(255,255,255,0.045);
-    min-height: 560px;
+.growth-card {
+    background: rgba(255,255,255,0.06);
+    min-height: 190px;
 }
 
 .label {
@@ -232,6 +278,14 @@ section[data-testid="stSidebar"] {
     font-size: 38px;
     font-weight: 900;
     color: #F97316;
+    margin-top: 16px;
+    line-height: 1.15;
+}
+
+.big-number-green {
+    font-size: 38px;
+    font-weight: 900;
+    color: #22C55E;
     margin-top: 16px;
     line-height: 1.15;
 }
@@ -342,17 +396,18 @@ div[data-testid="stExpander"] details[open] summary {
 """)
 
 # ---------------------------------------------------
-# TÍTULO
-# ---------------------------------------------------
-
-h('<div class="title">💳 Simulador Comercial PayZen Basic / Pro</div>')
-h('<div class="subtitle">Comparativo de costos entre pasarela actual vs PayZen</div>')
-
-# ---------------------------------------------------
 # SIDEBAR
 # ---------------------------------------------------
 
 with st.sidebar:
+    current_user = st.session_state.get("username", "")
+    st.success(f"Sesión activa: {USERS.get(current_user, {'name': 'Usuario'})['name']}")
+
+    if st.button("Cerrar sesión"):
+        st.session_state["authenticated"] = False
+        st.session_state["username"] = ""
+        st.rerun()
+
     st.header("⚙️ Parámetros base")
 
     ticket_promedio = st.number_input("Ticket promedio", min_value=0, value=60000, step=10000)
@@ -453,6 +508,13 @@ for nombre, tx in escenarios:
     })
 
 df = pd.DataFrame(resultados)
+
+# ---------------------------------------------------
+# TÍTULO
+# ---------------------------------------------------
+
+h('<div class="title">💳 Simulador Comercial PayZen Basic / Pro</div>')
+h('<div class="subtitle">Comparativo de costos entre pasarela actual vs PayZen</div>')
 
 # ---------------------------------------------------
 # PARÁMETROS BASE
@@ -631,66 +693,128 @@ fig_line = grafica_base(fig_line, titulo_y="Costo mensual COP", altura=560)
 st.plotly_chart(fig_line, use_container_width=True)
 
 # ---------------------------------------------------
-# TORTAS MENSUAL Y ANUAL
+# SI EL COMERCIO DUPLICA VENTAS
 # ---------------------------------------------------
 
-h('<div class="section-title">🥧 Distribución de costos y ahorro</div>')
+h('<div class="section-title">🚀 Si el comercio duplica sus ventas</div>')
 
-escenario_torta = st.selectbox(
-    "Selecciona el escenario para ver la distribución mensual y anual",
-    df["Escenario"]
+escenario_crecimiento = st.selectbox(
+    "Selecciona el escenario base para proyectar crecimiento",
+    df["Escenario"],
+    key="escenario_crecimiento"
 )
 
-row_torta = df[df["Escenario"] == escenario_torta].iloc[0]
+row_base = df[df["Escenario"] == escenario_crecimiento].iloc[0]
+tx_base = int(row_base["Transacciones"])
 
-actual_mensual = row_torta["Pasarela actual"]
-payzen_mensual = row_torta["PayZen"]
-ahorro_mensual = row_torta["Ahorro mensual"]
+multiplicadores = [1, 2, 4, 8]
+growth_rows = []
 
-actual_anual = actual_mensual * 12
-payzen_anual = payzen_mensual * 12
-ahorro_anual = ahorro_mensual * 12
+for mult in multiplicadores:
+    tx_growth = tx_base * mult
 
-costo_evitado_mensual = max(ahorro_mensual, 0)
-costo_evitado_anual = max(ahorro_anual, 0)
+    costo_actual_total, _, _ = calcular_pasarela_actual(
+        ticket_promedio,
+        tx_growth,
+        costo_fijo_actual,
+        porcentaje_actual
+    )
 
-col_pie_1, col_pie_2 = st.columns(2, gap="large")
+    payzen_growth = calcular_payzen(
+        ticket_promedio,
+        tx_growth,
+        plan_mensual,
+        tx_incluidas,
+        porcentaje_banco
+    )
 
-with col_pie_1:
+    ahorro_growth = costo_actual_total - payzen_growth["total"]
+    ahorro_anual_growth = ahorro_growth * 12
+    ahorro_pct_growth = (ahorro_growth / costo_actual_total * 100) if costo_actual_total > 0 else 0
+
+    growth_rows.append({
+        "Escenario": f"{mult}x",
+        "Transacciones": tx_growth,
+        "Pasarela actual": costo_actual_total,
+        "PayZen": payzen_growth["total"],
+        "Ahorro mensual": ahorro_growth,
+        "Ahorro anual": ahorro_anual_growth,
+        "Ahorro %": ahorro_pct_growth
+    })
+
+df_growth = pd.DataFrame(growth_rows)
+
+col_g1, col_g2, col_g3 = st.columns(3, gap="large")
+
+with col_g1:
     h(
-        '<div class="chart-card">'
-        f'<div class="label">Escenario seleccionado</div>'
-        f'<div class="big-number">{escenario_torta}</div>'
-        f'<div class="small-text">Comparación mensual entre el costo PayZen y el ahorro estimado frente a la pasarela actual.</div>'
+        '<div class="growth-card">'
+        '<div class="label">Escenario base</div>'
+        f'<div class="big-number">{number_fmt(tx_base)} tx</div>'
+        f'<div class="small-text">Se proyecta el crecimiento desde el escenario: <b>{escenario_crecimiento}</b>.</div>'
         '</div>'
     )
 
-    fig_pie_mensual = grafica_torta(
-        labels=["Costo con PayZen", "Ahorro mensual"],
-        values=[payzen_mensual, costo_evitado_mensual],
-        colors=["#06B6D4", "#22C55E"],
-        title="Distribución mensual"
-    )
-
-    st.plotly_chart(fig_pie_mensual, use_container_width=True)
-
-with col_pie_2:
+with col_g2:
+    row_2x = df_growth[df_growth["Escenario"] == "2x"].iloc[0]
     h(
-        '<div class="chart-card">'
-        f'<div class="label">Resumen anual</div>'
-        f'<div class="big-number-white">{money(actual_anual)}</div>'
-        f'<div class="small-text">Costo anual estimado si el cliente continúa con la pasarela actual.</div>'
+        '<div class="growth-card">'
+        '<div class="label">Si duplica ventas</div>'
+        f'<div class="big-number-green">{money(row_2x["Ahorro mensual"])}</div>'
+        '<div class="small-text">Ahorro mensual estimado con el doble de transacciones.</div>'
         '</div>'
     )
 
-    fig_pie_anual = grafica_torta(
-        labels=["Costo anual PayZen", "Ahorro anual"],
-        values=[payzen_anual, costo_evitado_anual],
-        colors=["#06B6D4", "#22C55E"],
-        title="Distribución anual"
+with col_g3:
+    h(
+        '<div class="growth-card">'
+        '<div class="label">Ahorro anual 2x</div>'
+        f'<div class="big-number-green">{money(row_2x["Ahorro anual"])}</div>'
+        f'<div class="small-text">Ahorro porcentual estimado: <b>{percent(row_2x["Ahorro %"])}</b>.</div>'
+        '</div>'
     )
 
-    st.plotly_chart(fig_pie_anual, use_container_width=True)
+fig_growth = go.Figure()
+
+fig_growth.add_trace(go.Scatter(
+    x=df_growth["Transacciones"],
+    y=df_growth["Ahorro mensual"],
+    name="Ahorro mensual",
+    mode="lines+markers",
+    line=dict(width=5, color="#22C55E"),
+    marker=dict(size=13, color="#22C55E"),
+    customdata=df_growth[["Ahorro anual", "Ahorro %", "Pasarela actual", "PayZen"]],
+    hovertemplate=(
+        "<b>%{x:,.0f} transacciones</b><br>"
+        "Pasarela actual: $%{customdata[2]:,.0f}<br>"
+        "PayZen: $%{customdata[3]:,.0f}<br>"
+        "Ahorro mensual: $%{y:,.0f}<br>"
+        "Ahorro anual: $%{customdata[0]:,.0f}<br>"
+        "Ahorro porcentual: %{customdata[1]:.2f}%"
+        "<extra></extra>"
+    )
+))
+
+fig_growth.add_trace(go.Bar(
+    x=df_growth["Transacciones"],
+    y=df_growth["Ahorro anual"],
+    name="Ahorro anual",
+    marker_color="rgba(34,197,94,0.35)",
+    hovertemplate=(
+        "<b>%{x:,.0f} transacciones</b><br>"
+        "Ahorro anual: $%{y:,.0f}"
+        "<extra></extra>"
+    )
+))
+
+fig_growth.update_layout(
+    xaxis_title="Transacciones mensuales",
+    yaxis_title="Ahorro estimado COP",
+    barmode="overlay"
+)
+
+fig_growth = grafica_base(fig_growth, titulo_y="Ahorro estimado COP", altura=570)
+st.plotly_chart(fig_growth, use_container_width=True)
 
 # ---------------------------------------------------
 # DETALLE MATEMÁTICO
