@@ -172,26 +172,49 @@ def calcular_payzen(ticket, tx, plan_mensual, tx_incluidas, porcentaje_banco):
         "total": total
     }
 
+def tarifa_por_rango(tx, r1_hasta, r1_tarifa, r2_hasta, r2_tarifa, r3_tarifa):
+    if tx <= 0:
+        return 0
+    if tx <= r1_hasta:
+        return r1_tarifa
+    if tx <= r2_hasta:
+        return r2_tarifa
+    return r3_tarifa
+
 def calcular_costos_canales(ticket, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_tc, pct_banco_tc,
-                            plan_mensual, tx_incluidas, costo_pse_actual, costo_pse_payzen,
-                            costo_breb_actual, costo_breb_payzen):
+                            plan_mensual, tx_incluidas, costo_pse_payzen,
+                            breb_r1_hasta, breb_r1_tarifa, breb_r2_hasta, breb_r2_tarifa, breb_r3_tarifa):
     total_tx = tx_tc + tx_pse + tx_breb
 
-    costo_actual_tc, costo_actual_por_tx, variable_actual = calcular_pasarela_actual(
-        ticket, tx_tc, fijo_tc, pct_actual_tc
+    # Competencia / pasarela actual:
+    # Se aplica el esquema global informado por el cliente: fijo + porcentaje.
+    # No se suma un costo PSE ni Bre-B aparte porque usualmente el cliente entrega una tarifa "full".
+    costo_actual_total, costo_actual_por_tx, variable_actual = calcular_pasarela_actual(
+        ticket, total_tx, fijo_tc, pct_actual_tc
     )
 
-    costo_actual_pse = tx_pse * costo_pse_actual
-    costo_actual_breb = tx_breb * costo_breb_actual
-    costo_actual_total = costo_actual_tc + costo_actual_pse + costo_actual_breb
+    costo_actual_tc, _, _ = calcular_pasarela_actual(ticket, tx_tc, fijo_tc, pct_actual_tc)
+    costo_actual_pse, _, _ = calcular_pasarela_actual(ticket, tx_pse, fijo_tc, pct_actual_tc)
+    costo_actual_breb, _, _ = calcular_pasarela_actual(ticket, tx_breb, fijo_tc, pct_actual_tc)
 
+    # PayZen:
+    # Mensualidad + transacciones adicionales sobre el total de canales + adquirencia/costos por canal.
     tx_adicionales = max(total_tx - tx_incluidas, 0)
     tarifa_adicional = tarifa_adicional_por_rango(tx_adicionales)
     costo_tx_adicionales = tx_adicionales * tarifa_adicional
 
     costo_banco_tc = ticket * tx_tc * pct_banco_tc / 100
     costo_payzen_pse = tx_pse * costo_pse_payzen
-    costo_payzen_breb = tx_breb * costo_breb_payzen
+
+    tarifa_breb_payzen = tarifa_por_rango(
+        tx_breb,
+        breb_r1_hasta,
+        breb_r1_tarifa,
+        breb_r2_hasta,
+        breb_r2_tarifa,
+        breb_r3_tarifa
+    )
+    costo_payzen_breb = tx_breb * tarifa_breb_payzen
 
     payzen_total = (
         plan_mensual
@@ -214,6 +237,7 @@ def calcular_costos_canales(ticket, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_
         "costo_tx_adicionales": costo_tx_adicionales,
         "costo_banco": costo_banco_tc,
         "costo_payzen_pse": costo_payzen_pse,
+        "tarifa_breb_payzen": tarifa_breb_payzen,
         "costo_payzen_breb": costo_payzen_breb,
         "payzen_total": payzen_total
     }
@@ -601,24 +625,33 @@ with st.sidebar:
         porcentaje_banco = 0.0
 
     st.divider()
-    st.subheader("Costos PSE")
+    st.subheader("Costo PSE PayZen")
 
     if activar_pse:
-        costo_pse_actual = st.number_input("Costo PSE actual por tx", min_value=0, value=700, step=50)
         costo_pse_payzen = st.number_input("Costo PSE PayZen por tx", min_value=0, value=400, step=50)
+        st.caption("La pasarela actual se calcula con el esquema global: fijo + porcentaje. No se suma PSE aparte.")
     else:
-        costo_pse_actual = 0
         costo_pse_payzen = 0
 
     st.divider()
-    st.subheader("Costos Bre-B")
+    st.subheader("Rangos Bre-B PayZen")
 
     if activar_breb:
-        costo_breb_actual = st.number_input("Costo Bre-B actual por tx", min_value=0, value=700, step=50)
-        costo_breb_payzen = st.number_input("Costo Bre-B PayZen por tx", min_value=0, value=600, step=50)
+        st.caption("Estos rangos son editables según la negociación con cada cliente.")
+
+        breb_r1_hasta = st.number_input("Rango 1 hasta tx", min_value=1, value=10000, step=1000)
+        breb_r1_tarifa = st.number_input("Tarifa Bre-B rango 1", min_value=0, value=600, step=50)
+
+        breb_r2_hasta = st.number_input("Rango 2 hasta tx", min_value=breb_r1_hasta + 1, value=100000, step=5000)
+        breb_r2_tarifa = st.number_input("Tarifa Bre-B rango 2", min_value=0, value=550, step=50)
+
+        breb_r3_tarifa = st.number_input("Tarifa Bre-B desde rango 3", min_value=0, value=500, step=50)
     else:
-        costo_breb_actual = 0
-        costo_breb_payzen = 0
+        breb_r1_hasta = 10000
+        breb_r1_tarifa = 600
+        breb_r2_hasta = 100000
+        breb_r2_tarifa = 550
+        breb_r3_tarifa = 500
 
 # ---------------------------------------------------
 # PLANES
@@ -719,10 +752,12 @@ for nombre, tx in escenarios:
         porcentaje_banco,
         plan_mensual,
         tx_incluidas,
-        costo_pse_actual,
         costo_pse_payzen,
-        costo_breb_actual,
-        costo_breb_payzen
+        breb_r1_hasta,
+        breb_r1_tarifa,
+        breb_r2_hasta,
+        breb_r2_tarifa,
+        breb_r3_tarifa
     )
 
     costo_actual_total = canales["costo_actual_total"]
@@ -754,7 +789,8 @@ for nombre, tx in escenarios:
         "Costo PSE actual": canales["costo_actual_pse"],
         "Costo PSE PayZen": canales["costo_payzen_pse"],
         "Costo Bre-B actual": canales["costo_actual_breb"],
-        "Costo Bre-B PayZen": canales["costo_payzen_breb"]
+        "Costo Bre-B PayZen": canales["costo_payzen_breb"],
+        "Tarifa Bre-B PayZen": canales["tarifa_breb_payzen"]
     })
 
 df = pd.DataFrame(resultados)
@@ -1115,7 +1151,8 @@ columnas_dinero = [
     "Costo PSE actual",
     "Costo PSE PayZen",
     "Costo Bre-B actual",
-    "Costo Bre-B PayZen"
+    "Costo Bre-B PayZen",
+    "Tarifa Bre-B PayZen"
 ]
 
 for col in columnas_dinero:
