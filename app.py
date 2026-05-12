@@ -1130,8 +1130,35 @@ Esta proyección comercial se realiza con base en la información suministrada p
 
 def generar_pdf_resumen(df_pdf):
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=28, bottomMargin=24)
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=28,
+        bottomMargin=24
+    )
     styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        "CustomTitle",
+        parent=styles["Title"],
+        fontSize=20,
+        leading=24,
+        alignment=1,
+        textColor=colors.black,
+        spaceAfter=12
+    )
+
+    section_style = ParagraphStyle(
+        "SectionTitle",
+        parent=styles["Heading2"],
+        fontSize=12,
+        leading=14,
+        textColor=colors.HexColor("#0F172A"),
+        spaceBefore=8,
+        spaceAfter=6
+    )
 
     small_style = ParagraphStyle(
         "SmallDisclaimer",
@@ -1139,6 +1166,23 @@ def generar_pdf_resumen(df_pdf):
         fontSize=7,
         leading=9,
         textColor=colors.HexColor("#4B5563")
+    )
+
+    cell_style = ParagraphStyle(
+        "CellStyle",
+        parent=styles["BodyText"],
+        fontSize=8,
+        leading=10,
+        textColor=colors.black
+    )
+
+    header_style = ParagraphStyle(
+        "HeaderStyle",
+        parent=styles["BodyText"],
+        fontSize=8,
+        leading=10,
+        textColor=colors.white,
+        fontName="Helvetica-Bold"
     )
 
     story = []
@@ -1149,54 +1193,107 @@ def generar_pdf_resumen(df_pdf):
         pass
 
     story.append(Spacer(1, 8))
-    story.append(Paragraph("Resumen Comercial PayZen", styles["Title"]))
-    story.append(Spacer(1, 12))
+    story.append(Paragraph("Resumen Comercial PayZen", title_style))
+    story.append(Spacer(1, 8))
 
     first = df_pdf.iloc[0]
-    resumen_data = [
-        ["Concepto", "Valor"],
-        ["Plan seleccionado", plan],
-        ["Total transacciones", number_fmt(first["Transacciones"])],
-        ["Costo actual", money(first["Pasarela actual"])],
-        ["Costo PayZen", money(first["PayZen"])],
-        ["Ahorro mensual", money(first["Ahorro mensual"])],
-        ["Ahorro anual", money(first["Ahorro anual"])],
-        ["Ahorro porcentual", percent(first["Ahorro %"])],
+
+    costo_actual_tarjetas = first["Pasarela actual"] - first.get("Costo PSE actual", 0) - first.get("Costo Bre-B actual", 0)
+    costo_payzen_plan_adicionales = plan_mensual + first["Costo adicionales"]
+    costo_payzen_tarjetas = first.get("Costo banco", 0)
+    costo_payzen_pse = first.get("Costo PSE PayZen", 0)
+    costo_payzen_breb = first.get("Costo Bre-B PayZen", 0)
+
+    # ---------------------------------------------------
+    # TABLA COMPARATIVA PRINCIPAL
+    # ---------------------------------------------------
+
+    story.append(Paragraph("Comparativo de costos mensuales", section_style))
+
+    comparativo_data = [
+        [
+            Paragraph("Concepto", header_style),
+            Paragraph("Pasarela actual", header_style),
+            Paragraph(f"PayZen - {plan}", header_style),
+        ],
+        [
+            Paragraph("Total transacciones", cell_style),
+            Paragraph(number_fmt(first["Transacciones"]), cell_style),
+            Paragraph(number_fmt(first["Transacciones"]), cell_style),
+        ],
+        [
+            Paragraph("Tarjetas crédito / débito", cell_style),
+            Paragraph(money(costo_actual_tarjetas), cell_style),
+            Paragraph(money(costo_payzen_tarjetas), cell_style),
+        ],
+        [
+            Paragraph("PSE", cell_style),
+            Paragraph(money(first.get("Costo PSE actual", 0)), cell_style),
+            Paragraph(money(costo_payzen_pse), cell_style),
+        ],
+        [
+            Paragraph("Bre-B", cell_style),
+            Paragraph(money(first.get("Costo Bre-B actual", 0)), cell_style),
+            Paragraph(money(costo_payzen_breb), cell_style),
+        ],
+        [
+            Paragraph("Plan + transacciones adicionales", cell_style),
+            Paragraph("No aplica", cell_style),
+            Paragraph(money(costo_payzen_plan_adicionales), cell_style),
+        ],
+        [
+            Paragraph("Costo mensual total", header_style),
+            Paragraph(money(first["Pasarela actual"]), header_style),
+            Paragraph(money(first["PayZen"]), header_style),
+        ],
     ]
 
-    resumen_table = Table(resumen_data, colWidths=[2.4*inch, 3.5*inch])
-    resumen_table.setStyle(TableStyle([
+    comparativo_table = Table(comparativo_data, colWidths=[2.3*inch, 1.8*inch, 2.1*inch])
+    comparativo_table.setStyle(TableStyle([
         ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#2563EB")),
+        ("BACKGROUND", (0,-1), (-1,-1), colors.HexColor("#0F172A")),
         ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+        ("TEXTCOLOR", (0,-1), (-1,-1), colors.white),
         ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+        ("FONTNAME", (0,-1), (-1,-1), "Helvetica-Bold"),
         ("GRID", (0,0), (-1,-1), 0.5, colors.HexColor("#94A3B8")),
-        ("FONTSIZE", (0,0), (-1,-1), 9),
+        ("FONTSIZE", (0,0), (-1,-1), 8),
         ("BOTTOMPADDING", (0,0), (-1,0), 8),
+        ("BOTTOMPADDING", (0,-1), (-1,-1), 8),
+        ("TOPPADDING", (0,0), (-1,-1), 6),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
     ]))
-    story.append(resumen_table)
+    story.append(comparativo_table)
 
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 14))
 
-    canales_data = [
-        ["Canal", "Transacciones", "Costo actual", "Costo PayZen"],
-        ["Tarjetas", number_fmt(first.get("TC", 0)), money(first["Pasarela actual"] - first.get("Costo PSE actual", 0) - first.get("Costo Bre-B actual", 0)), money(first["Costo banco"])],
-        ["PSE", number_fmt(first.get("PSE", 0)), money(first.get("Costo PSE actual", 0)), money(first.get("Costo PSE PayZen", 0))],
-        ["Bre-B", number_fmt(first.get("Bre-B", 0)), money(first.get("Costo Bre-B actual", 0)), money(first.get("Costo Bre-B PayZen", 0))],
-        ["Plan + tx adicionales", "", "", money(plan_mensual + first["Costo adicionales"])],
+    # ---------------------------------------------------
+    # TABLA DE AHORRO
+    # ---------------------------------------------------
+
+    story.append(Paragraph("Ahorro estimado con PayZen", section_style))
+
+    ahorro_data = [
+        [Paragraph("Indicador", header_style), Paragraph("Resultado", header_style)],
+        [Paragraph("Ahorro mensual estimado", cell_style), Paragraph(money(first["Ahorro mensual"]), cell_style)],
+        [Paragraph("Ahorro anual estimado", cell_style), Paragraph(money(first["Ahorro anual"]), cell_style)],
+        [Paragraph("Ahorro porcentual", cell_style), Paragraph(percent(first["Ahorro %"]), cell_style)],
+        [Paragraph("Costo PayZen frente al costo actual", cell_style), Paragraph(percent(first["PayZen %"]), cell_style)],
     ]
 
-    canales_table = Table(canales_data, colWidths=[1.6*inch, 1.3*inch, 1.5*inch, 1.5*inch])
-    canales_table.setStyle(TableStyle([
-        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#0F172A")),
+    ahorro_table = Table(ahorro_data, colWidths=[3.0*inch, 3.2*inch])
+    ahorro_table.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#16A34A")),
         ("TEXTCOLOR", (0,0), (-1,0), colors.white),
         ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
         ("GRID", (0,0), (-1,-1), 0.5, colors.HexColor("#94A3B8")),
         ("FONTSIZE", (0,0), (-1,-1), 8),
-        ("BOTTOMPADDING", (0,0), (-1,0), 7),
+        ("TOPPADDING", (0,0), (-1,-1), 6),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
     ]))
-    story.append(canales_table)
+    story.append(ahorro_table)
 
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 14))
     story.append(Paragraph(DISCLAIMER, small_style))
 
     doc.build(story)
