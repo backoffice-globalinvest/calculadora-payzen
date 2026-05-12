@@ -1133,215 +1133,168 @@ def generar_pdf_resumen(df_pdf):
     doc = SimpleDocTemplate(
         buffer,
         pagesize=letter,
-        rightMargin=28,
-        leftMargin=28,
-        topMargin=24,
-        bottomMargin=22
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=28,
+        bottomMargin=24
     )
-
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
         "CustomTitle",
         parent=styles["Title"],
-        fontSize=22,
-        leading=26,
+        fontSize=20,
+        leading=24,
         alignment=1,
         textColor=colors.black,
-        spaceAfter=14
+        spaceAfter=12
     )
 
-    blue_header_style = ParagraphStyle(
-        "BlueHeaderStyle",
-        parent=styles["BodyText"],
-        fontSize=11,
-        leading=13,
-        alignment=1,
-        textColor=colors.white,
-        fontName="Helvetica-Bold"
+    section_style = ParagraphStyle(
+        "SectionTitle",
+        parent=styles["Heading2"],
+        fontSize=12,
+        leading=14,
+        textColor=colors.HexColor("#0F172A"),
+        spaceBefore=8,
+        spaceAfter=6
     )
 
-    green_header_style = ParagraphStyle(
-        "GreenHeaderStyle",
+    small_style = ParagraphStyle(
+        "SmallDisclaimer",
         parent=styles["BodyText"],
-        fontSize=11,
-        leading=13,
-        alignment=1,
-        textColor=colors.white,
-        fontName="Helvetica-Bold"
-    )
-
-    column_header_style = ParagraphStyle(
-        "ColumnHeaderStyle",
-        parent=styles["BodyText"],
-        fontSize=8.5,
-        leading=10,
-        alignment=1,
-        textColor=colors.white,
-        fontName="Helvetica-Bold"
+        fontSize=7,
+        leading=9,
+        textColor=colors.HexColor("#4B5563")
     )
 
     cell_style = ParagraphStyle(
-        "CenteredCellStyle",
+        "CellStyle",
         parent=styles["BodyText"],
-        fontSize=8.5,
+        fontSize=8,
         leading=10,
-        alignment=1,
         textColor=colors.black
     )
 
-    bold_cell_style = ParagraphStyle(
-        "CenteredBoldCellStyle",
+    header_style = ParagraphStyle(
+        "HeaderStyle",
         parent=styles["BodyText"],
-        fontSize=8.8,
-        leading=10.5,
-        alignment=1,
-        textColor=colors.black,
+        fontSize=8,
+        leading=10,
+        textColor=colors.white,
         fontName="Helvetica-Bold"
-    )
-
-    disclaimer_style = ParagraphStyle(
-        "DisclaimerStyle",
-        parent=styles["BodyText"],
-        fontSize=7,
-        leading=8.5,
-        alignment=1,
-        textColor=colors.HexColor("#0F172A")
     )
 
     story = []
 
     try:
-        logo = Image("Logo_Globalinvest_PayZen.png", width=2.55 * inch, height=0.90 * inch)
-        logo.hAlign = "CENTER"
-        story.append(logo)
+        story.append(Image("Logo_Globalinvest_PayZen.png", width=2.6*inch, height=0.9*inch))
     except Exception:
         pass
 
     story.append(Spacer(1, 8))
     story.append(Paragraph("Resumen Comercial PayZen", title_style))
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 8))
 
     first = df_pdf.iloc[0]
 
+    costo_actual_tarjetas = first["Pasarela actual"] - first.get("Costo PSE actual", 0) - first.get("Costo Bre-B actual", 0)
     costo_payzen_plan_adicionales = plan_mensual + first["Costo adicionales"]
-    costo_payzen_tc = first.get("Costo banco", 0)
+    costo_payzen_tarjetas = first.get("Costo banco", 0)
     costo_payzen_pse = first.get("Costo PSE PayZen", 0)
     costo_payzen_breb = first.get("Costo Bre-B PayZen", 0)
-    costo_total_adquirencia = costo_payzen_tc + costo_payzen_pse + costo_payzen_breb
-    costo_total_payzen = costo_payzen_plan_adicionales + costo_total_adquirencia
 
-    ahorro_mensual = first["Pasarela actual"] - costo_total_payzen
-    ahorro_anual = ahorro_mensual * 12
-    ahorro_pct = (ahorro_mensual / first["Pasarela actual"] * 100) if first["Pasarela actual"] > 0 else 0
+    # ---------------------------------------------------
+    # TABLA COMPARATIVA PRINCIPAL
+    # ---------------------------------------------------
+
+    story.append(Paragraph("Comparativo de costos mensuales", section_style))
 
     comparativo_data = [
-        [Paragraph("Comparativo pasarela actual VS PayZen", blue_header_style), "", ""],
         [
-            Paragraph("Concepto", column_header_style),
-            Paragraph("Pasarela actual", column_header_style),
-            Paragraph("PayZen", column_header_style),
+            Paragraph("Concepto", header_style),
+            Paragraph("Pasarela actual", header_style),
+            Paragraph(f"PayZen - {plan}", header_style),
         ],
         [
-            Paragraph("Plan escogido", cell_style),
-            Paragraph(f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}", cell_style),
-            Paragraph(plan, cell_style),
-        ],
-        [
-            Paragraph("Total transacciones ** Proyectado", cell_style),
+            Paragraph("Total transacciones", cell_style),
             Paragraph(number_fmt(first["Transacciones"]), cell_style),
             Paragraph(number_fmt(first["Transacciones"]), cell_style),
         ],
         [
-            Paragraph("Transacción adicional", cell_style),
-            Paragraph("N/A", cell_style),
-            Paragraph(number_fmt(first["Tx adicionales"]), cell_style),
+            Paragraph("Tarjetas crédito / débito", cell_style),
+            Paragraph(money(costo_actual_tarjetas), cell_style),
+            Paragraph(money(costo_payzen_tarjetas), cell_style),
         ],
         [
-            Paragraph("Costo de la transacción adicional", cell_style),
-            Paragraph("N/A", cell_style),
-            Paragraph(money(first["Tarifa adicional"]), cell_style),
+            Paragraph("PSE", cell_style),
+            Paragraph(money(first.get("Costo PSE actual", 0)), cell_style),
+            Paragraph(money(costo_payzen_pse), cell_style),
         ],
         [
-            Paragraph("Costo de la mensualidad", cell_style),
-            Paragraph("N/A", cell_style),
-            Paragraph(money(plan_mensual), cell_style),
+            Paragraph("Bre-B", cell_style),
+            Paragraph(money(first.get("Costo Bre-B actual", 0)), cell_style),
+            Paragraph(money(costo_payzen_breb), cell_style),
         ],
         [
-            Paragraph("Costo total", bold_cell_style),
-            Paragraph(money(first["Pasarela actual"]), bold_cell_style),
-            Paragraph(money(costo_payzen_plan_adicionales), bold_cell_style),
+            Paragraph("Plan + transacciones adicionales", cell_style),
+            Paragraph("No aplica", cell_style),
+            Paragraph(money(costo_payzen_plan_adicionales), cell_style),
+        ],
+        [
+            Paragraph("Costo mensual total", header_style),
+            Paragraph(money(first["Pasarela actual"]), header_style),
+            Paragraph(money(first["PayZen"]), header_style),
         ],
     ]
 
-    comparativo_table = Table(comparativo_data, colWidths=[3.25 * inch, 1.55 * inch, 1.55 * inch])
+    comparativo_table = Table(comparativo_data, colWidths=[2.3*inch, 1.8*inch, 2.1*inch])
     comparativo_table.setStyle(TableStyle([
-        ("SPAN", (0, 0), (-1, 0)),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#005BEA")),
-        ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#2563EB")),
-        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#EAF3FF")),
-        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#8EA4C2")),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("FONTNAME", (0, 0), (-1, 1), "Helvetica-Bold"),
-        ("TOPPADDING", (0, 0), (-1, -1), 7),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#2563EB")),
+        ("BACKGROUND", (0,-1), (-1,-1), colors.HexColor("#0F172A")),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+        ("TEXTCOLOR", (0,-1), (-1,-1), colors.white),
+        ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+        ("FONTNAME", (0,-1), (-1,-1), "Helvetica-Bold"),
+        ("GRID", (0,0), (-1,-1), 0.5, colors.HexColor("#94A3B8")),
+        ("FONTSIZE", (0,0), (-1,-1), 8),
+        ("BOTTOMPADDING", (0,0), (-1,0), 8),
+        ("BOTTOMPADDING", (0,-1), (-1,-1), 8),
+        ("TOPPADDING", (0,0), (-1,-1), 6),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
     ]))
     story.append(comparativo_table)
-    story.append(Spacer(1, 18))
 
-    adquirencia_data = [
-        [Paragraph("Costos mensuales de adquirencia (Negociación con el banco)", blue_header_style), ""],
-        [
-            Paragraph("Método de pago", column_header_style),
-            Paragraph("Costo total mensual", column_header_style),
-        ],
-        [Paragraph("Tarjetas crédito / débito (TC)", cell_style), Paragraph(money(costo_payzen_tc), cell_style)],
-        [Paragraph("PSE", cell_style), Paragraph(money(costo_payzen_pse), cell_style)],
-        [Paragraph("Bre-B", cell_style), Paragraph(money(costo_payzen_breb), cell_style)],
-        [Paragraph("Costo total mensual de adquirencia", bold_cell_style), Paragraph(money(costo_total_adquirencia), bold_cell_style)],
-    ]
+    story.append(Spacer(1, 14))
 
-    adquirencia_table = Table(adquirencia_data, colWidths=[3.25 * inch, 3.10 * inch])
-    adquirencia_table.setStyle(TableStyle([
-        ("SPAN", (0, 0), (-1, 0)),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#005BEA")),
-        ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#2563EB")),
-        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#EAF3FF")),
-        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#8EA4C2")),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("FONTNAME", (0, 0), (-1, 1), "Helvetica-Bold"),
-        ("TOPPADDING", (0, 0), (-1, -1), 7),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-    ]))
-    story.append(adquirencia_table)
-    story.append(Spacer(1, 18))
+    # ---------------------------------------------------
+    # TABLA DE AHORRO
+    # ---------------------------------------------------
+
+    story.append(Paragraph("Ahorro estimado con PayZen", section_style))
 
     ahorro_data = [
-        [Paragraph("Ahorro estimado con PayZen", green_header_style), ""],
-        [Paragraph("Indicador", column_header_style), Paragraph("Resultado", column_header_style)],
-        [Paragraph("Ahorro mensual estimado", cell_style), Paragraph(money(ahorro_mensual), cell_style)],
-        [Paragraph("Ahorro anual estimado", cell_style), Paragraph(money(ahorro_anual), cell_style)],
-        [Paragraph("Ahorro porcentual", cell_style), Paragraph(percent(ahorro_pct), cell_style)],
+        [Paragraph("Indicador", header_style), Paragraph("Resultado", header_style)],
+        [Paragraph("Ahorro mensual estimado", cell_style), Paragraph(money(first["Ahorro mensual"]), cell_style)],
+        [Paragraph("Ahorro anual estimado", cell_style), Paragraph(money(first["Ahorro anual"]), cell_style)],
+        [Paragraph("Ahorro porcentual", cell_style), Paragraph(percent(first["Ahorro %"]), cell_style)],
+        [Paragraph("Costo PayZen frente al costo actual", cell_style), Paragraph(percent(first["PayZen %"]), cell_style)],
     ]
 
-    ahorro_table = Table(ahorro_data, colWidths=[3.25 * inch, 3.10 * inch])
+    ahorro_table = Table(ahorro_data, colWidths=[3.0*inch, 3.2*inch])
     ahorro_table.setStyle(TableStyle([
-        ("SPAN", (0, 0), (-1, 0)),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#058A3C")),
-        ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#16A34A")),
-        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#8EA4C2")),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("FONTNAME", (0, 0), (-1, 1), "Helvetica-Bold"),
-        ("TOPPADDING", (0, 0), (-1, -1), 7),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#16A34A")),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+        ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+        ("GRID", (0,0), (-1,-1), 0.5, colors.HexColor("#94A3B8")),
+        ("FONTSIZE", (0,0), (-1,-1), 8),
+        ("TOPPADDING", (0,0), (-1,-1), 6),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
     ]))
     story.append(ahorro_table)
-    story.append(Spacer(1, 18))
 
-    story.append(Paragraph(DISCLAIMER, disclaimer_style))
+    story.append(Spacer(1, 14))
+    story.append(Paragraph(DISCLAIMER, small_style))
 
     doc.build(story)
     pdf = buffer.getvalue()
