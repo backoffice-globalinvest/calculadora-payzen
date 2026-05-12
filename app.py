@@ -4,13 +4,16 @@ import plotly.graph_objects as go
 import hashlib
 import hmac
 from io import BytesIO
-from reportlab.lib.pagesizes import letter
+
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
+
 st.set_page_config(page_title="Simulador PayZen", page_icon="💳", layout="wide")
+
 
 # ---------------------------------------------------
 # LOGIN
@@ -27,6 +30,7 @@ USERS = {
     }
 }
 
+
 def check_password(username, password):
     username = username.strip().lower()
     if username not in USERS:
@@ -34,6 +38,7 @@ def check_password(username, password):
 
     password_hash = hashlib.sha256(password.encode()).hexdigest()
     return hmac.compare_digest(password_hash, USERS[username]["password_hash"])
+
 
 def login_screen():
     st.markdown("""
@@ -58,12 +63,11 @@ def login_screen():
         text-align: center;
         margin-bottom: 30px;
     }
-.stTextInput label {
+    .stTextInput label {
         color: #38BDF8 !important;
         font-size: 16px !important;
         font-weight: 700 !important;
     }
-
     .stFormSubmitButton button {
         background: #374151 !important;
         color: #38BDF8 !important;
@@ -73,13 +77,11 @@ def login_screen():
         padding: 10px 28px !important;
         min-width: 120px !important;
     }
-
     .stFormSubmitButton button:hover {
         background: #4B5563 !important;
         color: #38BDF8 !important;
         border: 1px solid rgba(56,189,248,0.90) !important;
     }
-
     .stFormSubmitButton button p {
         color: #38BDF8 !important;
         font-weight: 800 !important;
@@ -106,6 +108,7 @@ def login_screen():
                 else:
                     st.error("Usuario o contraseña incorrecta")
 
+
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 
@@ -116,123 +119,127 @@ if not st.session_state["authenticated"]:
     login_screen()
     st.stop()
 
+
 # ---------------------------------------------------
 # FUNCIONES GENERALES
 # ---------------------------------------------------
 
-def h(code):
-    st.markdown(code, unsafe_allow_html=True)
+def h(code_html):
+    st.markdown(code_html, unsafe_allow_html=True)
+
 
 def money(value):
-    return f"${value:,.0f}".replace(",", ".")
+    try:
+        return f"${float(value):,.0f}".replace(",", ".")
+    except Exception:
+        return "$0"
+
 
 def number_fmt(value):
-    return f"{value:,.0f}".replace(",", ".")
+    try:
+        return f"{float(value):,.0f}".replace(",", ".")
+    except Exception:
+        return "0"
+
 
 def percent(value):
-    return f"{value:.2f}%"
+    try:
+        return f"{float(value):.2f}%"
+    except Exception:
+        return "0.00%"
+
 
 def clean_number(value):
     try:
         return int(str(value).replace(".", "").replace(",", "").strip())
-    except:
+    except Exception:
         return None
 
-def tarifa_adicional_por_plan(tx_adicionales, tarifa_adicional_plan):
-    if tx_adicionales <= 0:
-        return 0
-    return tarifa_adicional_plan
 
-def calcular_pasarela_actual(ticket, tx, fijo, porcentaje):
-    variable_unitaria = ticket * porcentaje / 100
-    costo_por_tx = fijo + variable_unitaria
-    total = tx * costo_por_tx
-    return total, costo_por_tx, variable_unitaria
+PAYZEN_PLANS = {
+    "PayZen Basic 100 tx": {
+        "mensualidad": 126500,
+        "tx_incluidas": 100,
+        "creacion_tienda": 319000,
+        "tx_adicional": 505
+    },
+    "PayZen Pro 500 tx": {
+        "mensualidad": 324500,
+        "tx_incluidas": 500,
+        "creacion_tienda": 755500,
+        "tx_adicional": 440
+    },
+    "PayZen Pro 5.000 tx": {
+        "mensualidad": 1925000,
+        "tx_incluidas": 5000,
+        "creacion_tienda": 755500,
+        "tx_adicional": 385
+    },
+    "PayZen Pro 10.000 tx": {
+        "mensualidad": 3492500,
+        "tx_incluidas": 10000,
+        "creacion_tienda": 755500,
+        "tx_adicional": 349
+    },
+    "PayZen Pro 15.000 tx": {
+        "mensualidad": 3445000,
+        "tx_incluidas": 15000,
+        "creacion_tienda": 755500,
+        "tx_adicional": 297
+    },
+    "PayZen Pro 25.000 tx": {
+        "mensualidad": 7232500,
+        "tx_incluidas": 25000,
+        "creacion_tienda": 755500,
+        "tx_adicional": 289
+    },
+    "PayZen Pro 50.000 tx": {
+        "mensualidad": 14179000,
+        "tx_incluidas": 50000,
+        "creacion_tienda": 755500,
+        "tx_adicional": 284
+    },
+    "PayZen Pro 100.000 tx": {
+        "mensualidad": 27225000,
+        "tx_incluidas": 100000,
+        "creacion_tienda": 755500,
+        "tx_adicional": 272
+    },
+    "PayZen Pro 200.000 tx": {
+        "mensualidad": 52800000,
+        "tx_incluidas": 200000,
+        "creacion_tienda": 755500,
+        "tx_adicional": 264
+    },
+}
 
-def calcular_payzen(ticket, tx, plan_mensual, tx_incluidas, porcentaje_banco, tarifa_adicional_plan):
-    tx_adicionales = max(tx - tx_incluidas, 0)
-    tarifa_adicional = tarifa_adicional_por_plan(tx_adicionales, tarifa_adicional_plan)
-    costo_tx_adicionales = tx_adicionales * tarifa_adicional
-    costo_banco = ticket * tx * porcentaje_banco / 100
-    total = plan_mensual + costo_tx_adicionales + costo_banco
 
-    return {
-        "tx_adicionales": tx_adicionales,
-        "tarifa_adicional": tarifa_adicional,
-        "costo_tx_adicionales": costo_tx_adicionales,
-        "costo_banco": costo_banco,
-        "total": total
-    }
+def calcular_pasarela_actual(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_actual, pct_actual):
+    costo_tc = tx_tc * (fijo_actual + (ticket_tc * pct_actual / 100))
+    costo_pse = tx_pse * (fijo_actual + (ticket_pse * pct_actual / 100))
+    costo_breb = tx_breb * (fijo_actual + (ticket_breb * pct_actual / 100))
+    total = costo_tc + costo_pse + costo_breb
+    return costo_tc, costo_pse, costo_breb, total
 
-def tarifa_por_rango_breb(tx, r1_ini, r1_fin, r1_tarifa, r2_ini, r2_fin, r2_tarifa, r3_ini, r3_fin, r3_tarifa):
-    if tx <= 0:
-        return 0
 
-    if r1_ini <= tx <= r1_fin:
-        return r1_tarifa
-
-    if r2_ini <= tx <= r2_fin:
-        return r2_tarifa
-
-    if r3_ini <= tx <= r3_fin:
-        return r3_tarifa
-
-    return r3_tarifa
-
-def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_tc, pct_banco_tc,
-                            plan_mensual, tx_incluidas, tarifa_adicional_plan, costo_pse_payzen,
-                            breb_r1_ini, breb_r1_fin, breb_r1_tarifa,
-                            breb_r2_ini, breb_r2_fin, breb_r2_tarifa,
-                            breb_r3_ini, breb_r3_fin, breb_r3_tarifa):
+def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_actual, pct_actual,
+                            pct_banco_tc, plan_mensual, tx_incluidas, tx_adicional_unitario,
+                            costo_pse_payzen, costo_breb_payzen):
     total_tx = tx_tc + tx_pse + tx_breb
 
-    # Competencia / pasarela actual:
-    # Se aplica el esquema global informado por el cliente: fijo + porcentaje.
-    # No se suma un costo PSE ni Bre-B aparte porque usualmente el cliente entrega una tarifa "full".
-    costo_actual_tc, costo_actual_por_tx, variable_actual = calcular_pasarela_actual(
-        ticket_tc, tx_tc, fijo_tc, pct_actual_tc
+    costo_actual_tc, costo_actual_pse, costo_actual_breb, costo_actual_total = calcular_pasarela_actual(
+        ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_actual, pct_actual
     )
 
-    costo_actual_pse, _, _ = calcular_pasarela_actual(
-        ticket_pse, tx_pse, fijo_tc, pct_actual_tc
-    )
-
-    costo_actual_breb, _, _ = calcular_pasarela_actual(
-        ticket_breb, tx_breb, fijo_tc, pct_actual_tc
-    )
-
-    costo_actual_total = costo_actual_tc + costo_actual_pse + costo_actual_breb
-
-    # PayZen:
-    # Mensualidad + transacciones adicionales sobre el total de canales + adquirencia/costos por canal.
     tx_adicionales = max(total_tx - tx_incluidas, 0)
-    tarifa_adicional = tarifa_adicional_por_plan(tx_adicionales, tarifa_adicional_plan)
-    costo_tx_adicionales = tx_adicionales * tarifa_adicional
-
+    costo_tx_adicionales = tx_adicionales * tx_adicional_unitario
     costo_banco_tc = ticket_tc * tx_tc * pct_banco_tc / 100
     costo_payzen_pse = tx_pse * costo_pse_payzen
+    costo_payzen_breb = tx_breb * costo_breb_payzen
 
-    tarifa_breb_payzen = tarifa_por_rango_breb(
-        tx_breb,
-        breb_r1_ini,
-        breb_r1_fin,
-        breb_r1_tarifa,
-        breb_r2_ini,
-        breb_r2_fin,
-        breb_r2_tarifa,
-        breb_r3_ini,
-        breb_r3_fin,
-        breb_r3_tarifa
-    )
-    costo_payzen_breb = tx_breb * tarifa_breb_payzen
-
-    payzen_total = (
-        plan_mensual
-        + costo_tx_adicionales
-        + costo_banco_tc
-        + costo_payzen_pse
-        + costo_payzen_breb
-    )
+    total_adquirencia = costo_banco_tc + costo_payzen_pse + costo_payzen_breb
+    total_payzen_gateway = plan_mensual + costo_tx_adicionales
+    payzen_total = total_payzen_gateway + total_adquirencia
 
     return {
         "total_tx": total_tx,
@@ -240,17 +247,18 @@ def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, t
         "costo_actual_tc": costo_actual_tc,
         "costo_actual_pse": costo_actual_pse,
         "costo_actual_breb": costo_actual_breb,
-        "costo_actual_por_tx": costo_actual_por_tx,
-        "variable_actual": variable_actual,
         "tx_adicionales": tx_adicionales,
-        "tarifa_adicional": tarifa_adicional,
+        "tarifa_adicional": tx_adicional_unitario,
         "costo_tx_adicionales": costo_tx_adicionales,
+        "plan_mensual": plan_mensual,
+        "total_payzen_gateway": total_payzen_gateway,
         "costo_banco": costo_banco_tc,
         "costo_payzen_pse": costo_payzen_pse,
-        "tarifa_breb_payzen": tarifa_breb_payzen,
         "costo_payzen_breb": costo_payzen_breb,
+        "total_adquirencia": total_adquirencia,
         "payzen_total": payzen_total
     }
+
 
 def grafica_base(fig, titulo_y="COP", altura=560):
     fig.update_layout(
@@ -274,6 +282,7 @@ def grafica_base(fig, titulo_y="COP", altura=560):
     fig.update_xaxes(gridcolor="rgba(255,255,255,0.05)")
     return fig
 
+
 # ---------------------------------------------------
 # ESTILOS
 # ---------------------------------------------------
@@ -284,22 +293,18 @@ h("""
     background: linear-gradient(135deg, #020617 0%, #0F172A 45%, #082F49 100%);
     color: white;
 }
-
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
     height: 0rem;
 }
-
 .block-container {
     padding-top: 0.8rem;
     padding-bottom: 2rem;
     max-width: 1450px;
 }
-
 section[data-testid="stSidebar"] {
     background-color: #E5E7EB;
 }
-
 .title {
     font-size: 54px;
     font-weight: 900;
@@ -307,13 +312,11 @@ section[data-testid="stSidebar"] {
     line-height: 1.1;
     margin-top: 8px;
 }
-
 .subtitle {
     color: #CBD5E1;
     font-size: 21px;
     margin-bottom: 45px;
 }
-
 .section-title {
     font-size: 34px;
     font-weight: 900;
@@ -321,39 +324,32 @@ section[data-testid="stSidebar"] {
     margin-top: 38px;
     margin-bottom: 24px;
 }
-
 .card, .card-plan, .card-compare, .card-saving, .growth-card {
     border-radius: 24px;
     padding: 26px;
     box-shadow: 0px 8px 30px rgba(0,0,0,0.30);
     border: 1px solid rgba(255,255,255,0.10);
 }
-
 .card {
     background: rgba(255,255,255,0.06);
     min-height: 230px;
 }
-
 .card-plan {
     background: linear-gradient(135deg, #2563EB, #06B6D4);
     min-height: 230px;
 }
-
 .card-compare {
     background: rgba(255,255,255,0.06);
     min-height: 360px;
 }
-
 .card-saving {
     background: linear-gradient(135deg, #2563EB, #06B6D4);
     min-height: 360px;
 }
-
 .growth-card {
     background: rgba(255,255,255,0.06);
     min-height: 190px;
 }
-
 .label {
     color: #CBD5E1;
     text-transform: uppercase;
@@ -361,7 +357,6 @@ section[data-testid="stSidebar"] {
     font-size: 13px;
     font-weight: 800;
 }
-
 .label-white {
     color: white;
     text-transform: uppercase;
@@ -369,7 +364,6 @@ section[data-testid="stSidebar"] {
     font-size: 13px;
     font-weight: 800;
 }
-
 .big-number {
     font-size: 38px;
     font-weight: 900;
@@ -377,7 +371,6 @@ section[data-testid="stSidebar"] {
     margin-top: 16px;
     line-height: 1.15;
 }
-
 .big-number-white {
     font-size: 38px;
     font-weight: 900;
@@ -385,7 +378,6 @@ section[data-testid="stSidebar"] {
     margin-top: 16px;
     line-height: 1.15;
 }
-
 .big-number-orange {
     font-size: 38px;
     font-weight: 900;
@@ -393,7 +385,6 @@ section[data-testid="stSidebar"] {
     margin-top: 16px;
     line-height: 1.15;
 }
-
 .big-number-green {
     font-size: 38px;
     font-weight: 900;
@@ -401,7 +392,6 @@ section[data-testid="stSidebar"] {
     margin-top: 16px;
     line-height: 1.15;
 }
-
 .orange-inline {
     color: #F97316;
     font-size: 38px;
@@ -409,33 +399,28 @@ section[data-testid="stSidebar"] {
     margin-top: 4px;
     line-height: 1.15;
 }
-
 .small-text {
     color: #CBD5E1;
     font-size: 16px;
     line-height: 1.55;
 }
-
 .small-text-white {
     color: white;
     font-size: 16px;
     line-height: 1.55;
 }
-
 .actual-label {
     color: #F97316;
     font-size: 20px;
     font-weight: 900;
     margin-top: 26px;
 }
-
 .payzen-label {
     color: #38BDF8;
     font-size: 20px;
     font-weight: 900;
     margin-top: 26px;
 }
-
 .annual-text {
     color: white;
     font-size: 23px;
@@ -443,14 +428,12 @@ section[data-testid="stSidebar"] {
     margin-top: 18px;
     line-height: 1.4;
 }
-
 .percent-text {
     color: white;
     font-size: 38px;
     font-weight: 900;
     margin-top: 14px;
 }
-
 .math-box {
     background: rgba(15,23,42,0.90);
     border: 1px solid rgba(148,163,184,0.22);
@@ -459,52 +442,40 @@ section[data-testid="stSidebar"] {
     margin-top: 12px;
     margin-bottom: 16px;
 }
-
 .math-title {
     color: #38BDF8;
     font-size: 22px;
     font-weight: 900;
     margin-bottom: 14px;
 }
-
 .math-line {
     color: white;
     font-size: 20px;
     line-height: 1.65;
     font-weight: 600;
 }
-
 .math-result {
     color: #38BDF8;
     font-size: 28px;
     font-weight: 900;
     margin-top: 12px;
 }
-
 .math-result-orange {
     color: #F97316;
     font-size: 28px;
     font-weight: 900;
     margin-top: 12px;
 }
-
 div[data-testid="stExpander"] {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.10);
     border-radius: 16px;
 }
-
 div[data-testid="stExpander"] details summary {
     color: #38BDF8 !important;
     font-weight: 800;
     font-size: 18px;
 }
-
-div[data-testid="stExpander"] details[open] summary {
-    color: #38BDF8 !important;
-    background: rgba(56,189,248,0.10) !important;
-}
-
 .disclaimer {
     color: rgba(255,255,255,0.62);
     font-size: 11px;
@@ -512,7 +483,6 @@ div[data-testid="stExpander"] details[open] summary {
     margin-top: 22px;
     margin-bottom: 10px;
 }
-
 .stDownloadButton button {
     background: #374151 !important;
     color: #38BDF8 !important;
@@ -522,6 +492,7 @@ div[data-testid="stExpander"] details[open] summary {
 }
 </style>
 """)
+
 
 # ---------------------------------------------------
 # SIDEBAR
@@ -538,10 +509,6 @@ with st.sidebar:
 
     st.header("⚙️ Parámetros")
 
-    # ---------------------------------------------------
-    # DISTRIBUCIÓN DE TRANSACCIONES
-    # ---------------------------------------------------
-
     st.subheader("Distribución de transacciones")
 
     modo_transacciones = st.radio(
@@ -555,20 +522,9 @@ with st.sidebar:
     activar_breb = st.checkbox("Activar Bre-B", value=False)
 
     if modo_transacciones == "Por número de transacciones":
-        if activar_tc:
-            tx_tc_actual = st.number_input("Transacciones TC", min_value=0, value=350, step=50)
-        else:
-            tx_tc_actual = 0
-
-        if activar_pse:
-            tx_pse_actual = st.number_input("Transacciones PSE", min_value=0, value=0, step=50)
-        else:
-            tx_pse_actual = 0
-
-        if activar_breb:
-            tx_breb_actual = st.number_input("Transacciones Bre-B", min_value=0, value=0, step=50)
-        else:
-            tx_breb_actual = 0
+        tx_tc_actual = st.number_input("Transacciones TC", min_value=0, value=2000, step=50) if activar_tc else 0
+        tx_pse_actual = st.number_input("Transacciones PSE", min_value=0, value=200, step=50) if activar_pse else 0
+        tx_breb_actual = st.number_input("Transacciones Bre-B", min_value=0, value=10, step=10) if activar_breb else 0
 
         total_transacciones_base = tx_tc_actual + tx_pse_actual + tx_breb_actual
 
@@ -577,22 +533,11 @@ with st.sidebar:
         pct_breb = (tx_breb_actual / total_transacciones_base * 100) if total_transacciones_base > 0 else 0
 
     else:
-        total_transacciones_base = st.number_input("Total transacciones", min_value=0, value=4000, step=100)
+        total_transacciones_base = st.number_input("Total transacciones", min_value=0, value=2210, step=100)
 
-        if activar_tc:
-            pct_tc = st.number_input("% Tarjetas", min_value=0.0, max_value=100.0, value=30.0, step=1.0)
-        else:
-            pct_tc = 0.0
-
-        if activar_pse:
-            pct_pse = st.number_input("% PSE", min_value=0.0, max_value=100.0, value=70.0, step=1.0)
-        else:
-            pct_pse = 0.0
-
-        if activar_breb:
-            pct_breb = st.number_input("% Bre-B", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
-        else:
-            pct_breb = 0.0
+        pct_tc = st.number_input("% Tarjetas", min_value=0.0, max_value=100.0, value=90.50, step=0.10) if activar_tc else 0.0
+        pct_pse = st.number_input("% PSE", min_value=0.0, max_value=100.0, value=9.05, step=0.10) if activar_pse else 0.0
+        pct_breb = st.number_input("% Bre-B", min_value=0.0, max_value=100.0, value=0.45, step=0.10) if activar_breb else 0.0
 
         suma_pct = pct_tc + pct_pse + pct_breb
 
@@ -601,17 +546,21 @@ with st.sidebar:
 
         tx_tc_actual = int(round(total_transacciones_base * pct_tc / 100)) if activar_tc else 0
         tx_pse_actual = int(round(total_transacciones_base * pct_pse / 100)) if activar_pse else 0
-        tx_breb_actual = max(total_transacciones_base - tx_tc_actual - tx_pse_actual, 0) if activar_breb else int(round(total_transacciones_base * pct_breb / 100))
+        tx_breb_actual = int(round(total_transacciones_base * pct_breb / 100)) if activar_breb else 0
+
+        diferencia = total_transacciones_base - (tx_tc_actual + tx_pse_actual + tx_breb_actual)
+        if activar_breb:
+            tx_breb_actual += diferencia
+        elif activar_pse:
+            tx_pse_actual += diferencia
+        elif activar_tc:
+            tx_tc_actual += diferencia
 
     st.caption(
         f"Distribución calculada: TC {number_fmt(tx_tc_actual)} | "
         f"PSE {number_fmt(tx_pse_actual)} | Bre-B {number_fmt(tx_breb_actual)} | "
         f"Total {number_fmt(tx_tc_actual + tx_pse_actual + tx_breb_actual)}"
     )
-
-    # ---------------------------------------------------
-    # TICKET PROMEDIO
-    # ---------------------------------------------------
 
     st.divider()
     st.subheader("Ticket promedio")
@@ -629,13 +578,9 @@ with st.sidebar:
         ticket_breb = ticket_promedio
     else:
         ticket_tc = st.number_input("Ticket promedio TC", min_value=0, value=60000, step=10000)
-        ticket_pse = st.number_input("Ticket promedio PSE", min_value=0, value=40000, step=10000)
-        ticket_breb = st.number_input("Ticket promedio Bre-B", min_value=0, value=40000, step=10000)
+        ticket_pse = st.number_input("Ticket promedio PSE", min_value=0, value=60000, step=10000)
+        ticket_breb = st.number_input("Ticket promedio Bre-B", min_value=0, value=60000, step=10000)
         ticket_promedio = ticket_tc
-
-    # ---------------------------------------------------
-    # PASARELA ACTUAL
-    # ---------------------------------------------------
 
     st.divider()
     st.subheader("Pasarela actual")
@@ -643,85 +588,25 @@ with st.sidebar:
     costo_fijo_actual = st.number_input("Costo fijo actual por transacción", min_value=0, value=750, step=50)
     porcentaje_actual = st.number_input("% actual de la pasarela", min_value=0.0, value=2.90, step=0.10)
 
-    st.caption("La pasarela actual se calcula con el esquema global: fijo + porcentaje aplicado al total de canales activos.")
-
-    # ---------------------------------------------------
-    # COSTOS ADQUIRENCIA / PROCESAMIENTO
-    # ---------------------------------------------------
+    st.caption("Modelo agregador: porcentaje + fijo por transacción, aplicado a todos los métodos activos.")
 
     st.divider()
     st.subheader("Costos adquirencia / procesamiento")
 
-    if activar_tc:
-        porcentaje_banco = st.number_input("% adquirencia banco TC", min_value=0.0, value=1.84, step=0.01)
-    else:
-        porcentaje_banco = 0.0
-
-    if activar_pse:
-        costo_pse_payzen = st.number_input("Costo PSE PayZen por tx", min_value=0, value=400, step=50)
-    else:
-        costo_pse_payzen = 0
-
-    if activar_breb:
-        st.divider()
-        st.subheader("Rangos Bre-B PayZen")
-        st.caption("Rangos editables según la negociación con cada cliente.")
-
-        st.markdown("**Rango 1**")
-        breb_r1_ini = st.number_input("Rango 1 inicial", min_value=0, value=1, step=1000)
-        breb_r1_fin = st.number_input("Rango 1 final", min_value=breb_r1_ini, value=10000, step=1000)
-        breb_r1_tarifa = st.number_input("Valor rango 1", min_value=0, value=600, step=50)
-
-        st.markdown("**Rango 2**")
-        breb_r2_ini = st.number_input("Rango 2 inicial", min_value=0, value=10001, step=1000)
-        breb_r2_fin = st.number_input("Rango 2 final", min_value=breb_r2_ini, value=100000, step=5000)
-        breb_r2_tarifa = st.number_input("Valor rango 2", min_value=0, value=550, step=50)
-
-        st.markdown("**Rango 3**")
-        breb_r3_ini = st.number_input("Rango 3 inicial", min_value=0, value=100001, step=10000)
-        breb_r3_fin = st.number_input("Rango 3 final", min_value=breb_r3_ini, value=999999999, step=10000)
-        breb_r3_tarifa = st.number_input("Valor rango 3", min_value=0, value=500, step=50)
-    else:
-        breb_r1_ini = 1
-        breb_r1_fin = 10000
-        breb_r1_tarifa = 600
-        breb_r2_ini = 10001
-        breb_r2_fin = 100000
-        breb_r2_tarifa = 550
-        breb_r3_ini = 100001
-        breb_r3_fin = 999999999
-        breb_r3_tarifa = 500
-
-    # ---------------------------------------------------
-    # PLAN PAYZEN
-    # ---------------------------------------------------
+    porcentaje_banco = st.number_input("% adquirencia banco TC", min_value=0.0, value=1.84, step=0.01) if activar_tc else 0.0
+    costo_pse_payzen = st.number_input("Costo PSE por tx", min_value=0, value=400, step=50) if activar_pse else 0
+    costo_breb_payzen = st.number_input("Costo Bre-B por tx", min_value=0, value=600, step=50) if activar_breb else 0
 
     st.divider()
     st.subheader("Plan PayZen")
 
-    PLANES_PAYZEN = {
-        "PayZen Basic 100 tx": {"mensualidad": 126500, "tx_incluidas": 100, "tarifa_adicional": 505, "creacion_tienda": 319000},
-        "PayZen Pro 500 tx": {"mensualidad": 324500, "tx_incluidas": 500, "tarifa_adicional": 440, "creacion_tienda": 755500},
-        "PayZen Pro 5.000 tx": {"mensualidad": 1925000, "tx_incluidas": 5000, "tarifa_adicional": 385, "creacion_tienda": 755500},
-        "PayZen Pro 10.000 tx": {"mensualidad": 3492500, "tx_incluidas": 10000, "tarifa_adicional": 349, "creacion_tienda": 755500},
-        "PayZen Pro 15.000 tx": {"mensualidad": 3445000, "tx_incluidas": 15000, "tarifa_adicional": 297, "creacion_tienda": 755500},
-        "PayZen Pro 25.000 tx": {"mensualidad": 7232500, "tx_incluidas": 25000, "tarifa_adicional": 289, "creacion_tienda": 755500},
-        "PayZen Pro 50.000 tx": {"mensualidad": 14179000, "tx_incluidas": 50000, "tarifa_adicional": 284, "creacion_tienda": 755500},
-        "PayZen Pro 100.000 tx": {"mensualidad": 27225000, "tx_incluidas": 100000, "tarifa_adicional": 272, "creacion_tienda": 755500},
-        "PayZen Pro 200.000 tx": {"mensualidad": 52800000, "tx_incluidas": 200000, "tarifa_adicional": 264, "creacion_tienda": 755500},
-    }
-
-    plan = st.selectbox("Selecciona el plan", list(PLANES_PAYZEN.keys()), index=1)
-
-    # ---------------------------------------------------
-    # PROYECCIONES
-    # ---------------------------------------------------
+    plan = st.selectbox("Selecciona el plan", list(PAYZEN_PLANS.keys()), index=1)
 
     st.divider()
 
     proyecciones_texto = st.text_area(
         "Proyecciones de transacciones totales",
-        value="2000\n3000",
+        value="3000\n5000",
         help="Escribe el total de transacciones proyectadas por línea. La app mantendrá la distribución por canal."
     )
 
@@ -730,13 +615,12 @@ with st.sidebar:
 # PLANES
 # ---------------------------------------------------
 
-# Diccionario de planes definido en el sidebar.
-# Cada plan tiene su propia mensualidad, transacciones incluidas y tarifa fija por transacción adicional.
-plan_config = PLANES_PAYZEN[plan]
-plan_mensual = plan_config["mensualidad"]
-tx_incluidas = plan_config["tx_incluidas"]
-tarifa_adicional_plan = plan_config["tarifa_adicional"]
-creacion_tienda = plan_config["creacion_tienda"]
+plan_info = PAYZEN_PLANS[plan]
+plan_mensual = plan_info["mensualidad"]
+tx_incluidas = plan_info["tx_incluidas"]
+creacion_tienda = plan_info["creacion_tienda"]
+tx_adicional_unitario = plan_info["tx_adicional"]
+
 
 # ---------------------------------------------------
 # PROYECCIONES
@@ -759,6 +643,7 @@ escenarios = [("Actual", total_tx_base)]
 for tx in proyecciones:
     escenarios.append((f"Proyección {number_fmt(tx)} tx", tx))
 
+
 # ---------------------------------------------------
 # CÁLCULOS
 # ---------------------------------------------------
@@ -767,25 +652,10 @@ resultados = []
 
 tx_base_canales = max(tx_tc_actual + tx_pse_actual + tx_breb_actual, 1)
 
+
 def distribuir_transacciones(total_tx):
     if total_tx <= 0:
         return 0, 0, 0
-
-    if modo_transacciones == "Por porcentaje sobre total":
-        tc = int(round(total_tx * pct_tc / 100)) if activar_tc else 0
-        pse = int(round(total_tx * pct_pse / 100)) if activar_pse else 0
-        breb = int(round(total_tx * pct_breb / 100)) if activar_breb else 0
-
-        diferencia = total_tx - (tc + pse + breb)
-
-        if activar_breb:
-            breb += diferencia
-        elif activar_pse:
-            pse += diferencia
-        elif activar_tc:
-            tc += diferencia
-
-        return max(tc, 0), max(pse, 0), max(breb, 0)
 
     ratio_tc = tx_tc_actual / tx_base_canales
     ratio_pse = tx_pse_actual / tx_base_canales
@@ -805,6 +675,7 @@ def distribuir_transacciones(total_tx):
         tc += diferencia
 
     return max(tc, 0), max(pse, 0), max(breb, 0)
+
 
 for nombre, tx in escenarios:
     if nombre == "Actual":
@@ -826,17 +697,9 @@ for nombre, tx in escenarios:
         porcentaje_banco,
         plan_mensual,
         tx_incluidas,
-        tarifa_adicional_plan,
+        tx_adicional_unitario,
         costo_pse_payzen,
-        breb_r1_ini,
-        breb_r1_fin,
-        breb_r1_tarifa,
-        breb_r2_ini,
-        breb_r2_fin,
-        breb_r2_tarifa,
-        breb_r3_ini,
-        breb_r3_fin,
-        breb_r3_tarifa
+        costo_breb_payzen
     )
 
     costo_actual_total = canales["costo_actual_total"]
@@ -845,7 +708,6 @@ for nombre, tx in escenarios:
     ahorro = costo_actual_total - payzen_total
     ahorro_anual = ahorro * 12
     ahorro_pct = (ahorro / costo_actual_total * 100) if costo_actual_total > 0 else 0
-    payzen_pct = (payzen_total / costo_actual_total * 100) if costo_actual_total > 0 else 0
 
     resultados.append({
         "Escenario": nombre,
@@ -857,25 +719,26 @@ for nombre, tx in escenarios:
         "Ticket PSE": ticket_pse,
         "Ticket Bre-B": ticket_breb,
         "Pasarela actual": costo_actual_total,
-        "Costo actual por tx": canales["costo_actual_por_tx"],
-        "Variable actual por tx": canales["variable_actual"],
+        "Costo actual TC": canales["costo_actual_tc"],
+        "Costo actual PSE": canales["costo_actual_pse"],
+        "Costo actual Bre-B": canales["costo_actual_breb"],
         "PayZen": payzen_total,
         "Ahorro mensual": ahorro,
         "Ahorro anual": ahorro_anual,
-        "PayZen %": payzen_pct,
         "Ahorro %": ahorro_pct,
         "Tx adicionales": canales["tx_adicionales"],
         "Tarifa adicional": canales["tarifa_adicional"],
         "Costo adicionales": canales["costo_tx_adicionales"],
-        "Costo banco": canales["costo_banco"],
-        "Costo PSE actual": canales["costo_actual_pse"],
+        "Costo plan": canales["plan_mensual"],
+        "Total PayZen Gateway": canales["total_payzen_gateway"],
+        "Costo banco TC": canales["costo_banco"],
         "Costo PSE PayZen": canales["costo_payzen_pse"],
-        "Costo Bre-B actual": canales["costo_actual_breb"],
         "Costo Bre-B PayZen": canales["costo_payzen_breb"],
-        "Tarifa Bre-B PayZen": canales["tarifa_breb_payzen"]
+        "Total adquirencia": canales["total_adquirencia"]
     })
 
 df = pd.DataFrame(resultados)
+
 
 # ---------------------------------------------------
 # TÍTULO
@@ -892,6 +755,7 @@ with header_col1:
 with header_col2:
     h('<div class="title">💳 Simulador Comercial PayZen Basic / Pro</div>')
     h('<div class="subtitle">Comparativo de costos entre pasarela actual vs PayZen</div>')
+
 
 # ---------------------------------------------------
 # PARÁMETROS BASE
@@ -936,10 +800,10 @@ with c4:
         f'<div class="big-number-white">{plan}</div>'
         f'<br><div class="small-text-white">Mensualidad: <b>{money(plan_mensual)}</b></div>'
         f'<div class="small-text-white">Tx incluidas: <b>{number_fmt(tx_incluidas)}</b></div>'
-        f'<div class="small-text-white">Tx adicional: <b>{money(tarifa_adicional_plan)}</b></div>'
-        f'<div class="small-text-white">Creación tienda: <b>{money(creacion_tienda)}</b></div>'
+        f'<div class="small-text-white">Tx adicional: <b>{money(tx_adicional_unitario)}</b></div>'
         '</div>'
     )
+
 
 # ---------------------------------------------------
 # COMPARATIVO DE COSTOS
@@ -958,11 +822,12 @@ for start in range(0, len(df), 3):
                 f'<div class="small-text">Transacciones: <b>{number_fmt(row["Transacciones"])}</b></div>'
                 f'<div class="actual-label">Pasarela actual</div>'
                 f'<div class="big-number-orange">{money(row["Pasarela actual"])}</div>'
-                f'<div class="payzen-label">PayZen</div>'
+                f'<div class="payzen-label">PayZen + adquirencia</div>'
                 f'<div class="big-number">{money(row["PayZen"])}</div>'
                 f'<br><div class="small-text">Diferencia mensual estimada: <b>{money(row["Ahorro mensual"])}</b></div>'
                 '</div>'
             )
+
 
 # ---------------------------------------------------
 # AHORRO ESTIMADO
@@ -981,11 +846,11 @@ for start in range(0, len(df), 3):
                 f'<div class="big-number-white">{money(row["Ahorro mensual"])}</div>'
                 f'<div class="small-text-white">Ahorro mensual estimado</div>'
                 f'<div class="annual-text">Ahorro anual: {money(row["Ahorro anual"])}</div>'
-                f'<br><div class="small-text-white">Si hoy pagas el 100% con tu pasarela actual, con PayZen ahorrarías:</div>'
+                f'<br><div class="small-text-white">Ahorro estimado frente al modelo agregador actual:</div>'
                 f'<div class="percent-text">{percent(row["Ahorro %"])}</div>'
-                f'<div class="small-text-white">Costo PayZen frente al costo actual: <b>{percent(row["PayZen %"])}</b>.</div>'
                 '</div>'
             )
+
 
 # ---------------------------------------------------
 # GRÁFICA BARRAS
@@ -1007,21 +872,17 @@ fig.add_trace(go.Bar(
 fig.add_trace(go.Bar(
     x=df["Escenario"],
     y=df["PayZen"],
-    name="PayZen",
+    name="PayZen + adquirencia",
     text=[money(v) for v in df["PayZen"]],
     textposition="outside",
     marker_color="#06B6D4"
 ))
 
-max_y = max(df["Pasarela actual"].max(), df["PayZen"].max())
-
-fig.update_layout(
-    barmode="group",
-    yaxis=dict(range=[0, max_y * 1.22])
-)
-
+max_y = max(df["Pasarela actual"].max(), df["PayZen"].max()) if len(df) else 0
+fig.update_layout(barmode="group", yaxis=dict(range=[0, max_y * 1.22 if max_y > 0 else 1]))
 fig = grafica_base(fig, titulo_y="Costo mensual COP", altura=560)
 st.plotly_chart(fig, use_container_width=True)
+
 
 # ---------------------------------------------------
 # GRÁFICA LÍNEA
@@ -1042,7 +903,7 @@ fig_line.add_trace(go.Scatter(
     hovertemplate=(
         "<b>%{x}</b><br>"
         "Pasarela actual: $%{y:,.0f}<br>"
-        "PayZen: $%{customdata[2]:,.0f}<br>"
+        "PayZen + adquirencia: $%{customdata[2]:,.0f}<br>"
         "Ahorro mensual: $%{customdata[0]:,.0f}<br>"
         "Ahorro porcentual: %{customdata[1]:.2f}%"
         "<extra></extra>"
@@ -1052,14 +913,14 @@ fig_line.add_trace(go.Scatter(
 fig_line.add_trace(go.Scatter(
     x=df["Escenario"],
     y=df["PayZen"],
-    name="PayZen",
+    name="PayZen + adquirencia",
     mode="lines+markers",
     line=dict(width=4, color="#06B6D4"),
     marker=dict(size=12, color="#06B6D4"),
     customdata=df[["Ahorro mensual", "Ahorro %", "Pasarela actual"]],
     hovertemplate=(
         "<b>%{x}</b><br>"
-        "PayZen: $%{y:,.0f}<br>"
+        "PayZen + adquirencia: $%{y:,.0f}<br>"
         "Pasarela actual: $%{customdata[2]:,.0f}<br>"
         "Ahorro mensual: $%{customdata[0]:,.0f}<br>"
         "Ahorro porcentual: %{customdata[1]:.2f}%"
@@ -1069,6 +930,7 @@ fig_line.add_trace(go.Scatter(
 
 fig_line = grafica_base(fig_line, titulo_y="Costo mensual COP", altura=560)
 st.plotly_chart(fig_line, use_container_width=True)
+
 
 # ---------------------------------------------------
 # DETALLE MATEMÁTICO
@@ -1080,32 +942,28 @@ for row in resultados:
     titulo_expander = f"Ver cálculo de {row['Escenario']} - {number_fmt(row['Transacciones'])} tx"
 
     with st.expander(titulo_expander):
-        tx = row["Transacciones"]
-        variable_actual = row["Variable actual por tx"]
-        costo_banco_payzen = row["Costo banco"]
-
         h(
             '<div class="math-box">'
-            '<div class="math-title">Pasarela actual</div>'
-            f'<div class="math-line">{number_fmt(tx)} × ({money(costo_fijo_actual)} + ({percent(porcentaje_actual)} × ticket por canal))</div>'
-            f'<div class="math-line">{number_fmt(tx)} × ({money(costo_fijo_actual)} + {money(variable_actual)})</div>'
+            '<div class="math-title">Pasarela actual / modelo agregador</div>'
+            f'<div class="math-line">Total: {number_fmt(row["Transacciones"])} × ({percent(porcentaje_actual)} × ticket + {money(costo_fijo_actual)})</div>'
             f'<div class="math-result-orange">= {money(row["Pasarela actual"])}</div>'
             '</div>'
         )
 
-        if row["Tx adicionales"] > 0:
-            linea_adicionales = f"+ ({number_fmt(row['Tx adicionales'])} × {money(row['Tarifa adicional'])})"
-            calculo_adicionales = f"+ {money(row['Costo adicionales'])}"
-        else:
-            linea_adicionales = "+ $0 transacciones adicionales"
-            calculo_adicionales = "+ $0"
+        h(
+            '<div class="math-box">'
+            '<div class="math-title">PayZen Gateway</div>'
+            f'<div class="math-line">Mensualidad {money(row["Costo plan"])} + '
+            f'({number_fmt(row["Tx adicionales"])} tx adicionales × {money(row["Tarifa adicional"])})</div>'
+            f'<div class="math-result">= {money(row["Total PayZen Gateway"])}</div>'
+            '</div>'
+        )
 
         h(
             '<div class="math-box">'
-            '<div class="math-title">PayZen</div>'
-            f'<div class="math-line">{money(plan_mensual)} {linea_adicionales} + ({money(ticket_promedio)} × {number_fmt(tx)} × {percent(porcentaje_banco)})</div>'
-            f'<div class="math-line">{money(plan_mensual)} {calculo_adicionales} + TC banco {money(costo_banco_payzen)} + PSE {money(row.get("Costo PSE PayZen", 0))} + Bre-B {money(row.get("Costo Bre-B PayZen", 0))}</div>'
-            f'<div class="math-result">= {money(row["PayZen"])}</div>'
+            '<div class="math-title">Adquirencia / costos por método</div>'
+            f'<div class="math-line">TC: {money(row["Costo banco TC"])} | PSE: {money(row["Costo PSE PayZen"])} | Bre-B: {money(row["Costo Bre-B PayZen"])}</div>'
+            f'<div class="math-result">= {money(row["Total adquirencia"])}</div>'
             '</div>'
         )
 
@@ -1128,178 +986,268 @@ DISCLAIMER = """
 Esta proyección comercial se realiza con base en la información suministrada por el cliente durante la reunión y/o en los datos actuales compartidos para efectos de análisis. Los valores presentados son estimaciones y no constituyen una oferta definitiva ni vinculante. Las tarifas podrán estar sujetas a validación, condiciones comerciales finales, cambios en políticas de adquirencia, ajustes operativos, incrementos anuales, IPC, costos de terceros o modificaciones acordadas entre las partes.
 """
 
+
+def paragraph_cell(text, style):
+    return Paragraph(str(text), style)
+
+
 def generar_pdf_resumen(df_pdf):
     buffer = BytesIO()
+
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=letter,
-        rightMargin=36,
-        leftMargin=36,
-        topMargin=28,
-        bottomMargin=24
+        pagesize=landscape(letter),
+        rightMargin=28,
+        leftMargin=28,
+        topMargin=18,
+        bottomMargin=18
     )
+
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-        "CustomTitle",
+        "TitleCenter",
         parent=styles["Title"],
-        fontSize=20,
-        leading=24,
         alignment=1,
-        textColor=colors.black,
-        spaceAfter=12
+        fontSize=22,
+        leading=26,
+        spaceAfter=10
     )
 
     section_style = ParagraphStyle(
-        "SectionTitle",
+        "Section",
         parent=styles["Heading2"],
-        fontSize=12,
-        leading=14,
-        textColor=colors.HexColor("#0F172A"),
-        spaceBefore=8,
-        spaceAfter=6
+        fontSize=10,
+        leading=12,
+        spaceBefore=6,
+        spaceAfter=4,
+        textColor=colors.black
     )
 
     small_style = ParagraphStyle(
         "SmallDisclaimer",
         parent=styles["BodyText"],
-        fontSize=7,
-        leading=9,
-        textColor=colors.HexColor("#4B5563")
+        fontSize=6.5,
+        leading=8,
+        textColor=colors.HexColor("#111827"),
+        alignment=0
     )
 
-    cell_style = ParagraphStyle(
-        "CellStyle",
+    table_cell = ParagraphStyle(
+        "TableCell",
         parent=styles["BodyText"],
-        fontSize=8,
-        leading=10,
+        fontSize=7,
+        leading=8.5,
         textColor=colors.black
     )
 
-    header_style = ParagraphStyle(
-        "HeaderStyle",
-        parent=styles["BodyText"],
-        fontSize=8,
-        leading=10,
-        textColor=colors.white,
-        fontName="Helvetica-Bold"
+    table_cell_center = ParagraphStyle(
+        "TableCellCenter",
+        parent=table_cell,
+        alignment=1
+    )
+
+    table_cell_right = ParagraphStyle(
+        "TableCellRight",
+        parent=table_cell,
+        alignment=2
+    )
+
+    table_header = ParagraphStyle(
+        "TableHeader",
+        parent=table_cell,
+        fontName="Helvetica-Bold",
+        alignment=1,
+        textColor=colors.black
     )
 
     story = []
 
     try:
-        story.append(Image("Logo_Globalinvest_PayZen.png", width=2.6*inch, height=0.9*inch))
+        logo = Image("Logo_Globalinvest_PayZen.png", width=2.2 * inch, height=0.70 * inch)
+        logo.hAlign = "CENTER"
+        story.append(logo)
+        story.append(Spacer(1, 4))
     except Exception:
         pass
 
-    story.append(Spacer(1, 8))
     story.append(Paragraph("Resumen Comercial PayZen", title_style))
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 4))
 
     first = df_pdf.iloc[0]
 
-    costo_actual_tarjetas = first["Pasarela actual"] - first.get("Costo PSE actual", 0) - first.get("Costo Bre-B actual", 0)
-    costo_payzen_plan_adicionales = plan_mensual + first["Costo adicionales"]
-    costo_payzen_tarjetas = first.get("Costo banco", 0)
-    costo_payzen_pse = first.get("Costo PSE PayZen", 0)
-    costo_payzen_breb = first.get("Costo Bre-B PayZen", 0)
+    total_tx = first["Transacciones"]
+    total_methods = max(total_tx, 1)
 
-    # ---------------------------------------------------
-    # TABLA COMPARATIVA PRINCIPAL
-    # ---------------------------------------------------
+    pct_tc_pdf = (first["TC"] / total_methods * 100) if total_methods > 0 else 0
+    pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
+    pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
 
-    story.append(Paragraph("Comparativo de costos mensuales", section_style))
+    # 1. INFORMACIÓN OPERATIVA INICIAL
+    story.append(Paragraph("Información Operativa Inicial", section_style))
 
-    comparativo_data = [
-        [
-            Paragraph("Concepto", header_style),
-            Paragraph("Pasarela actual", header_style),
-            Paragraph(f"PayZen - {plan}", header_style),
-        ],
-        [
-            Paragraph("Total transacciones", cell_style),
-            Paragraph(number_fmt(first["Transacciones"]), cell_style),
-            Paragraph(number_fmt(first["Transacciones"]), cell_style),
-        ],
-        [
-            Paragraph("Tarjetas crédito / débito", cell_style),
-            Paragraph(money(costo_actual_tarjetas), cell_style),
-            Paragraph(money(costo_payzen_tarjetas), cell_style),
-        ],
-        [
-            Paragraph("PSE", cell_style),
-            Paragraph(money(first.get("Costo PSE actual", 0)), cell_style),
-            Paragraph(money(costo_payzen_pse), cell_style),
-        ],
-        [
-            Paragraph("Bre-B", cell_style),
-            Paragraph(money(first.get("Costo Bre-B actual", 0)), cell_style),
-            Paragraph(money(costo_payzen_breb), cell_style),
-        ],
-        [
-            Paragraph("Plan + transacciones adicionales", cell_style),
-            Paragraph("No aplica", cell_style),
-            Paragraph(money(costo_payzen_plan_adicionales), cell_style),
-        ],
-        [
-            Paragraph("Costo mensual total", header_style),
-            Paragraph(money(first["Pasarela actual"]), header_style),
-            Paragraph(money(first["PayZen"]), header_style),
-        ],
+    info_data = [
+        [paragraph_cell("Volumen (Número de transacciones)", table_cell), paragraph_cell(number_fmt(total_tx), table_cell_right), ""],
+        [paragraph_cell("Ticket Promedio", table_cell), paragraph_cell(money(ticket_promedio), table_cell_right), ""],
+        ["", "", ""],
+        [paragraph_cell("Métodos de pago escogidos", table_header), paragraph_cell("Número de transacciones", table_header), paragraph_cell("% Transaccional", table_header)],
+        [paragraph_cell("Tarjeta Crédito / Tarjeta Débito", table_cell), paragraph_cell(number_fmt(first["TC"]), table_cell_right), paragraph_cell(percent(pct_tc_pdf), table_cell_right)],
+        [paragraph_cell("PSE", table_cell), paragraph_cell(number_fmt(first["PSE"]), table_cell_right), paragraph_cell(percent(pct_pse_pdf), table_cell_right)],
+        [paragraph_cell("Bre-B", table_cell), paragraph_cell(number_fmt(first["Bre-B"]), table_cell_right), paragraph_cell(percent(pct_breb_pdf), table_cell_right)],
+        ["", paragraph_cell(number_fmt(total_tx), table_cell_right), paragraph_cell("100%", table_cell_right)],
     ]
 
-    comparativo_table = Table(comparativo_data, colWidths=[2.3*inch, 1.8*inch, 2.1*inch])
-    comparativo_table.setStyle(TableStyle([
-        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#2563EB")),
-        ("BACKGROUND", (0,-1), (-1,-1), colors.HexColor("#0F172A")),
-        ("TEXTCOLOR", (0,0), (-1,0), colors.white),
-        ("TEXTCOLOR", (0,-1), (-1,-1), colors.white),
-        ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
-        ("FONTNAME", (0,-1), (-1,-1), "Helvetica-Bold"),
-        ("GRID", (0,0), (-1,-1), 0.5, colors.HexColor("#94A3B8")),
-        ("FONTSIZE", (0,0), (-1,-1), 8),
-        ("BOTTOMPADDING", (0,0), (-1,0), 8),
-        ("BOTTOMPADDING", (0,-1), (-1,-1), 8),
-        ("TOPPADDING", (0,0), (-1,-1), 6),
-        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
+    info_table = Table(info_data, colWidths=[2.45 * inch, 1.35 * inch, 1.15 * inch])
+    info_table.setStyle(TableStyle([
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
+        ("SPAN", (1, 0), (2, 0)),
+        ("SPAN", (1, 1), (2, 1)),
+        ("BACKGROUND", (0, 3), (-1, 3), colors.HexColor("#E5E7EB")),
+        ("FONTNAME", (0, 3), (-1, 3), "Helvetica-Bold"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
     ]))
-    story.append(comparativo_table)
+    story.append(info_table)
+    story.append(Spacer(1, 6))
 
-    story.append(Spacer(1, 14))
+    # 2. COSTOS PASARELA ACTUAL
+    story.append(Paragraph("Costos Pasarela Actual", section_style))
 
-    # ---------------------------------------------------
-    # TABLA DE AHORRO
-    # ---------------------------------------------------
+    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
+    actual_data = [
+        [paragraph_cell("Costos Pasarela Actual", table_header), paragraph_cell("MODELO AGREGADOR", table_header)],
+        [paragraph_cell("Plan actual", table_cell), paragraph_cell(modelo_actual, table_cell_right)],
+        [paragraph_cell("Ticket Promedio", table_cell), paragraph_cell(money(ticket_promedio), table_cell_right)],
+        [paragraph_cell("Volumen (Número de transacciones)", table_cell), paragraph_cell(number_fmt(total_tx), table_cell_right)],
+        [paragraph_cell("Costo Total pasarela agregadora", table_header), paragraph_cell(money(first["Pasarela actual"]), table_cell_right)],
+    ]
 
+    actual_table = Table(actual_data, colWidths=[2.45 * inch, 1.45 * inch])
+    actual_table.setStyle(TableStyle([
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")),
+        ("BACKGROUND", (0, 4), (-1, 4), colors.yellow),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, 4), (-1, 4), "Helvetica-Bold"),
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+    story.append(actual_table)
+    story.append(Spacer(1, 6))
+
+    # 3. COSTOS PAYZEN Y COSTOS ADQUIRENTE LADO A LADO
+    payzen_data = [
+        [paragraph_cell("Costos PayZen", table_header), paragraph_cell("MODELO GATEWAY", table_header)],
+        [paragraph_cell("Ticket Promedio", table_cell), paragraph_cell(money(ticket_promedio), table_cell_right)],
+        [paragraph_cell("Volumen (Número de transacciones)", table_cell), paragraph_cell(number_fmt(total_tx), table_cell_right)],
+        [paragraph_cell("Costo de la transacción Adicional", table_cell), paragraph_cell(money(first["Tarifa adicional"]), table_cell_right)],
+        [paragraph_cell("Cantidad de transacciones Adicionales", table_cell), paragraph_cell(number_fmt(first["Tx adicionales"]), table_cell_right)],
+        [paragraph_cell("Costo total de las transacciones Adicionales", table_cell), paragraph_cell(money(first["Costo adicionales"]), table_cell_right)],
+        [paragraph_cell(f"Costo del Plan Escogido {plan}", table_cell), paragraph_cell(money(first["Costo plan"]), table_cell_right)],
+        [paragraph_cell("Total Costo PayZen", table_header), paragraph_cell(money(first["Total PayZen Gateway"]), table_cell_right)],
+        ["", ""],
+        [paragraph_cell("Total PayZen + Total Adquirientes", table_header), paragraph_cell(money(first["PayZen"]), table_cell_right)],
+    ]
+
+    payzen_table = Table(payzen_data, colWidths=[2.55 * inch, 1.28 * inch])
+    payzen_table.setStyle(TableStyle([
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")),
+        ("BACKGROUND", (0, 5), (-1, 6), colors.HexColor("#D1D5DB")),
+        ("BACKGROUND", (0, 7), (-1, 7), colors.yellow),
+        ("BACKGROUND", (0, 9), (-1, 9), colors.yellow),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, 7), (-1, 7), "Helvetica-Bold"),
+        ("FONTNAME", (0, 9), (-1, 9), "Helvetica-Bold"),
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 3),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+
+    adquirente_data = [
+        ["", paragraph_cell("Costos Adquiriente", table_header), "", "", ""],
+        [paragraph_cell("Método de pago", table_header), paragraph_cell("Valor", table_header), paragraph_cell("Número de transacciones", table_header), paragraph_cell("Ticket promedio", table_header), paragraph_cell("Total Adquiriente", table_header)],
+        [paragraph_cell("Tarjeta Crédito / Tarjeta Débito", table_cell), paragraph_cell(percent(porcentaje_banco), table_cell_right), paragraph_cell(number_fmt(first["TC"]), table_cell_right), paragraph_cell(money(first["Ticket TC"]), table_cell_right), paragraph_cell(money(first["Costo banco TC"]), table_cell_right)],
+        [paragraph_cell("PSE", table_cell), paragraph_cell(money(costo_pse_payzen), table_cell_right), paragraph_cell(number_fmt(first["PSE"]), table_cell_right), paragraph_cell(money(first["Ticket PSE"]), table_cell_right), paragraph_cell(money(first["Costo PSE PayZen"]), table_cell_right)],
+        [paragraph_cell("Bre-B", table_cell), paragraph_cell(money(costo_breb_payzen), table_cell_right), paragraph_cell(number_fmt(first["Bre-B"]), table_cell_right), paragraph_cell(money(first["Ticket Bre-B"]), table_cell_right), paragraph_cell(money(first["Costo Bre-B PayZen"]), table_cell_right)],
+        ["", "", "", paragraph_cell("Total de los Adquirientes", table_header), paragraph_cell(money(first["Total adquirencia"]), table_cell_right)],
+    ]
+
+    adquirente_table = Table(adquirente_data, colWidths=[1.75 * inch, 0.72 * inch, 1.18 * inch, 0.95 * inch, 1.15 * inch])
+    adquirente_table.setStyle(TableStyle([
+        ("GRID", (0, 1), (-1, -1), 0.45, colors.black),
+        ("SPAN", (1, 0), (4, 0)),
+        ("FONTNAME", (1, 0), (4, 0), "Helvetica-Bold"),
+        ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#E5E7EB")),
+        ("BACKGROUND", (3, 5), (4, 5), colors.yellow),
+        ("FONTNAME", (0, 1), (-1, 1), "Helvetica-Bold"),
+        ("FONTNAME", (3, 5), (4, 5), "Helvetica-Bold"),
+        ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 3),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+
+    combined_tables = Table([[payzen_table, adquirente_table]], colWidths=[3.95 * inch, 5.85 * inch])
+    combined_tables.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+    ]))
+    story.append(combined_tables)
+    story.append(Spacer(1, 6))
+
+    # 4. AHORRO ESTIMADO
     story.append(Paragraph("Ahorro estimado con PayZen", section_style))
 
     ahorro_data = [
-        [Paragraph("Indicador", header_style), Paragraph("Resultado", header_style)],
-        [Paragraph("Ahorro mensual estimado", cell_style), Paragraph(money(first["Ahorro mensual"]), cell_style)],
-        [Paragraph("Ahorro anual estimado", cell_style), Paragraph(money(first["Ahorro anual"]), cell_style)],
-        [Paragraph("Ahorro porcentual", cell_style), Paragraph(percent(first["Ahorro %"]), cell_style)],
-        [Paragraph("Costo PayZen frente al costo actual", cell_style), Paragraph(percent(first["PayZen %"]), cell_style)],
+        [paragraph_cell("Indicador", table_header), paragraph_cell("Resultado", table_header)],
+        [paragraph_cell("Ahorro mensual", table_cell), paragraph_cell(money(first["Ahorro mensual"]), table_cell_right)],
+        [paragraph_cell("Ahorro anual", table_cell), paragraph_cell(money(first["Ahorro anual"]), table_cell_right)],
+        [paragraph_cell("Ahorro porcentual", table_cell), paragraph_cell(percent(first["Ahorro %"]), table_cell_right)],
     ]
 
-    ahorro_table = Table(ahorro_data, colWidths=[3.0*inch, 3.2*inch])
+    ahorro_table = Table(ahorro_data, colWidths=[2.45 * inch, 1.45 * inch])
     ahorro_table.setStyle(TableStyle([
-        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#16A34A")),
-        ("TEXTCOLOR", (0,0), (-1,0), colors.white),
-        ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
-        ("GRID", (0,0), (-1,-1), 0.5, colors.HexColor("#94A3B8")),
-        ("FONTSIZE", (0,0), (-1,-1), 8),
-        ("TOPPADDING", (0,0), (-1,-1), 6),
-        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#16A34A")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
     ]))
     story.append(ahorro_table)
+    story.append(Spacer(1, 8))
 
-    story.append(Spacer(1, 14))
     story.append(Paragraph(DISCLAIMER, small_style))
 
     doc.build(story)
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
+
 
 st.download_button(
     label="📄 Descargar resumen PDF",
@@ -1321,29 +1269,29 @@ df_mostrar = df.copy()
 
 columnas_dinero = [
     "Pasarela actual",
+    "Costo actual TC",
+    "Costo actual PSE",
+    "Costo actual Bre-B",
     "PayZen",
     "Ahorro mensual",
     "Ahorro anual",
     "Costo adicionales",
-    "Costo banco",
-    "Costo actual por tx",
-    "Variable actual por tx",
+    "Costo plan",
+    "Total PayZen Gateway",
+    "Costo banco TC",
+    "Costo PSE PayZen",
+    "Costo Bre-B PayZen",
+    "Total adquirencia",
     "Ticket TC",
     "Ticket PSE",
     "Ticket Bre-B",
-    "Costo PSE actual",
-    "Costo PSE PayZen",
-    "Costo Bre-B actual",
-    "Costo Bre-B PayZen",
-    "Tarifa Bre-B PayZen"
+    "Tarifa adicional",
 ]
 
 for col in columnas_dinero:
     df_mostrar[col] = df_mostrar[col].apply(money)
 
-df_mostrar["PayZen %"] = df_mostrar["PayZen %"].apply(percent)
 df_mostrar["Ahorro %"] = df_mostrar["Ahorro %"].apply(percent)
-df_mostrar["Tarifa adicional"] = df_mostrar["Tarifa adicional"].apply(money)
 df_mostrar["Transacciones"] = df_mostrar["Transacciones"].apply(number_fmt)
 df_mostrar["Tx adicionales"] = df_mostrar["Tx adicionales"].apply(number_fmt)
 
