@@ -138,18 +138,10 @@ def clean_number(value):
     except:
         return None
 
-def tarifa_adicional_por_rango(tx_adicionales):
+def tarifa_adicional_por_plan(tx_adicionales, tarifa_adicional_plan):
     if tx_adicionales <= 0:
         return 0
-    if tx_adicionales <= 500:
-        return 506
-    elif tx_adicionales <= 1000:
-        return 440
-    elif tx_adicionales <= 5000:
-        return 385
-    elif tx_adicionales <= 10000:
-        return 363
-    return 319
+    return tarifa_adicional_plan
 
 def calcular_pasarela_actual(ticket, tx, fijo, porcentaje):
     variable_unitaria = ticket * porcentaje / 100
@@ -157,9 +149,9 @@ def calcular_pasarela_actual(ticket, tx, fijo, porcentaje):
     total = tx * costo_por_tx
     return total, costo_por_tx, variable_unitaria
 
-def calcular_payzen(ticket, tx, plan_mensual, tx_incluidas, porcentaje_banco):
+def calcular_payzen(ticket, tx, plan_mensual, tx_incluidas, porcentaje_banco, tarifa_adicional_plan):
     tx_adicionales = max(tx - tx_incluidas, 0)
-    tarifa_adicional = tarifa_adicional_por_rango(tx_adicionales)
+    tarifa_adicional = tarifa_adicional_por_plan(tx_adicionales, tarifa_adicional_plan)
     costo_tx_adicionales = tx_adicionales * tarifa_adicional
     costo_banco = ticket * tx * porcentaje_banco / 100
     total = plan_mensual + costo_tx_adicionales + costo_banco
@@ -188,7 +180,7 @@ def tarifa_por_rango_breb(tx, r1_ini, r1_fin, r1_tarifa, r2_ini, r2_fin, r2_tari
     return r3_tarifa
 
 def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_tc, pct_actual_tc, pct_banco_tc,
-                            plan_mensual, tx_incluidas, costo_pse_payzen,
+                            plan_mensual, tx_incluidas, tarifa_adicional_plan, costo_pse_payzen,
                             breb_r1_ini, breb_r1_fin, breb_r1_tarifa,
                             breb_r2_ini, breb_r2_fin, breb_r2_tarifa,
                             breb_r3_ini, breb_r3_fin, breb_r3_tarifa):
@@ -214,7 +206,7 @@ def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, t
     # PayZen:
     # Mensualidad + transacciones adicionales sobre el total de canales + adquirencia/costos por canal.
     tx_adicionales = max(total_tx - tx_incluidas, 0)
-    tarifa_adicional = tarifa_adicional_por_rango(tx_adicionales)
+    tarifa_adicional = tarifa_adicional_por_plan(tx_adicionales, tarifa_adicional_plan)
     costo_tx_adicionales = tx_adicionales * tarifa_adicional
 
     costo_banco_tc = ticket_tc * tx_tc * pct_banco_tc / 100
@@ -707,7 +699,19 @@ with st.sidebar:
     st.divider()
     st.subheader("Plan PayZen")
 
-    plan = st.selectbox("Selecciona el plan", ["PayZen Pro", "PayZen Basic"])
+    PLANES_PAYZEN = {
+        "PayZen Basic 100 tx": {"mensualidad": 126500, "tx_incluidas": 100, "tarifa_adicional": 505, "creacion_tienda": 319000},
+        "PayZen Pro 500 tx": {"mensualidad": 324500, "tx_incluidas": 500, "tarifa_adicional": 440, "creacion_tienda": 755500},
+        "PayZen Pro 5.000 tx": {"mensualidad": 1925000, "tx_incluidas": 5000, "tarifa_adicional": 385, "creacion_tienda": 755500},
+        "PayZen Pro 10.000 tx": {"mensualidad": 3492500, "tx_incluidas": 10000, "tarifa_adicional": 349, "creacion_tienda": 755500},
+        "PayZen Pro 15.000 tx": {"mensualidad": 3445000, "tx_incluidas": 15000, "tarifa_adicional": 297, "creacion_tienda": 755500},
+        "PayZen Pro 25.000 tx": {"mensualidad": 7232500, "tx_incluidas": 25000, "tarifa_adicional": 289, "creacion_tienda": 755500},
+        "PayZen Pro 50.000 tx": {"mensualidad": 14179000, "tx_incluidas": 50000, "tarifa_adicional": 284, "creacion_tienda": 755500},
+        "PayZen Pro 100.000 tx": {"mensualidad": 27225000, "tx_incluidas": 100000, "tarifa_adicional": 272, "creacion_tienda": 755500},
+        "PayZen Pro 200.000 tx": {"mensualidad": 52800000, "tx_incluidas": 200000, "tarifa_adicional": 264, "creacion_tienda": 755500},
+    }
+
+    plan = st.selectbox("Selecciona el plan", list(PLANES_PAYZEN.keys()), index=1)
 
     # ---------------------------------------------------
     # PROYECCIONES
@@ -726,14 +730,13 @@ with st.sidebar:
 # PLANES
 # ---------------------------------------------------
 
-if plan == "PayZen Pro":
-    plan_mensual = 340000
-    tx_incluidas = 500
-    creacion_tienda = 755500
-else:
-    plan_mensual = 126500
-    tx_incluidas = 100
-    creacion_tienda = 319000
+# Diccionario de planes definido en el sidebar.
+# Cada plan tiene su propia mensualidad, transacciones incluidas y tarifa fija por transacción adicional.
+plan_config = PLANES_PAYZEN[plan]
+plan_mensual = plan_config["mensualidad"]
+tx_incluidas = plan_config["tx_incluidas"]
+tarifa_adicional_plan = plan_config["tarifa_adicional"]
+creacion_tienda = plan_config["creacion_tienda"]
 
 # ---------------------------------------------------
 # PROYECCIONES
@@ -823,6 +826,7 @@ for nombre, tx in escenarios:
         porcentaje_banco,
         plan_mensual,
         tx_incluidas,
+        tarifa_adicional_plan,
         costo_pse_payzen,
         breb_r1_ini,
         breb_r1_fin,
@@ -932,6 +936,7 @@ with c4:
         f'<div class="big-number-white">{plan}</div>'
         f'<br><div class="small-text-white">Mensualidad: <b>{money(plan_mensual)}</b></div>'
         f'<div class="small-text-white">Tx incluidas: <b>{number_fmt(tx_incluidas)}</b></div>'
+        f'<div class="small-text-white">Tx adicional: <b>{money(tarifa_adicional_plan)}</b></div>'
         f'<div class="small-text-white">Creación tienda: <b>{money(creacion_tienda)}</b></div>'
         '</div>'
     )
