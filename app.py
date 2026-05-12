@@ -1089,7 +1089,6 @@ def generar_pdf_resumen(df_pdf):
     info_data = [
         [paragraph_cell("Volumen (Número de transacciones)", table_cell), paragraph_cell(number_fmt(total_tx), table_cell_right), ""],
         [paragraph_cell("Ticket Promedio", table_cell), paragraph_cell(money(ticket_promedio), table_cell_right), ""],
-        ["", "", ""],
         [paragraph_cell("Métodos de pago escogidos", table_header), paragraph_cell("Número de transacciones", table_header), paragraph_cell("% Transaccional", table_header)],
         [paragraph_cell("Tarjeta Crédito / Tarjeta Débito", table_cell), paragraph_cell(number_fmt(first["TC"]), table_cell_right), paragraph_cell(percent(pct_tc_pdf), table_cell_right)],
         [paragraph_cell("PSE", table_cell), paragraph_cell(number_fmt(first["PSE"]), table_cell_right), paragraph_cell(percent(pct_pse_pdf), table_cell_right)],
