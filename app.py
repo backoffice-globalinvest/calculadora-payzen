@@ -1263,7 +1263,7 @@ def generar_pdf_resumen(df_pdf):
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D36F11")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
 
-        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#E2713C")),
+        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#E67B16")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 4), (-1, 4), "Helvetica-Bold"),
 
@@ -1457,7 +1457,7 @@ def generar_pdf_resumen(df_pdf):
     story.append(Paragraph("Ahorro estimado con PayZen", section_style))
 
     ahorro_data = [
-        [paragraph_cell("Indicador", table_header), paragraph_cell("Resultado", table_header)],
+        [Paragraph('<font color="white"><b>Indicador</b></font>', table_header), Paragraph('<font color="white"><b>Resultado</b></font>', table_header)],
         [paragraph_cell("Ahorro mensual", table_cell), paragraph_cell(money(first["Ahorro mensual"]), table_cell_right)],
         [paragraph_cell("Ahorro anual", table_cell), paragraph_cell(money(first["Ahorro anual"]), table_cell_right)],
         [paragraph_cell("Ahorro porcentual", table_cell), paragraph_cell(percent(first["Ahorro %"]), table_cell_right)],
