@@ -1064,15 +1064,31 @@ def generar_pdf_resumen(df_pdf):
     story = []
 
     try:
-        logo = Image("Logo_Globalinvest_PayZen.png", width=1.8 * inch, height=0.70 * inch)
-        logo.hAlign = "CENTER"
-        story.append(logo)
-        story.append(Spacer(1, 2))
+        logo = Image("Logo_Globalinvest_PayZen.png", width=1.45 * inch, height=0.50 * inch)
     except Exception:
-        pass
+        logo = Paragraph("", table_cell)
 
-    story.append(Paragraph("Resumen Comercial PayZen", title_style))
-    story.append(Spacer(1, 2))
+    titulo_pdf = Paragraph("Resumen Comercial PayZen", title_style)
+
+    encabezado_pdf = Table(
+        [[logo, titulo_pdf]],
+        colWidths=[1.65 * inch, 8.20 * inch]
+        )
+
+    encabezado_pdf.hAlign = "LEFT"
+
+    encabezado_pdf.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("ALIGN", (0, 0), (0, 0), "LEFT"),
+        ("ALIGN", (1, 0), (1, 0), "LEFT"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+    ]))
+
+    story.append(encabezado_pdf)
+    story.append(Spacer(1, 4))
 
     first = df_pdf.iloc[0]
 
@@ -1380,10 +1396,10 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(money(first["Costo Bre-B PayZen"]), table_cell_right)
         ],
         [
-            "",
-            "",
-            "",
             paragraph_cell("Total de los Adquirientes", table_header),
+            "",
+            "",
+            "",
             paragraph_cell(money(first["Total adquirencia"]), table_cell_right)
         ],
     ]
