@@ -1260,10 +1260,9 @@ def generar_pdf_resumen(df_pdf):
     story.append(Spacer(1, 8))
 
     # 3. COSTOS PAYZEN Y COSTOS ADQUIRENTE LADO A LADO
-    # 3. COSTOS PAYZEN Y COSTOS ADQUIRENTE LADO A LADO
 
     story.append(Paragraph(
-        '<font color="#111827"><b>Costos con PayZen</b></font>',
+        '<font color="#111827"><b>Costos PayZen + Costos Adquirientes</b></font>',
         section_style
     ))
 
@@ -1272,21 +1271,13 @@ def generar_pdf_resumen(df_pdf):
             Paragraph('<font color="white"><b>Costos PayZen</b></font>', table_header),
             Paragraph('<font color="white"><b>MODELO GATEWAY</b></font>', table_header)
         ],
-
         [paragraph_cell("Ticket Promedio", table_cell), paragraph_cell(money(ticket_promedio), table_cell_right)],
         [paragraph_cell("Volumen (Número de transacciones)", table_cell), paragraph_cell(number_fmt(total_tx), table_cell_right)],
         [paragraph_cell("Costo de la transacción Adicional", table_cell), paragraph_cell(money(first["Tarifa adicional"]), table_cell_right)],
         [paragraph_cell("Cantidad de transacciones Adicionales", table_cell), paragraph_cell(number_fmt(first["Tx adicionales"]), table_cell_right)],
-
         [paragraph_cell("Costo total de las transacciones Adicionales", table_cell), paragraph_cell(money(first["Costo adicionales"]), table_cell_right)],
-
         [paragraph_cell(f"Costo del Plan Escogido {plan}", table_cell), paragraph_cell(money(first["Costo plan"]), table_cell_right)],
-
         [paragraph_cell("Total Costo PayZen", table_header), paragraph_cell(money(first["Total PayZen Gateway"]), table_cell_right)],
-
-        ["", ""],
-
-        [paragraph_cell("Total PayZen + Total Adquirientes", table_header), paragraph_cell(money(first["PayZen"]), table_cell_right)],
     ]
 
     payzen_table = Table(
@@ -1295,31 +1286,64 @@ def generar_pdf_resumen(df_pdf):
     )
 
     payzen_table.setStyle(TableStyle([
-
         ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#A7B7D8")),
         ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#2563EB")),
-
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2563EB")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-
         ("BACKGROUND", (0, 7), (-1, 7), colors.HexColor("#DBEAFE")),
-        ("BACKGROUND", (0, 9), (-1, 9), colors.HexColor("#DBEAFE")),
-
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 7), (-1, 7), "Helvetica-Bold"),
-        ("FONTNAME", (0, 9), (-1, 9), "Helvetica-Bold"),
-
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 4),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 4),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
 
-    adquirente_data = [
+    total_payzen_data = [
+        [
+            paragraph_cell("Total PayZen + Total Adquirientes", table_header),
+            paragraph_cell(money(first["PayZen"]), table_cell_right)
+        ]
+    ]
 
+    total_payzen_table = Table(
+        total_payzen_data,
+        colWidths=[2.55 * inch, 1.28 * inch]
+    )
+
+    total_payzen_table.setStyle(TableStyle([
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#A7B7D8")),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#2563EB")),
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#DBEAFE")),
+        ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+    ]))
+
+    payzen_bloque = Table(
+        [
+            [payzen_table],
+            [Spacer(1, 6)],
+            [total_payzen_table],
+        ],
+        colWidths=[3.95 * inch]
+    )
+
+    payzen_bloque.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    adquirente_data = [
         [
             Paragraph('<font color="white"><b>Costos Adquiriente</b></font>', table_header),
             "",
@@ -1327,7 +1351,6 @@ def generar_pdf_resumen(df_pdf):
             "",
             ""
         ],
-
         [
             Paragraph('<font color="white"><b>Método de pago</b></font>', table_header),
             Paragraph('<font color="white"><b>Valor</b></font>', table_header),
@@ -1335,7 +1358,6 @@ def generar_pdf_resumen(df_pdf):
             Paragraph('<font color="white"><b>Ticket promedio</b></font>', table_header),
             Paragraph('<font color="white"><b>Total Adquiriente</b></font>', table_header)
         ],
-
         [
             paragraph_cell("Tarjeta Crédito / Tarjeta Débito", table_cell),
             paragraph_cell(percent(porcentaje_banco), table_cell_right),
@@ -1343,7 +1365,6 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(money(first["Ticket TC"]), table_cell_right),
             paragraph_cell(money(first["Costo banco TC"]), table_cell_right)
         ],
-
         [
             paragraph_cell("PSE", table_cell),
             paragraph_cell(money(costo_pse_payzen), table_cell_right),
@@ -1351,7 +1372,6 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(money(first["Ticket PSE"]), table_cell_right),
             paragraph_cell(money(first["Costo PSE PayZen"]), table_cell_right)
         ],
-
         [
             paragraph_cell("Bre-B", table_cell),
             paragraph_cell(money(costo_breb_payzen), table_cell_right),
@@ -1359,7 +1379,6 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(money(first["Ticket Bre-B"]), table_cell_right),
             paragraph_cell(money(first["Costo Bre-B PayZen"]), table_cell_right)
         ],
-
         [
             "",
             "",
@@ -1375,26 +1394,18 @@ def generar_pdf_resumen(df_pdf):
     )
 
     adquirente_table.setStyle(TableStyle([
-
         ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#A7B7D8")),
         ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#2563EB")),
-
         ("SPAN", (0, 0), (4, 0)),
-
         ("BACKGROUND", (0, 0), (-1, 1), colors.HexColor("#2563EB")),
         ("TEXTCOLOR", (0, 0), (-1, 1), colors.white),
-
         ("BACKGROUND", (3, 5), (4, 5), colors.HexColor("#DBEAFE")),
-
         ("FONTNAME", (0, 0), (-1, 1), "Helvetica-Bold"),
         ("FONTNAME", (3, 5), (4, 5), "Helvetica-Bold"),
-
         ("ALIGN", (0, 0), (4, 0), "CENTER"),
         ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
         ("ALIGN", (0, 1), (0, -1), "LEFT"),
-
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 4),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 4),
@@ -1402,7 +1413,7 @@ def generar_pdf_resumen(df_pdf):
     ]))
 
     combined_tables = Table(
-        [[payzen_table, adquirente_table]],
+        [[payzen_bloque, adquirente_table]],
         colWidths=[3.95 * inch, 5.85 * inch]
     )
 
@@ -1416,7 +1427,7 @@ def generar_pdf_resumen(df_pdf):
 
     story.append(combined_tables)
     story.append(Spacer(1, 6))
-
+    
     # 4. AHORRO ESTIMADO
     story.append(Paragraph("Ahorro estimado con PayZen", section_style))
 
