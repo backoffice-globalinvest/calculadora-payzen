@@ -1084,6 +1084,7 @@ def generar_pdf_resumen(df_pdf):
     pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
 
      # 1. INFORMACIÓN OPERATIVA INICIAL
+
     story.append(Paragraph("Información Operativa Inicial", section_style))
 
     # Tabla 1: Volumen y Ticket Promedio
@@ -1140,7 +1141,7 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(percent(pct_breb_pdf), table_cell_right)
         ],
         [
-            "",
+            paragraph_cell("Total",table_header),
             paragraph_cell(number_fmt(total_tx), table_cell_right),
             paragraph_cell("100%", table_cell_right)
         ],
@@ -1167,7 +1168,7 @@ def generar_pdf_resumen(df_pdf):
     story.append(metodos_table)
     story.append(Spacer(1, 6))
 
-
+    
     # 2. COSTOS PASARELA ACTUAL
     story.append(Paragraph("Costos Pasarela Actual", section_style))
 
