@@ -27,6 +27,10 @@ USERS = {
     "director": {
         "name": "Director",
         "password_hash": "ae12bd8f5543f2f2d6844dfa694fdb5570687f347d36c95be20a8ff5efa9c263"
+    },
+    "desarrollo": {
+        "name": "Desarrollo",
+        "password_hash": "c648919311c73fc5f855e3bdf3b163e6443adfda670352d5f5fadbe9ddf12b1a"
     }
 }
 
