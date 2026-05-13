@@ -1113,13 +1113,13 @@ def generar_pdf_resumen(df_pdf):
 
     info_resumen_table.setStyle(TableStyle([
         ("SPAN", (0, 0), (1, 0)),
-        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#1D4ED8")),
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#1B1B1D")),
         ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
         ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
         ("ALIGN", (0, 0), (1, 0), "CENTER"),
 
         ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
-        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#1D4ED8")),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#C6CAD3B5")),
 
         ("ALIGN", (1, 1), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -1133,9 +1133,9 @@ def generar_pdf_resumen(df_pdf):
     # Tabla 2: Métodos de pago escogidos
     metodos_data = [
         [
-            paragraph_cell("Métodos de pago escogidos", table_header),
-            paragraph_cell("Número de transacciones", table_header),
-            paragraph_cell("% Transaccional", table_header)
+            Paragraph('<font color="white"><b>Métodos de pago escogidos</b></font>', table_header),
+            Paragraph('<font color="white"><b>Número de transacciones</b></font>', table_header),
+            Paragraph('<font color="white"><b>% Transaccional</b></font>', table_header)
         ],
         [
             paragraph_cell("Tarjeta Crédito / Tarjeta Débito", table_cell),
@@ -1166,12 +1166,12 @@ def generar_pdf_resumen(df_pdf):
 
     metodos_table.setStyle(TableStyle([
         ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1B1B1D")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
         ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#C6CAD3B5")),
         ("LEFTPADDING", (0, 0), (-1, -1), 4),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 3),
