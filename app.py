@@ -1083,7 +1083,7 @@ def generar_pdf_resumen(df_pdf):
     pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
     pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
 
-     # 1. INFORMACIÓN OPERATIVA INICIAL
+    # 1. INFORMACIÓN OPERATIVA INICIAL
 
     story.append(Paragraph("Información Operativa Inicial", section_style))
 
@@ -1115,9 +1115,6 @@ def generar_pdf_resumen(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
 
-    story.append(info_resumen_table)
-    story.append(Spacer(1, 12))
-
     # Tabla 2: Métodos de pago escogidos
     metodos_data = [
         [
@@ -1141,7 +1138,7 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(percent(pct_breb_pdf), table_cell_right)
         ],
         [
-            paragraph_cell("Total",table_header),
+            paragraph_cell("Total", table_cell),
             paragraph_cell(number_fmt(total_tx), table_cell_right),
             paragraph_cell("100%", table_cell_right)
         ],
@@ -1156,6 +1153,7 @@ def generar_pdf_resumen(df_pdf):
         ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
         ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
@@ -1163,12 +1161,24 @@ def generar_pdf_resumen(df_pdf):
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 3),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
     ]))
 
-    story.append(metodos_table)
-    story.append(Spacer(1, 6))
+    # Unir las dos tablas lado a lado
+    tablas_operativas = Table(
+        [[info_resumen_table, metodos_table]],
+        colWidths=[3.35 * inch, 5.20 * inch]
+    )
 
+    tablas_operativas.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    story.append(tablas_operativas)
+    story.append(Spacer(1, 8))
     
     # 2. COSTOS PASARELA ACTUAL
     story.append(Paragraph("Costos Pasarela Actual", section_style))
