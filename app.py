@@ -1240,10 +1240,10 @@ def generar_pdf_resumen(df_pdf):
         ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#BFC5D2")),
         ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#E67B16")),
 
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#111827")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D36F11")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
 
-        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#B39573")),
+        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#C07D30")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 4), (-1, 4), "Helvetica-Bold"),
 
