@@ -1003,7 +1003,7 @@ def generar_pdf_resumen(df_pdf):
         pagesize=landscape(letter),
         rightMargin=28,
         leftMargin=28,
-        topMargin=18,
+        topMargin=10,
         bottomMargin=18
     )
 
@@ -1015,7 +1015,7 @@ def generar_pdf_resumen(df_pdf):
         alignment=1,
         fontSize=22,
         leading=26,
-        spaceAfter=10
+        spaceAfter=4
     )
 
     section_style = ParagraphStyle(
@@ -1023,8 +1023,8 @@ def generar_pdf_resumen(df_pdf):
         parent=styles["Heading2"],
         fontSize=10,
         leading=12,
-        spaceBefore=6,
-        spaceAfter=4,
+        spaceBefore=2,
+        spaceAfter=2,
         textColor=colors.black
     )
 
@@ -1450,7 +1450,7 @@ def generar_pdf_resumen(df_pdf):
     ]))
 
     story.append(combined_tables)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 2))
     
     # 4. AHORRO ESTIMADO
     story.append(Paragraph("Ahorro estimado con PayZen", section_style))
