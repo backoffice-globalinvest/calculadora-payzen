@@ -1087,10 +1087,14 @@ def generar_pdf_resumen(df_pdf):
 
     story.append(Paragraph("Información Operativa Inicial", section_style))
 
-    # Tabla 1: Volumen y Ticket Promedio
+    # Tabla 1: Valor inicial
     info_resumen_data = [
         [
-            paragraph_cell("Volumen (Número de transacciones)", table_cell),
+            paragraph_cell("VALOR INICIAL", table_header),
+            ""
+        ],
+        [
+            paragraph_cell("Volumen", table_cell),
             paragraph_cell(number_fmt(total_tx), table_cell_right)
         ],
         [
@@ -1105,14 +1109,22 @@ def generar_pdf_resumen(df_pdf):
     )
 
     info_resumen_table.setStyle(TableStyle([
+        ("SPAN", (0, 0), (1, 0)),
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#1D4ED8")),
+        ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
+        ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
+        ("ALIGN", (0, 0), (1, 0), "CENTER"),
+
         ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
-        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
-        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#1D4ED8")),
+
+        ("ALIGN", (1, 1), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 4),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 4),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
     ]))
 
     # Tabla 2: Métodos de pago escogidos
