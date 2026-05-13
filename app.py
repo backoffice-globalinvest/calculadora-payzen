@@ -1101,7 +1101,7 @@ def generar_pdf_resumen(df_pdf):
 
     info_resumen_table = Table(
         info_resumen_data,
-        colWidths=[2.95 * inch, 2.95 * inch]
+        colWidths=[2.25 * inch, 1.00 * inch]
     )
 
     info_resumen_table.setStyle(TableStyle([
