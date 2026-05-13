@@ -1064,7 +1064,7 @@ def generar_pdf_resumen(df_pdf):
     story = []
 
     try:
-        logo = Image("Logo_Globalinvest_PayZen.png", width=1.45 * inch, height=0.50 * inch)
+        logo = Image("Logo_Globalinvest_PayZen.png", width=1.80 * inch, height=0.55 * inch)
     except Exception:
         logo = Paragraph("", table_cell)
 
@@ -1385,14 +1385,14 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell("PSE", table_cell),
             paragraph_cell(money(costo_pse_payzen), table_cell_right),
             paragraph_cell(number_fmt(first["PSE"]), table_cell_right),
-            paragraph_cell(money(first["Ticket PSE"]), table_cell_right),
+            paragraph_cell("N/A", table_cell_center),
             paragraph_cell(money(first["Costo PSE PayZen"]), table_cell_right)
         ],
         [
             paragraph_cell("Bre-B", table_cell),
             paragraph_cell(money(costo_breb_payzen), table_cell_right),
             paragraph_cell(number_fmt(first["Bre-B"]), table_cell_right),
-            paragraph_cell(money(first["Ticket Bre-B"]), table_cell_right),
+            paragraph_cell("N/A", table_cell_center),
             paragraph_cell(money(first["Costo Bre-B PayZen"]), table_cell_right)
         ],
         [
