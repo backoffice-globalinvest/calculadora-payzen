@@ -1102,6 +1102,7 @@ def generar_pdf_resumen(df_pdf):
     pct_tc_pdf = (first["TC"] / total_methods * 100) if total_methods > 0 else 0
     pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
     pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
+    pct_total_pdf = pct_tc_pdf + pct_pse_pdf + pct_breb_pdf
 
     # 1. INFORMACIÓN OPERATIVA INICIAL
 
@@ -1111,7 +1112,7 @@ def generar_pdf_resumen(df_pdf):
     info_resumen_data = [
         [
         Paragraph(
-            '<font color="white"><b>VALOR INICIAL</b></font>',
+            '<font color="white"><b>Valores Iniciales</b></font>',
             table_header
         ),
         ""
@@ -1173,9 +1174,9 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(percent(pct_breb_pdf), table_cell_right)
         ],
         [
-            paragraph_cell("Total", table_cell),
-            paragraph_cell(number_fmt(total_tx), table_cell_right),
-            paragraph_cell("100%", table_cell_right)
+            Paragraph("<b>Total</b>", table_cell),
+            Paragraph(f"<b>{number_fmt(total_tx)}</b>", table_cell_right),
+            Paragraph(f"<b>{percent(pct_total_pdf)}</b>", table_cell_right)
         ],
     ]
 
@@ -1244,7 +1245,7 @@ def generar_pdf_resumen(df_pdf):
             paragraph_cell(number_fmt(total_tx), table_cell_right)
         ],
         [
-            paragraph_cell("Costo Total pasarela agregadora", table_cell),
+            Paragraph("<b>Costo Total pasarela agregadora</b>", table_cell),
             paragraph_cell(money(first["Pasarela actual"]), table_cell_right)
         ],
     ]
@@ -1258,12 +1259,12 @@ def generar_pdf_resumen(df_pdf):
 
     actual_table.setStyle(TableStyle([
         ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#BFC5D2")),
-        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#E67B16")),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#F97316")),
 
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#D36F11")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F97316")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
 
-        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#E67B16")),
+        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#F97316")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 4), (-1, 4), "Helvetica-Bold"),
 
