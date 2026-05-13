@@ -1498,14 +1498,6 @@ def generar_pdf_Comercial(df_pdf):
     return pdf
 
 
-st.download_button(
-    label="📄 Descargar resumen PDF",
-    data=generar_pdf_Comercial(df),
-    file_name="Resumen_Comercial_PayZen.pdf",
-    mime="application/pdf"
-)
-
-h(f'<div class="disclaimer">{DISCLAIMER}</div>')
 
 
 # ---------------------------------------------------
@@ -1914,15 +1906,17 @@ def generar_pdf_ejecutivo(df_pdf):
 
     story.append(Spacer(1, 18))
 
+
+
     # ---------------------------------------------------
     # CONCLUSIÓN EJECUTIVA
     # ---------------------------------------------------
 
-    conclusion = f"""
-    Con base en el escenario analizado, la propuesta PayZen permite
-    una reducción estimada del {percent(first["Ahorro %"])}
-    en costos transaccionales mensuales frente al modelo agregador actual.
-    """
+    conclusion = (
+        "Con base en el escenario analizado, la propuesta PayZen permite "
+        f"una reducción estimada del {percent(first['Ahorro %'])} "
+        "en costos transaccionales mensuales frente al modelo agregador actual."
+    )
 
     conclusion_style = ParagraphStyle(
         "Conclusion",
@@ -1965,6 +1959,23 @@ def generar_pdf_ejecutivo(df_pdf):
 
     return pdf
 
+
+
+st.download_button(
+    label="📄 Descargar Resumen Comercial PDF",
+    data=generar_pdf_Comercial(df),
+    file_name="Resumen_Comercial_PayZen.pdf",
+    mime="application/pdf"
+)
+
+st.download_button(
+    label="📄 Descargar PDF Ejecutivo",
+    data=generar_pdf_ejecutivo(df),
+    file_name="Resumen_Ejecutivo_PayZen.pdf",
+    mime="application/pdf"
+)
+
+h(f'<div class="disclaimer">{DISCLAIMER}</div>')
 
 
 # ---------------------------------------------------
