@@ -1246,7 +1246,7 @@ def generar_pdf_resumen(df_pdf):
         ],
         [
             Paragraph("<b>Costo Total pasarela agregadora</b>", table_cell),
-            paragraph_cell(money(first["Pasarela actual"]), table_cell_right)
+            Paragraph(f"<b>{money(first['Pasarela actual'])}</b>", table_cell_right)
         ],
     ]
 
@@ -1259,12 +1259,13 @@ def generar_pdf_resumen(df_pdf):
 
     actual_table.setStyle(TableStyle([
         ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#BFC5D2")),
-        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#F97316")),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#EA7A2F")),
 
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F97316")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EA7A2F")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("TEXTCOLOR", (0, 4), (-1, 4), colors.black),
 
-        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#F97316")),
+        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#FDE7D7")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 4), (-1, 4), "Helvetica-Bold"),
 
