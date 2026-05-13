@@ -1118,8 +1118,8 @@ def generar_pdf_resumen(df_pdf):
         ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
         ("ALIGN", (0, 0), (1, 0), "CENTER"),
 
-        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
-        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#C6CAD3B5")),
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#9CA3AF")),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#9CA3AF")),
 
         ("ALIGN", (1, 1), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -1165,13 +1165,13 @@ def generar_pdf_resumen(df_pdf):
     )
 
     metodos_table.setStyle(TableStyle([
-        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#9CA3AF")),
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1B1B1D")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
         ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#C6CAD3B5")),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#9CA3AF")),
         ("LEFTPADDING", (0, 0), (-1, -1), 4),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 3),
