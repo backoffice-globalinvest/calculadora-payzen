@@ -1169,10 +1169,12 @@ def generar_pdf_resumen(df_pdf):
         colWidths=[3.35 * inch, 5.20 * inch]
     )
 
+    tablas_operativas.hAlign = "LEFT"
+
     tablas_operativas.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
