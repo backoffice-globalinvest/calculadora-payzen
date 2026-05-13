@@ -1453,6 +1453,7 @@ def generar_pdf_resumen(df_pdf):
     story.append(Spacer(1, 2))
     
     # 4. AHORRO ESTIMADO
+
     story.append(Paragraph("Ahorro estimado con PayZen", section_style))
 
     ahorro_data = [
@@ -1463,18 +1464,26 @@ def generar_pdf_resumen(df_pdf):
     ]
 
     ahorro_table = Table(ahorro_data, colWidths=[2.45 * inch, 1.45 * inch])
+
     ahorro_table.setStyle(TableStyle([
-        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#16A34A")),
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#A7B7D8")),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#047857")),
+
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#047857")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+
+        ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#ECFDF5")),
+
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 4),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
     story.append(ahorro_table)
     story.append(Spacer(1, 8))
