@@ -1090,8 +1090,11 @@ def generar_pdf_resumen(df_pdf):
     # Tabla 1: Valor inicial
     info_resumen_data = [
         [
-            paragraph_cell("VALOR INICIAL", table_header),
-            ""
+        Paragraph(
+            '<font color="white"><b>VALOR INICIAL</b></font>',
+            table_header
+        ),
+        ""
         ],
         [
             paragraph_cell("Volumen", table_cell),
