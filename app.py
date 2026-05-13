@@ -1426,6 +1426,10 @@ def generar_pdf_resumen(df_pdf):
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 4),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ("SPAN", (0, 5), (3, 5)),
+        ("ALIGN", (0, 5), (3, 5), "CENTER"),
+        ("BACKGROUND", (0, 5), (4, 5), colors.HexColor("#DBEAFE")),
+        ("FONTNAME", (0, 5), (4, 5), "Helvetica-Bold"),
     ]))
 
     combined_tables = Table(
