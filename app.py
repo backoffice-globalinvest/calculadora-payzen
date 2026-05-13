@@ -1163,6 +1163,7 @@ def generar_pdf_resumen(df_pdf):
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 3),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
     ]))
 
     story.append(metodos_table)
