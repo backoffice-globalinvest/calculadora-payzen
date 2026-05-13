@@ -1083,36 +1083,90 @@ def generar_pdf_resumen(df_pdf):
     pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
     pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
 
-    # 1. INFORMACIÓN OPERATIVA INICIAL
+     # 1. INFORMACIÓN OPERATIVA INICIAL
     story.append(Paragraph("Información Operativa Inicial", section_style))
 
-    info_data = [
-        [paragraph_cell("Volumen (Número de transacciones)", table_cell), paragraph_cell(number_fmt(total_tx), table_cell_right), ""],
-        [paragraph_cell("Ticket Promedio", table_cell), paragraph_cell(money(ticket_promedio), table_cell_right), ""],
-        [paragraph_cell("Métodos de pago escogidos", table_header), paragraph_cell("Número de transacciones", table_header), paragraph_cell("% Transaccional", table_header)],
-        [paragraph_cell("Tarjeta Crédito / Tarjeta Débito", table_cell), paragraph_cell(number_fmt(first["TC"]), table_cell_right), paragraph_cell(percent(pct_tc_pdf), table_cell_right)],
-        [paragraph_cell("PSE", table_cell), paragraph_cell(number_fmt(first["PSE"]), table_cell_right), paragraph_cell(percent(pct_pse_pdf), table_cell_right)],
-        [paragraph_cell("Bre-B", table_cell), paragraph_cell(number_fmt(first["Bre-B"]), table_cell_right), paragraph_cell(percent(pct_breb_pdf), table_cell_right)],
-        ["", paragraph_cell(number_fmt(total_tx), table_cell_right), paragraph_cell("100%", table_cell_right)],
+    # Tabla 1: Volumen y Ticket Promedio
+    info_resumen_data = [
+        [
+            paragraph_cell("Volumen (Número de transacciones)", table_cell),
+            paragraph_cell(number_fmt(total_tx), table_cell_right)
+        ],
+        [
+            paragraph_cell("Ticket Promedio", table_cell),
+            paragraph_cell(money(ticket_promedio), table_cell_right)
+        ],
     ]
 
-    info_table = Table(info_data, colWidths=[2.45 * inch, 1.35 * inch, 1.15 * inch])
-    info_table.setStyle(TableStyle([
+    info_resumen_table = Table(
+        info_resumen_data,
+        colWidths=[2.95 * inch, 2.95 * inch]
+    )
+
+    info_resumen_table.setStyle(TableStyle([
         ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
-        ("SPAN", (1, 0), (2, 0)),
-        ("SPAN", (1, 1), (2, 1)),
-        ("BACKGROUND", (0, 3), (-1, 3), colors.HexColor("#E5E7EB")),
-        ("FONTNAME", (0, 3), (-1, 3), "Helvetica-Bold"),
+        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+    ]))
+
+    story.append(info_resumen_table)
+    story.append(Spacer(1, 12))
+
+    # Tabla 2: Métodos de pago escogidos
+    metodos_data = [
+        [
+            paragraph_cell("Métodos de pago escogidos", table_header),
+            paragraph_cell("Número de transacciones", table_header),
+            paragraph_cell("% Transaccional", table_header)
+        ],
+        [
+            paragraph_cell("Tarjeta Crédito / Tarjeta Débito", table_cell),
+            paragraph_cell(number_fmt(first["TC"]), table_cell_right),
+            paragraph_cell(percent(pct_tc_pdf), table_cell_right)
+        ],
+        [
+            paragraph_cell("PSE", table_cell),
+            paragraph_cell(number_fmt(first["PSE"]), table_cell_right),
+            paragraph_cell(percent(pct_pse_pdf), table_cell_right)
+        ],
+        [
+            paragraph_cell("Bre-B", table_cell),
+            paragraph_cell(number_fmt(first["Bre-B"]), table_cell_right),
+            paragraph_cell(percent(pct_breb_pdf), table_cell_right)
+        ],
+        [
+            "",
+            paragraph_cell(number_fmt(total_tx), table_cell_right),
+            paragraph_cell("100%", table_cell_right)
+        ],
+    ]
+
+    metodos_table = Table(
+        metodos_data,
+        colWidths=[2.45 * inch, 1.35 * inch, 1.15 * inch]
+    )
+
+    metodos_table.setStyle(TableStyle([
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
         ("LEFTPADDING", (0, 0), (-1, -1), 4),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 3),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
     ]))
-    story.append(info_table)
+
+    story.append(metodos_table)
     story.append(Spacer(1, 6))
+
 
     # 2. COSTOS PASARELA ACTUAL
     story.append(Paragraph("Costos Pasarela Actual", section_style))
