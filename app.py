@@ -1064,7 +1064,7 @@ def generar_pdf_resumen(df_pdf):
     story = []
 
     try:
-        logo = Image("Logo_Globalinvest_PayZen.png", width=2.2 * inch, height=0.70 * inch)
+        logo = Image("Logo_Globalinvest_PayZen.png", width=1.8 * inch, height=0.70 * inch)
         logo.hAlign = "CENTER"
         story.append(logo)
         story.append(Spacer(1, 4))
@@ -1113,7 +1113,7 @@ def generar_pdf_resumen(df_pdf):
 
     info_resumen_table.setStyle(TableStyle([
         ("SPAN", (0, 0), (1, 0)),
-        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#1B1B1D")),
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#3A3A3D")),
         ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
         ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
         ("ALIGN", (0, 0), (1, 0), "CENTER"),
@@ -1166,7 +1166,7 @@ def generar_pdf_resumen(df_pdf):
 
     metodos_table.setStyle(TableStyle([
         ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#9CA3AF")),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1B1B1D")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#3A3A3D")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
         ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
@@ -1198,34 +1198,66 @@ def generar_pdf_resumen(df_pdf):
     story.append(Spacer(1, 8))
     
     # 2. COSTOS PASARELA ACTUAL
-    story.append(Paragraph("Costos Pasarela Actual", section_style))
+
+    story.append(Paragraph(
+        '<font color="#111827"><b>Costos Pasarela Actual</b></font>',
+        section_style
+    ))
 
     modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
+
     actual_data = [
-        [paragraph_cell("Costos Pasarela Actual", table_header), paragraph_cell("MODELO AGREGADOR", table_header)],
-        [paragraph_cell("Plan actual", table_cell), paragraph_cell(modelo_actual, table_cell_right)],
-        [paragraph_cell("Ticket Promedio", table_cell), paragraph_cell(money(ticket_promedio), table_cell_right)],
-        [paragraph_cell("Volumen (Número de transacciones)", table_cell), paragraph_cell(number_fmt(total_tx), table_cell_right)],
-        [paragraph_cell("Costo Total pasarela agregadora", table_header), paragraph_cell(money(first["Pasarela actual"]), table_cell_right)],
+        [
+            Paragraph('<font color="white"><b>Costos Pasarela Actual</b></font>', table_header),
+            Paragraph('<font color="white"><b>MODELO AGREGADOR</b></font>', table_header)
+        ],
+        [
+            paragraph_cell("Plan actual", table_cell),
+            paragraph_cell(modelo_actual, table_cell_right)
+        ],
+        [
+            paragraph_cell("Ticket Promedio", table_cell),
+            paragraph_cell(money(ticket_promedio), table_cell_right)
+        ],
+        [
+            paragraph_cell("Volumen (Número de transacciones)", table_cell),
+            paragraph_cell(number_fmt(total_tx), table_cell_right)
+        ],
+        [
+            paragraph_cell("Costo Total pasarela agregadora", table_cell),
+            paragraph_cell(money(first["Pasarela actual"]), table_cell_right)
+        ],
     ]
 
-    actual_table = Table(actual_data, colWidths=[2.45 * inch, 1.45 * inch])
+    actual_table = Table(
+        actual_data,
+        colWidths=[2.45 * inch, 1.45 * inch]
+    )
+
+    actual_table.hAlign = "LEFT"
+
     actual_table.setStyle(TableStyle([
-        ("GRID", (0, 0), (-1, -1), 0.45, colors.black),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#E5E7EB")),
-        ("BACKGROUND", (0, 4), (-1, 4), colors.yellow),
+        ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#BFC5D2")),
+        ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#E67B16")),
+
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#111827")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+
+        ("BACKGROUND", (0, 4), (-1, 4), colors.HexColor("#B39573")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 4), (-1, 4), "Helvetica-Bold"),
+
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 4),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
     ]))
+
     story.append(actual_table)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 8))
 
     # 3. COSTOS PAYZEN Y COSTOS ADQUIRENTE LADO A LADO
     payzen_data = [
