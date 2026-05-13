@@ -1460,12 +1460,9 @@ def generar_pdf_resumen(df_pdf):
 
     ahorro_data = [
         [Paragraph('<font color="white"><b>Indicador</b></font>', table_header), Paragraph('<font color="white"><b>Resultado</b></font>', table_header)],
-        [Paragraph("<b>Ahorro Mensual</b>", table_cell)],
-        [Paragraph(f"<b>{money(first['Ahorro mensual'])}</b>", table_cell_right)],
-        [Paragraph("<b>Ahorro Anual</b>", table_cell)],
-        [Paragraph(f"<b>{money(first['Ahorro anual'])}</b>", table_cell_right)],
-        [ Paragraph("<b>Ahorro porcentual</b>", table_cell),],
-        [Paragraph(f"<b>{percent(first['Ahorro %'])}</b>", table_cell_right)],
+        [paragraph_cell("Ahorro mensual", table_cell), paragraph_cell(money(first["Ahorro mensual"]), table_cell_right)],
+        [paragraph_cell("Ahorro anual", table_cell), paragraph_cell(money(first["Ahorro anual"]), table_cell_right)],
+        [paragraph_cell("Ahorro porcentual", table_cell), paragraph_cell(percent(first["Ahorro %"]), table_cell_right)],
     ]
 
     ahorro_table = Table(ahorro_data, colWidths=[2.45 * inch, 1.45 * inch])
