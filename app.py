@@ -1797,10 +1797,15 @@ def generar_pdf_ejecutivo(df_pdf):
             Paragraph("<b>Costo total PayZen</b>", total_style),
             Paragraph(f"<b>{money(first['Total PayZen Gateway'])}</b>", total_style_right)
         ],
-                [
+        [
             Paragraph("<b>Costo adquirientes</b>", total_style),
             Paragraph(f"<b>{money(first['Total adquirencia'])}</b>", total_style_right)
         ],
+        [
+            Paragraph("<b>Total PayZen + adquirientes</b>", total_style),
+            Paragraph(f"<b>{money(first['PayZen'])}</b>", total_style_right)
+        ],
+
     ]
 
     modelo_payzen_table = Table(
@@ -1819,9 +1824,9 @@ def generar_pdf_ejecutivo(df_pdf):
         ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
         ("FONTNAME", (0, 1), (1, 1), "Helvetica-Bold"),
 
-        ("BACKGROUND", (0, 6), (1, 6), colors.HexColor("#0F172A")),
-        ("TEXTCOLOR", (0, 6), (1, 6), colors.white),
-        ("FONTNAME", (0, 6), (1, 6), "Helvetica-Bold"),
+        ("BACKGROUND", (0, 8), (1, 8), colors.HexColor("#0F172A")),
+        ("TEXTCOLOR", (0, 8), (1, 8), colors.white),
+        ("FONTNAME", (0, 8), (1, 8), "Helvetica-Bold"),
 
         ("ALIGN", (0, 0), (1, 1), "CENTER"),
         ("ALIGN", (1, 2), (1, -1), "RIGHT"),
