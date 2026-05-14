@@ -1714,10 +1714,10 @@ def generar_pdf_ejecutivo(df_pdf):
             Paragraph('<font color="white"><b>Costos Pasarela Actual</b></font>', table_header),
             ""
         ],
-        [
-            Paragraph("<b>Concepto</b>", table_header),
-            Paragraph("<b>Valor</b>", table_header)
-        ],
+       #[
+        #    Paragraph("<b>Concepto</b>", table_header),
+       #     Paragraph("<b>Valor</b>", table_header)
+       #],
         [
             Paragraph("Plan actual", table_cell),
             Paragraph(modelo_actual, table_cell_right)
