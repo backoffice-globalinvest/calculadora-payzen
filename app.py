@@ -1811,7 +1811,7 @@ def generar_pdf_ejecutivo(df_pdf):
         ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
         ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
 
-        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#DBEAFE")),
+        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#507BB3")),
         ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
         ("FONTNAME", (0, 1), (1, 1), "Helvetica-Bold"),
 
