@@ -1797,6 +1797,10 @@ def generar_pdf_ejecutivo(df_pdf):
             Paragraph("<b>Costo total PayZen</b>", total_style),
             Paragraph(f"<b>{money(first['Total PayZen Gateway'])}</b>", total_style_right)
         ],
+                [
+            Paragraph("<b>Costo adquirientes</b>", total_style),
+            Paragraph(f"<b>{money(first['Total adquirencia'])}</b>", total_style_right)
+        ],
     ]
 
     modelo_payzen_table = Table(
