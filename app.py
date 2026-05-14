@@ -1499,7 +1499,7 @@ def generar_pdf_Comercial(df_pdf):
 
 
 # ---------------------------------------------------
-# PDF EJECUTIVO CEDRIC 
+# PDF EJECUTIVO - CEDRIC 
 # ---------------------------------------------------
 
 def generar_pdf_ejecutivo(df_pdf):
@@ -1646,7 +1646,7 @@ def generar_pdf_ejecutivo(df_pdf):
 
     header_table = Table(
         [[logo, Paragraph("Resumen Ejecutivo PayZen", title_style)]],
-        colWidths=[2.0 * inch, 7.8 * inch]
+        colWidths=[1.7 * inch, 7.5 * inch]
     )
     header_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -1709,13 +1709,61 @@ def generar_pdf_ejecutivo(df_pdf):
     # ---------------------------------------------------
     # TABLA 2 - MODELO ACTUAL
     # ---------------------------------------------------
-    story.append(Paragraph("Modelo actual", section_style))
     modelo_actual_data = [
-        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
-        [Paragraph("Plan pasarela actual", table_cell), Paragraph(modelo_actual, table_cell_right)],
-        [Paragraph("Costo pasarela actual", table_cell), Paragraph(money(first["Pasarela actual"]), table_cell_right)],
+        [
+            Paragraph('<font color="white"><b>Modelo actual</b></font>', table_header),
+            ""
+        ],
+        [
+            Paragraph("<b>Concepto</b>", table_header),
+            Paragraph("<b>Valor</b>", table_header)
+        ],
+        [
+            Paragraph("Plan pasarela actual", table_cell),
+            Paragraph(modelo_actual, table_cell_right)
+        ],
+        [
+            Paragraph("Costo pasarela actual", table_cell),
+            Paragraph(money(first["Pasarela actual"]), table_cell_right)
+        ],
     ]
-    story.append(make_table(modelo_actual_data, [4.8 * inch, 2.4 * inch], header_color="#EA7A2F", grid_color="#F3B383"))
+
+    modelo_actual_table = Table(
+        modelo_actual_data,
+        colWidths=[4.8 * inch, 2.4 * inch]
+    )
+
+    modelo_actual_table.setStyle(TableStyle([
+        ("SPAN", (0, 0), (1, 0)),
+
+        # Naranja oscuro arriba
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#C2410C")),
+
+        # Naranja claro abajo
+        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#FDBA74")),
+
+        ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
+        ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
+
+        ("ALIGN", (0, 0), (1, 1), "CENTER"),
+        ("ALIGN", (1, 2), (1, -1), "RIGHT"),
+
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#F3B383")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+
+        # para que resalte el negro en el total todo el margen 
+
+        ("BACKGROUND", (0, 3), (1, 3), colors.HexColor("#0F172A")),
+        ("TEXTCOLOR", (0, 3), (1, 3), colors.white),
+        ("FONTNAME", (0, 3), (1, 3), "Helvetica-Bold"),
+    ]))
+
+    story.append(modelo_actual_table)
     story.append(Spacer(1, 7))
 
     # ---------------------------------------------------
