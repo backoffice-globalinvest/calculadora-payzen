@@ -1698,8 +1698,8 @@ def generar_pdf_ejecutivo(df_pdf):
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("LEFTPADDING", (0, 0), (-1, -1), 7),
         ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
     ]))
 
     story.append(datos_iniciales_table)
@@ -1768,16 +1768,70 @@ def generar_pdf_ejecutivo(df_pdf):
     # ---------------------------------------------------
     # TABLA 3 - MODELO PAYZEN
     # ---------------------------------------------------
-    story.append(Paragraph("Modelo PayZen", section_style))
     modelo_payzen_data = [
-        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
-        [Paragraph("Plan seleccionado PayZen", table_cell), Paragraph(plan, table_cell_right)],
-        [Paragraph("Costo PayZen", table_cell), Paragraph(money(first["Costo plan"]), table_cell_right)],
-        [Paragraph("Costo transacción adicional PayZen", table_cell), Paragraph(money(first["Tarifa adicional"]), table_cell_right)],
-        [Paragraph("Costo total transacciones adicionales PayZen", table_cell), Paragraph(money(first["Costo adicionales"]), table_cell_right)],
-        [Paragraph("Costo total PayZen", total_style), Paragraph(money(first["Total PayZen Gateway"]), total_style_right)],
+        [
+            Paragraph('<font color="white"><b>Modelo PayZen</b></font>', table_header),
+            ""
+        ],
+        [
+            Paragraph('<font color="white"><b>Concepto</b></font>', table_header),
+            Paragraph('<font color="white"><b>Valor</b></font>', table_header)
+        ],
+        [
+            Paragraph("Plan seleccionado PayZen", table_cell),
+            Paragraph(plan, table_cell_right)
+        ],
+        [
+            Paragraph("Costo PayZen", table_cell),
+            Paragraph(money(first["Costo plan"]), table_cell_right)
+        ],
+        [
+            Paragraph("Costo transacción adicional PayZen", table_cell),
+            Paragraph(money(first["Tarifa adicional"]), table_cell_right)
+        ],
+        [
+            Paragraph("Costo total transacciones adicionales PayZen", table_cell),
+            Paragraph(money(first["Costo adicionales"]), table_cell_right)
+        ],
+        [
+            Paragraph("<b>Costo total PayZen</b>", total_style),
+            Paragraph(f"<b>{money(first['Total PayZen Gateway'])}</b>", total_style_right)
+        ],
     ]
-    story.append(make_table(modelo_payzen_data, [4.8 * inch, 2.4 * inch], total_last=True))
+
+    modelo_payzen_table = Table(
+        modelo_payzen_data,
+        colWidths=[4.8 * inch, 2.4 * inch]
+    )
+
+    modelo_payzen_table.setStyle(TableStyle([
+        ("SPAN", (0, 0), (1, 0)),
+
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#2563EB")),
+        ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
+        ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
+
+        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#DBEAFE")),
+        ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
+        ("FONTNAME", (0, 1), (1, 1), "Helvetica-Bold"),
+
+        ("BACKGROUND", (0, 6), (1, 6), colors.HexColor("#0F172A")),
+        ("TEXTCOLOR", (0, 6), (1, 6), colors.white),
+        ("FONTNAME", (0, 6), (1, 6), "Helvetica-Bold"),
+
+        ("ALIGN", (0, 0), (1, 1), "CENTER"),
+        ("ALIGN", (1, 2), (1, -1), "RIGHT"),
+
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#A7B7D8")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+    ]))
+
+    story.append(modelo_payzen_table)
     story.append(Spacer(1, 7))
 
     # ---------------------------------------------------
