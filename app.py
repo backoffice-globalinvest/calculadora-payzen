@@ -1498,17 +1498,11 @@ def generar_pdf_Comercial(df_pdf):
     return pdf
 
 
-
-
-# ---------------------------------------------------
-# PDF Cedric -  PDF informe ejecutivo
-# ---------------------------------------------------
 # ---------------------------------------------------
 # PDF EJECUTIVO
 # ---------------------------------------------------
 
 def generar_pdf_ejecutivo(df_pdf):
-
     buffer = BytesIO()
 
     doc = SimpleDocTemplate(
@@ -1516,51 +1510,47 @@ def generar_pdf_ejecutivo(df_pdf):
         pagesize=landscape(letter),
         rightMargin=34,
         leftMargin=34,
-        topMargin=18,
-        bottomMargin=22
+        topMargin=16,
+        bottomMargin=18
     )
 
     styles = getSampleStyleSheet()
 
-    # ---------------------------------------------------
-    # ESTILOS
-    # ---------------------------------------------------
-
     title_style = ParagraphStyle(
         "TitleExecutive",
         parent=styles["Title"],
-        fontSize=24,
-        leading=28,
+        fontSize=22,
+        leading=25,
         textColor=colors.HexColor("#0F172A"),
         alignment=1,
-        spaceAfter=6
+        spaceAfter=4
     )
 
     subtitle_style = ParagraphStyle(
         "SubtitleExecutive",
         parent=styles["BodyText"],
-        fontSize=10,
-        leading=12,
+        fontSize=9,
+        leading=11,
         alignment=1,
         textColor=colors.HexColor("#64748B"),
-        spaceAfter=12
+        spaceAfter=8
     )
 
     section_style = ParagraphStyle(
         "SectionExecutive",
         parent=styles["Heading2"],
-        fontSize=12,
-        leading=14,
+        fontSize=9.5,
+        leading=11,
         textColor=colors.HexColor("#0F172A"),
-        spaceBefore=8,
-        spaceAfter=8
+        spaceBefore=4,
+        spaceAfter=4
     )
 
     table_cell = ParagraphStyle(
         "ExecutiveCell",
         parent=styles["BodyText"],
-        fontSize=9,
-        leading=11,
+        fontSize=7.6,
+        leading=9.2,
         textColor=colors.HexColor("#111827")
     )
 
@@ -1582,8 +1572,8 @@ def generar_pdf_ejecutivo(df_pdf):
         "ExecutiveTotal",
         parent=table_cell,
         fontName="Helvetica-Bold",
-        fontSize=10,
-        leading=12,
+        fontSize=8.4,
+        leading=10,
         textColor=colors.white
     )
 
@@ -1597,50 +1587,67 @@ def generar_pdf_ejecutivo(df_pdf):
         "AhorroStyle",
         parent=table_cell,
         fontName="Helvetica-Bold",
-        fontSize=10,
-        leading=12,
-        textColor=colors.HexColor("#047857")
+        fontSize=8.4,
+        leading=10,
+        textColor=colors.HexColor("#047857"),
+        alignment=2
     )
 
     disclaimer_style = ParagraphStyle(
         "DisclaimerExecutive",
         parent=styles["BodyText"],
-        fontSize=6.5,
-        leading=8,
+        fontSize=6,
+        leading=7,
         textColor=colors.HexColor("#6B7280"),
         alignment=0
     )
 
-    story = []
+    conclusion_style = ParagraphStyle(
+        "Conclusion",
+        parent=styles["BodyText"],
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor("#334155"),
+        alignment=0
+    )
 
-    # ---------------------------------------------------
-    # HEADER
-    # ---------------------------------------------------
+    def make_table(data, col_widths, header_color="#2563EB", total_last=False, grid_color="#CBD5E1"):
+        table = Table(data, colWidths=col_widths)
+        style_cmds = [
+            ("GRID", (0, 0), (-1, -1), 0.30, colors.HexColor(grid_color)),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(header_color)),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ]
+        if total_last:
+            style_cmds.extend([
+                ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#0F172A")),
+                ("TEXTCOLOR", (0, -1), (-1, -1), colors.white),
+                ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+            ])
+        table.setStyle(TableStyle(style_cmds))
+        return table
+
+    story = []
+    first = df_pdf.iloc[0]
+    total_tx = first["Transacciones"]
+    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
 
     try:
-        logo = Image(
-            "Logo_Globalinvest_PayZen.png",
-            width=1.70 * inch,
-            height=0.52 * inch
-        )
+        logo = Image("Logo_Globalinvest_PayZen.png", width=1.70 * inch, height=0.52 * inch)
     except Exception:
         logo = Paragraph("", table_cell)
 
-    titulo = Paragraph(
-        "Resumen Ejecutivo PayZen",
-        title_style
-    )
-
-    subtitulo = Paragraph(
-        "Análisis comparativo de costos transaccionales",
-        subtitle_style
-    )
-
     header_table = Table(
-        [[logo, titulo]],
+        [[logo, Paragraph("Resumen Ejecutivo PayZen", title_style)]],
         colWidths=[2.0 * inch, 7.8 * inch]
     )
-
     header_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
@@ -1650,315 +1657,90 @@ def generar_pdf_ejecutivo(df_pdf):
     ]))
 
     story.append(header_table)
-    story.append(subtitulo)
+    story.append(Paragraph("Análisis comparativo de costos transaccionales", subtitle_style))
+    story.append(Spacer(1, 5))
+
+    # ---------------------------------------------------
+    # TABLA 1 - DATOS INICIALES
+    # ---------------------------------------------------
+    story.append(Paragraph("Datos iniciales", section_style))
+    datos_iniciales_data = [
+        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
+        [Paragraph("Ticket promedio", table_cell), Paragraph(money(ticket_promedio), table_cell_right)],
+        [Paragraph("Número de transacciones", table_cell), Paragraph(number_fmt(total_tx), table_cell_right)],
+    ]
+    story.append(make_table(datos_iniciales_data, [4.8 * inch, 2.4 * inch]))
+    story.append(Spacer(1, 7))
+
+    # ---------------------------------------------------
+    # TABLA 2 - MODELO ACTUAL
+    # ---------------------------------------------------
+    story.append(Paragraph("Modelo actual", section_style))
+    modelo_actual_data = [
+        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
+        [Paragraph("Plan pasarela actual", table_cell), Paragraph(modelo_actual, table_cell_right)],
+        [Paragraph("Costo pasarela actual", table_cell), Paragraph(money(first["Pasarela actual"]), table_cell_right)],
+    ]
+    story.append(make_table(modelo_actual_data, [4.8 * inch, 2.4 * inch], header_color="#EA7A2F", grid_color="#F3B383"))
+    story.append(Spacer(1, 7))
+
+    # ---------------------------------------------------
+    # TABLA 3 - MODELO PAYZEN
+    # ---------------------------------------------------
+    story.append(Paragraph("Modelo PayZen", section_style))
+    modelo_payzen_data = [
+        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
+        [Paragraph("Plan seleccionado PayZen", table_cell), Paragraph(plan, table_cell_right)],
+        [Paragraph("Costo PayZen", table_cell), Paragraph(money(first["Costo plan"]), table_cell_right)],
+        [Paragraph("Costo transacción adicional PayZen", table_cell), Paragraph(money(first["Tarifa adicional"]), table_cell_right)],
+        [Paragraph("Costo total transacciones adicionales PayZen", table_cell), Paragraph(money(first["Costo adicionales"]), table_cell_right)],
+        [Paragraph("Costo total PayZen", total_style), Paragraph(money(first["Total PayZen Gateway"]), total_style_right)],
+    ]
+    story.append(make_table(modelo_payzen_data, [4.8 * inch, 2.4 * inch], total_last=True))
+    story.append(Spacer(1, 7))
+
+    # ---------------------------------------------------
+    # TABLA 4 - ADQUIRIENCIA Y TOTAL
+    # ---------------------------------------------------
+    story.append(Paragraph("Adquirencia y total", section_style))
+    total_data = [
+        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
+        [Paragraph("Costo adquirientes", table_cell), Paragraph(money(first["Total adquirencia"]), table_cell_right)],
+        [Paragraph("Total PayZen + adquirientes", total_style), Paragraph(money(first["PayZen"]), total_style_right)],
+    ]
+    story.append(make_table(total_data, [4.8 * inch, 2.4 * inch], total_last=True))
     story.append(Spacer(1, 8))
 
     # ---------------------------------------------------
-    # VARIABLES
+    # TABLA 5 - AHORRO ESTIMADO
     # ---------------------------------------------------
-
-    first = df_pdf.iloc[0]
-
-    total_tx = first["Transacciones"]
-
-    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
-
-    # ---------------------------------------------------
-    # TABLA EJECUTIVA
-    # ---------------------------------------------------
-
-    story.append(
-        Paragraph(
-            "Resumen Ejecutivo de Costos",
-            section_style
-        )
-    )
-
-    ejecutivo_data = [
-
-        [
-            Paragraph(
-                '<font color="white"><b>Concepto</b></font>',
-                table_header
-            ),
-            Paragraph(
-                '<font color="white"><b>Valor</b></font>',
-                table_header
-            )
-        ],
-
-        [
-            Paragraph("<b>DATOS INICIALES</b>", table_cell),
-            ""
-        ],
-
-        [
-            Paragraph("Ticket promedio", table_cell),
-            Paragraph(money(ticket_promedio), table_cell_right)
-        ],
-
-        [
-            Paragraph("Número de transacciones", table_cell),
-            Paragraph(number_fmt(total_tx), table_cell_right)
-        ],
-
-        [
-            "", ""
-        ],
-
-        [
-            Paragraph("<b>MODELO ACTUAL</b>", table_cell),
-            ""
-        ],
-
-        [
-            Paragraph("Plan pasarela actual", table_cell),
-            Paragraph(modelo_actual, table_cell_right)
-        ],
-
-        [
-            Paragraph("Costo pasarela actual", table_cell),
-            Paragraph(money(first["Pasarela actual"]), table_cell_right)
-        ],
-
-        [
-            "", ""
-        ],
-
-        [
-            Paragraph("<b>MODELO PAYZEN</b>", table_cell),
-            ""
-        ],
-
-        [
-            Paragraph("Plan seleccionado PayZen", table_cell),
-            Paragraph(plan, table_cell_right)
-        ],
-
-        [
-            Paragraph("Costo PayZen", table_cell),
-            Paragraph(money(first["Costo plan"]), table_cell_right)
-        ],
-
-        [
-            Paragraph("Costo transacción adicional PayZen", table_cell),
-            Paragraph(money(first["Tarifa adicional"]), table_cell_right)
-        ],
-
-        [
-            Paragraph("Costo total transacciones adicionales PayZen", table_cell),
-            Paragraph(money(first["Costo adicionales"]), table_cell_right)
-        ],
-
-        [
-            Paragraph("<b>Costo total PayZen</b>", table_cell),
-            Paragraph(
-                f"<b>{money(first['Total PayZen Gateway'])}</b>",
-                table_cell_right
-            )
-        ],
-
-        [
-            "", ""
-        ],
-
-        [
-            Paragraph("<b>ADQUIRIENCIA</b>", table_cell),
-            ""
-        ],
-
-        [
-            Paragraph("Costo adquirientes", table_cell),
-            Paragraph(
-                money(first["Total adquirencia"]),
-                table_cell_right
-            )
-        ],
-
-        [
-            "", ""
-        ],
-
-        [
-            Paragraph(
-                "<b>Total PayZen + adquirientes</b>",
-                total_style
-            ),
-
-            Paragraph(
-                f"<b>{money(first['PayZen'])}</b>",
-                total_style_right
-            )
-        ]
-    ]
-
-    ejecutivo_table = Table(
-        ejecutivo_data,
-        colWidths=[4.8 * inch, 2.4 * inch]
-    )
-
-    ejecutivo_table.setStyle(TableStyle([
-
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#CBD5E1")),
-
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2563EB")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-
-        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#0F172A")),
-        ("TEXTCOLOR", (0, -1), (-1, -1), colors.white),
-
-        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
-
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-
-    ]))
-
-    story.append(ejecutivo_table)
-
-    story.append(Spacer(1, 14))
-
-    # ---------------------------------------------------
-    # TABLA AHORRO
-    # ---------------------------------------------------
-
-    story.append(
-        Paragraph(
-            "Ahorro Estimado",
-            section_style
-        )
-    )
-
+    story.append(Paragraph("Ahorro estimado", section_style))
     ahorro_data = [
-
-        [
-            Paragraph(
-                '<font color="white"><b>Indicador</b></font>',
-                table_header
-            ),
-
-            Paragraph(
-                '<font color="white"><b>Resultado</b></font>',
-                table_header
-            )
-        ],
-
-        [
-            Paragraph("Ahorro mensual", table_cell),
-            Paragraph(
-                money(first["Ahorro mensual"]),
-                ahorro_style
-            )
-        ],
-
-        [
-            Paragraph("Ahorro anual", table_cell),
-            Paragraph(
-                money(first["Ahorro anual"]),
-                ahorro_style
-            )
-        ],
-
-        [
-            Paragraph("Ahorro porcentual", table_cell),
-            Paragraph(
-                percent(first["Ahorro %"]),
-                ahorro_style
-            )
-        ]
-
+        [Paragraph('<font color="white"><b>Indicador</b></font>', table_header), Paragraph('<font color="white"><b>Resultado</b></font>', table_header)],
+        [Paragraph("Ahorro mensual", table_cell), Paragraph(money(first["Ahorro mensual"]), ahorro_style)],
+        [Paragraph("Ahorro anual", table_cell), Paragraph(money(first["Ahorro anual"]), ahorro_style)],
+        [Paragraph("Ahorro porcentual", table_cell), Paragraph(percent(first["Ahorro %"]), ahorro_style)],
     ]
-
-    ahorro_table = Table(
-        ahorro_data,
-        colWidths=[3.6 * inch, 2.2 * inch]
-    )
-
+    ahorro_table = make_table(ahorro_data, [4.8 * inch, 2.4 * inch], header_color="#16A34A", grid_color="#BBF7D0")
     ahorro_table.setStyle(TableStyle([
-
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#BBF7D0")),
-
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#16A34A")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-
         ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F0FDF4")),
-
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-
-        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
-
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-
     ]))
-
     story.append(ahorro_table)
-
-    story.append(Spacer(1, 18))
-
-
-
-    # ---------------------------------------------------
-    # CONCLUSIÓN EJECUTIVA
-    # ---------------------------------------------------
+    story.append(Spacer(1, 7))
 
     conclusion = (
         "Con base en el escenario analizado, la propuesta PayZen permite "
         f"una reducción estimada del {percent(first['Ahorro %'])} "
         "en costos transaccionales mensuales frente al modelo agregador actual."
     )
-
-    conclusion_style = ParagraphStyle(
-        "Conclusion",
-        parent=styles["BodyText"],
-        fontSize=9,
-        leading=13,
-        textColor=colors.HexColor("#334155"),
-        alignment=0
-    )
-
-    story.append(
-        Paragraph(
-            conclusion,
-            conclusion_style
-        )
-    )
-
-    story.append(Spacer(1, 12))
-
-    # ---------------------------------------------------
-    # DISCLAIMER
-    # ---------------------------------------------------
-
-    story.append(
-        Paragraph(
-            DISCLAIMER,
-            disclaimer_style
-        )
-    )
-
-    # ---------------------------------------------------
-    # BUILD PDF
-    # ---------------------------------------------------
+    story.append(Paragraph(conclusion, conclusion_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(DISCLAIMER, disclaimer_style))
 
     doc.build(story)
-
     pdf = buffer.getvalue()
-
     buffer.close()
-
     return pdf
-
 
 
 st.download_button(
