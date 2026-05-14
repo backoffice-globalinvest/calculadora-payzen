@@ -1793,14 +1793,16 @@ def generar_pdf_ejecutivo(df_pdf):
             Paragraph("Costo total transacciones adicionales PayZen", table_cell),
             Paragraph(money(first["Costo adicionales"]), table_cell_right)
         ],
+    
         [
-            Paragraph("<b>Costo total PayZen</b>", total_style),
-            Paragraph(f"<b>{money(first['Total PayZen Gateway'])}</b>", total_style_right)
+            Paragraph("Costo total PayZen", table_cell),
+            Paragraph(money(first["Total PayZen Gateway"]), table_cell_right)
         ],
         [
-            Paragraph("<b>Costo adquirientes</b>", total_style),
-            Paragraph(f"<b>{money(first['Total adquirencia'])}</b>", total_style_right)
+            Paragraph("Costo adquirientes", table_cell),
+            Paragraph(money(first["Total adquirencia"]), table_cell_right)
         ],
+
         [
             Paragraph("<b>Total PayZen + adquirientes</b>", total_style),
             Paragraph(f"<b>{money(first['PayZen'])}</b>", total_style_right)
