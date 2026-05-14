@@ -1710,22 +1710,33 @@ def generar_pdf_ejecutivo(df_pdf):
     # TABLA 2 - MODELO ACTUAL
     # ---------------------------------------------------
     modelo_actual_data = [
+
         [
-            Paragraph('<font color="white"><b>Modelo actual</b></font>', table_header),
+            Paragraph(
+                '<font color="white"><b>Modelo actual</b></font>',
+                table_header
+            ),
             ""
         ],
+
         [
             Paragraph("<b>Concepto</b>", table_header),
             Paragraph("<b>Valor</b>", table_header)
         ],
+
         [
             Paragraph("Plan pasarela actual", table_cell),
             Paragraph(modelo_actual, table_cell_right)
         ],
+
         [
-            Paragraph("Costo pasarela actual", table_cell),
-            Paragraph(money(first["Pasarela actual"]), table_cell_right)
+            Paragraph("<b>Costo pasarela actual</b>", table_cell),
+            Paragraph(
+                f"<b>{money(first['Pasarela actual'])}</b>",
+                table_cell_right
+            )
         ],
+
     ]
 
     modelo_actual_table = Table(
@@ -1736,35 +1747,35 @@ def generar_pdf_ejecutivo(df_pdf):
     modelo_actual_table.setStyle(TableStyle([
         ("SPAN", (0, 0), (1, 0)),
 
-        # Naranja oscuro arriba
-        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#C2410C")),
-
-        # Naranja claro abajo
-        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#FDBA74")),
-
+        # Encabezado principal
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#B45309")),
         ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
-        ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
+        ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
 
+        # Encabezado Concepto / Valor
+        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#FED7AA")),
+        ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
+        ("FONTNAME", (0, 1), (1, 1), "Helvetica-Bold"),
+
+        # Fila total
+        ("BACKGROUND", (0, 3), (1, 3), colors.HexColor("#0F172A")),
+        ("TEXTCOLOR", (0, 3), (1, 3), colors.white),
+        ("FONTNAME", (0, 3), (1, 3), "Helvetica-Bold"),
+
+        # Alineaciones
         ("ALIGN", (0, 0), (1, 1), "CENTER"),
         ("ALIGN", (1, 2), (1, -1), "RIGHT"),
 
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#F3B383")),
+        # Bordes y espacios
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#FDBA74")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 7),
         ("RIGHTPADDING", (0, 0), (-1, -1), 7),
         ("TOPPADDING", (0, 0), (-1, -1), 6),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-
-        # para que resalte el negro en el total todo el margen 
-
-        ("BACKGROUND", (0, 3), (1, 3), colors.HexColor("#0F172A")),
-        ("TEXTCOLOR", (0, 3), (1, 3), colors.white),
-        ("FONTNAME", (0, 3), (1, 3), "Helvetica-Bold"),
     ]))
 
-    story.append(modelo_actual_table)
-    story.append(Spacer(1, 7))
+
 
     # ---------------------------------------------------
     # TABLA 3 - MODELO PAYZEN
