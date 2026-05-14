@@ -983,7 +983,7 @@ for row in resultados:
 
 
 # ---------------------------------------------------
-# PDF RESUMEN
+# PDF RESUMEN COMERCILA JULI
 # ---------------------------------------------------
 
 DISCLAIMER = """
@@ -1499,7 +1499,7 @@ def generar_pdf_Comercial(df_pdf):
 
 
 # ---------------------------------------------------
-# PDF EJECUTIVO
+# PDF EJECUTIVO CEDRIC 
 # ---------------------------------------------------
 
 def generar_pdf_ejecutivo(df_pdf):
@@ -1663,14 +1663,48 @@ def generar_pdf_ejecutivo(df_pdf):
     # ---------------------------------------------------
     # TABLA 1 - DATOS INICIALES
     # ---------------------------------------------------
-    story.append(Paragraph("Datos iniciales", section_style))
+
     datos_iniciales_data = [
-        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
-        [Paragraph("Ticket promedio", table_cell), Paragraph(money(ticket_promedio), table_cell_right)],
-        [Paragraph("Número de transacciones", table_cell), Paragraph(number_fmt(total_tx), table_cell_right)],
+        [
+            Paragraph('<font color="white"><b>Datos iniciales del escenario</b></font>', table_header),
+            ""
+        ],
+        [
+            Paragraph('<font color="white"><b>Concepto</b></font>', table_header),
+            Paragraph('<font color="white"><b>Valor</b></font>', table_header)
+        ],
+        [
+            Paragraph("Ticket promedio", table_cell),
+            Paragraph(money(ticket_promedio), table_cell_right)
+        ],
+        [
+            Paragraph("Número de transacciones", table_cell),
+            Paragraph(number_fmt(total_tx), table_cell_right)
+        ],
     ]
-    story.append(make_table(datos_iniciales_data, [4.8 * inch, 2.4 * inch]))
+
+    datos_iniciales_table = Table(
+        datos_iniciales_data,
+        colWidths=[4.8 * inch, 2.4 * inch]
+    )
+
+    datos_iniciales_table.setStyle(TableStyle([
+        ("SPAN", (0, 0), (1, 0)),
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#4B5563")),
+        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#9CA3AF")),
+        ("TEXTCOLOR", (0, 0), (1, 1), colors.white),
+        ("ALIGN", (0, 0), (1, 1), "CENTER"),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#CBD5E1")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]))
+
+    story.append(datos_iniciales_table)
     story.append(Spacer(1, 7))
+
 
     # ---------------------------------------------------
     # TABLA 2 - MODELO ACTUAL
@@ -1744,14 +1778,14 @@ def generar_pdf_ejecutivo(df_pdf):
 
 
 st.download_button(
-    label="📄 Descargar Resumen Comercial PDF",
+    label="📄 PDF Comercial para Cliente",
     data=generar_pdf_Comercial(df),
     file_name="Resumen_Comercial_PayZen.pdf",
     mime="application/pdf"
 )
 
 st.download_button(
-    label="📄 Descargar PDF Ejecutivo",
+    label="📄 PDF Ejecutivo",
     data=generar_pdf_ejecutivo(df),
     file_name="Resumen_Ejecutivo_PayZen.pdf",
     mime="application/pdf"
