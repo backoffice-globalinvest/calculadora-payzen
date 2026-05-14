@@ -1714,10 +1714,10 @@ def generar_pdf_ejecutivo(df_pdf):
             Paragraph('<font color="white"><b>Costos Pasarela Actual</b></font>', table_header),
             ""
         ],
-       #[
-        #    Paragraph("<b>Concepto</b>", table_header),
-       #     Paragraph("<b>Valor</b>", table_header)
-       #],
+       [
+            Paragraph("<b>Concepto</b>", table_header),
+            Paragraph("<b>Valor</b>", table_header)
+       ],
         [
             Paragraph("Plan actual", table_cell),
             Paragraph(modelo_actual, table_cell_right)
@@ -1807,7 +1807,7 @@ def generar_pdf_ejecutivo(df_pdf):
     modelo_payzen_table.setStyle(TableStyle([
         ("SPAN", (0, 0), (1, 0)),
 
-        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#2563EB")),
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#0955F9")),
         ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
         ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
 
@@ -1822,7 +1822,7 @@ def generar_pdf_ejecutivo(df_pdf):
         ("ALIGN", (0, 0), (1, 1), "CENTER"),
         ("ALIGN", (1, 2), (1, -1), "RIGHT"),
 
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#A7B7D8")),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#0096FF")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
 
         ("LEFTPADDING", (0, 0), (-1, -1), 7),
