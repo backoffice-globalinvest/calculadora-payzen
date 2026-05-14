@@ -1736,28 +1736,24 @@ def generar_pdf_ejecutivo(df_pdf):
     modelo_actual_table.setStyle(TableStyle([
         ("SPAN", (0, 0), (1, 0)),
 
-        # Encabezado principal
-        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#B45309")),
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#EA7A2F")),
         ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
         ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
 
-        # Encabezado Concepto / Valor
-        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#FED7AA")),
+        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#FDE7D7")),
         ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
         ("FONTNAME", (0, 1), (1, 1), "Helvetica-Bold"),
 
-        # Fila total
         ("BACKGROUND", (0, 3), (1, 3), colors.HexColor("#0F172A")),
         ("TEXTCOLOR", (0, 3), (1, 3), colors.white),
         ("FONTNAME", (0, 3), (1, 3), "Helvetica-Bold"),
 
-        # Alineaciones
         ("ALIGN", (0, 0), (1, 1), "CENTER"),
         ("ALIGN", (1, 2), (1, -1), "RIGHT"),
 
-        # Bordes y espacios
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#FDBA74")),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#EA7A2F")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
         ("LEFTPADDING", (0, 0), (-1, -1), 7),
         ("RIGHTPADDING", (0, 0), (-1, -1), 7),
         ("TOPPADDING", (0, 0), (-1, -1), 6),
