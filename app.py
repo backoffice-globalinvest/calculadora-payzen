@@ -1774,7 +1774,8 @@ def generar_pdf_ejecutivo(df_pdf):
         ("TOPPADDING", (0, 0), (-1, -1), 6),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
-
+    
+    story.append(Paragraph("Modelo actual", section_style))
     story.append(modelo_actual_table)
     story.append(Spacer(1, 7))
 
