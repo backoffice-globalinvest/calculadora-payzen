@@ -1710,33 +1710,22 @@ def generar_pdf_ejecutivo(df_pdf):
     # TABLA 2 - MODELO ACTUAL
     # ---------------------------------------------------
     modelo_actual_data = [
-
         [
-            Paragraph(
-                '<font color="white"><b>Modelo actual</b></font>',
-                table_header
-            ),
+            Paragraph('<font color="white"><b>Costos Pasarela Actual</b></font>', table_header),
             ""
         ],
-
         [
             Paragraph("<b>Concepto</b>", table_header),
             Paragraph("<b>Valor</b>", table_header)
         ],
-
         [
-            Paragraph("Plan pasarela actual", table_cell),
+            Paragraph("Plan actual", table_cell),
             Paragraph(modelo_actual, table_cell_right)
         ],
-
         [
-            Paragraph("<b>Costo pasarela actual</b>", table_cell),
-            Paragraph(
-                f"<b>{money(first['Pasarela actual'])}</b>",
-                table_cell_right
-            )
+            Paragraph("<b>Costo total pasarela agregadora</b>", total_style),
+            Paragraph(f"<b>{money(first['Pasarela actual'])}</b>", total_style_right)
         ],
-
     ]
 
     modelo_actual_table = Table(
@@ -1774,7 +1763,7 @@ def generar_pdf_ejecutivo(df_pdf):
         ("TOPPADDING", (0, 0), (-1, -1), 6),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
-    
+
     story.append(Paragraph("Modelo actual", section_style))
     story.append(modelo_actual_table)
     story.append(Spacer(1, 7))
