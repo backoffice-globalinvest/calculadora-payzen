@@ -1736,11 +1736,11 @@ def generar_pdf_ejecutivo(df_pdf):
     modelo_actual_table.setStyle(TableStyle([
         ("SPAN", (0, 0), (1, 0)),
 
-        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#FF5F1F")),
+        ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#FF7A1A")),
         ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
         ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
 
-        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#F28C28")),
+        ("BACKGROUND", (0, 1), (1, 1), colors.HexColor("#FFA346")),
         ("TEXTCOLOR", (0, 1), (1, 1), colors.black),
         ("FONTNAME", (0, 1), (1, 1), "Helvetica-Bold"),
 
