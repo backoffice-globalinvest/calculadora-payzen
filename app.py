@@ -1129,7 +1129,7 @@ def generar_pdf_Comercial(df_pdf):
         fontName="Helvetica-Bold",
         fontSize=32,
         leading=36,
-        textColor=colors.HexColor("#38BDF8"),
+        textColor=colors.HexColor("#060EF6"),
         spaceAfter=4
     )
 
@@ -1632,12 +1632,13 @@ def generar_pdf_ejecutivo(df_pdf):
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-        "TitleExecutive",
+        "TitleCenter",
         parent=styles["Title"],
-        fontSize=20,
-        leading=23,
-        textColor=colors.HexColor("#0F172A"),
         alignment=1,
+        fontName="Helvetica-Bold",
+        fontSize=32,
+        leading=36,
+        textColor=colors.HexColor("#060EF6"),
         spaceAfter=4
     )
 
