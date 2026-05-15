@@ -883,10 +883,11 @@ with c2:
 with c3:
     h(
         '<div class="card">'
-        f'<div class="label">Pasarela actual</div>'
+        '<div class="label">PASARELA ACTUAL</div>'
         f'<div class="big-number-orange">{money(costo_fijo_actual)}</div>'
+        '<div style="color:#F97316; font-size:30px; font-weight:900; line-height:0.6;">+</div>'
         f'<div class="orange-inline">{percent(porcentaje_actual)}</div>'
-        f'<div class="small-text">por transacción</div>'
+        '<div class="small-text">por transacción</div>'
         '</div>'
     )
 
