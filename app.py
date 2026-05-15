@@ -812,41 +812,53 @@ with c1:
         '</div>'
     )
 
-    lineas_transacciones = f"""
-        <div style="display:flex; justify-content:space-between;">
-            <span>TC / TD</span>
-            <span><b>{number_fmt(tx_tc_actual)}</b></span>
-        </div>
+with c2:
+
+    transacciones_html = f"""
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <span>TC / TD</span>
+        <span><b>{number_fmt(tx_tc_actual)}</b></span>
+    </div>
     """
 
     if activar_pse:
-        lineas_transacciones += f"""
-            <div style="display:flex; justify-content:space-between;">
-                <span>PSE</span>
-                <span><b>{number_fmt(tx_pse_actual)}</b></span>
-            </div>
+        transacciones_html += f"""
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>PSE</span>
+            <span><b>{number_fmt(tx_pse_actual)}</b></span>
+        </div>
         """
 
     if activar_breb:
-        lineas_transacciones += f"""
-            <div style="display:flex; justify-content:space-between;">
-                <span>Bre-B</span>
-                <span><b>{number_fmt(tx_breb_actual)}</b></span>
-            </div>
-        """
-
-    h(
-        f"""
-        <div class="card">
-            <div class="label">Transacciones actuales</div>
-            <div style="margin-top:18px; line-height:1.9; color:white; font-size:18px;">
-                {lineas_transacciones}
-            </div>
-            <br>
-            <div class="small-text">Escenario base del cliente.</div>
+        transacciones_html += f"""
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>Bre-B</span>
+            <span><b>{number_fmt(tx_breb_actual)}</b></span>
         </div>
         """
-    )
+
+    h(f"""
+    <div class="card">
+
+        <div class="label">
+            TRANSACCIONES ACTUALES
+        </div>
+
+        <div style="
+            margin-top:20px;
+            color:white;
+            font-size:18px;
+            line-height:1.7;
+        ">
+            {transacciones_html}
+        </div>
+
+        <div class="small-text" style="margin-top:20px;">
+            Escenario base del cliente.
+        </div>
+
+    </div>
+    """)
 
 with c3:
     h(
