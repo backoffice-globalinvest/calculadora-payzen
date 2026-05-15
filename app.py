@@ -1040,8 +1040,8 @@ def generar_pdf_Comercial(df_pdf):
     table_cell = ParagraphStyle(
         "TableCell",
         parent=styles["BodyText"],
-        fontSize=7,
-        leading=8.5,
+        fontSize=9.5,
+        leading=12,
         textColor=colors.black
     )
 
@@ -1572,8 +1572,8 @@ def generar_pdf_ejecutivo(df_pdf):
         "ExecutiveTotal",
         parent=table_cell,
         fontName="Helvetica-Bold",
-        fontSize=8.4,
-        leading=10,
+        fontSize=10,
+        leading=12,
         textColor=colors.white
     )
 
@@ -1587,8 +1587,8 @@ def generar_pdf_ejecutivo(df_pdf):
         "AhorroStyle",
         parent=table_cell,
         fontName="Helvetica-Bold",
-        fontSize=8.4,
-        leading=10,
+        fontSize=10,
+        leading=12,
         textColor=colors.HexColor("#047857"),
         alignment=2
     )
