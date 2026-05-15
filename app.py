@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import hashlib
 import hmac
+from reportlab.lib.pagesizes import ledger
 from io import BytesIO
 
 from reportlab.lib.pagesizes import letter, landscape
@@ -1000,7 +1001,7 @@ def generar_pdf_Comercial(df_pdf):
 
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=landscape(letter),
+        pagesize=landscape(ledger),
         rightMargin=28,
         leftMargin=28,
         topMargin=10,
