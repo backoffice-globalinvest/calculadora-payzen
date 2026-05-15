@@ -1845,17 +1845,7 @@ def generar_pdf_ejecutivo(df_pdf):
     story.append(modelo_payzen_table)
     story.append(Spacer(1, 7))
 
-    # ---------------------------------------------------
-    # TABLA 4 - ADQUIRIENCIA Y TOTAL
-    # ---------------------------------------------------
-    story.append(Paragraph("Adquirencia y total", section_style))
-    total_data = [
-        [Paragraph('<font color="white"><b>Concepto</b></font>', table_header), Paragraph('<font color="white"><b>Valor</b></font>', table_header)],
-        [Paragraph("Costo adquirientes", table_cell), Paragraph(money(first["Total adquirencia"]), table_cell_right)],
-        [Paragraph("Total PayZen + adquirientes", total_style), Paragraph(money(first["PayZen"]), total_style_right)],
-    ]
-    story.append(make_table(total_data, [4.8 * inch, 2.4 * inch], total_last=True))
-    story.append(Spacer(1, 8))
+
 
     # ---------------------------------------------------
     # TABLA 5 - AHORRO ESTIMADO
