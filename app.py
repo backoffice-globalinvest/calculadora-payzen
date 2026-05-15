@@ -1828,7 +1828,7 @@ def generar_pdf_ejecutivo(df_pdf):
     # ---------------------------------------------------
     # TABLA 5 - AHORRO ESTIMADO
     # ---------------------------------------------------
-    story.append(Paragraph("Ahorro estimado", section_style))
+    
     ahorro_data = [
         [Paragraph('<font color="white"><b>Indicador</b></font>', table_header), Paragraph('<font color="white"><b>Resultado</b></font>', table_header)],
         [Paragraph("Ahorro mensual", table_cell), Paragraph(money(first["Ahorro mensual"]), ahorro_style)],
@@ -1841,6 +1841,10 @@ def generar_pdf_ejecutivo(df_pdf):
     ]))
     story.append(ahorro_table)
     story.append(Spacer(1, 7))
+
+    #-------------------------------------------------
+    #CONCLUSION 
+    #-------------------------------------------------
 
     conclusion = (
         "Con base en el escenario analizado, la propuesta PayZen permite "
