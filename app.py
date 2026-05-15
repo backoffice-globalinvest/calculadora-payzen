@@ -813,52 +813,47 @@ with c1:
     )
 
 with c2:
+    lineas_transacciones = ""
 
-    transacciones_html = f"""
-    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-        <span>TC / TD</span>
-        <span><b>{number_fmt(tx_tc_actual)}</b></span>
-    </div>
-    """
+    if activar_tc:
+        lineas_transacciones += f"""
+        <div style="display:flex; justify-content:space-between; margin-top:10px;">
+            <span>TC / TD</span>
+            <span><b>{number_fmt(tx_tc_actual)}</b> ({percent(pct_tc)})</span>
+        </div>
+        """
 
     if activar_pse:
-        transacciones_html += f"""
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        lineas_transacciones += f"""
+        <div style="display:flex; justify-content:space-between; margin-top:10px;">
             <span>PSE</span>
-            <span><b>{number_fmt(tx_pse_actual)}</b></span>
+            <span><b>{number_fmt(tx_pse_actual)}</b> ({percent(pct_pse)})</span>
         </div>
         """
 
     if activar_breb:
-        transacciones_html += f"""
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        lineas_transacciones += f"""
+        <div style="display:flex; justify-content:space-between; margin-top:10px;">
             <span>Bre-B</span>
-            <span><b>{number_fmt(tx_breb_actual)}</b></span>
+            <span><b>{number_fmt(tx_breb_actual)}</b> ({percent(pct_breb)})</span>
         </div>
         """
 
-    h(f"""
-    <div class="card">
+    st.markdown(
+        f"""
+        <div class="card">
+            <div class="label">Transacciones actuales</div>
 
-        <div class="label">
-            TRANSACCIONES ACTUALES
+            <div style="margin-top:18px; color:white; font-size:17px; line-height:1.6;">
+                {lineas_transacciones}
+            </div>
+
+            <br>
+            <div class="small-text">Escenario base del cliente.</div>
         </div>
-
-        <div style="
-            margin-top:20px;
-            color:white;
-            font-size:18px;
-            line-height:1.7;
-        ">
-            {transacciones_html}
-        </div>
-
-        <div class="small-text" style="margin-top:20px;">
-            Escenario base del cliente.
-        </div>
-
-    </div>
-    """)
+        """,
+        unsafe_allow_html=True
+    )
 
 with c3:
     h(
