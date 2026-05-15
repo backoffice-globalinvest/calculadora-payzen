@@ -816,43 +816,35 @@ with c2:
     lineas_transacciones = ""
 
     if activar_tc:
-        lineas_transacciones += f"""
-        <div style="display:flex; justify-content:space-between; margin-top:10px;">
-            <span>TC / TD</span>
-            <span><b>{number_fmt(tx_tc_actual)}</b> ({percent(pct_tc)})</span>
-        </div>
-        """
+        lineas_transacciones += (
+            f'<div style="display:flex; justify-content:space-between; margin-top:8px;">'
+            f'<span>TC / TD</span>'
+            f'<span><b>{number_fmt(tx_tc_actual)}</b> ({percent(pct_tc)})</span>'
+            f'</div>'
+        )
 
     if activar_pse:
-        lineas_transacciones += f"""
-        <div style="display:flex; justify-content:space-between; margin-top:10px;">
-            <span>PSE</span>
-            <span><b>{number_fmt(tx_pse_actual)}</b> ({percent(pct_pse)})</span>
-        </div>
-        """
+        lineas_transacciones += (
+            f'<div style="display:flex; justify-content:space-between; margin-top:8px;">'
+            f'<span>PSE</span>'
+            f'<span><b>{number_fmt(tx_pse_actual)}</b> ({percent(pct_pse)})</span>'
+            f'</div>'
+        )
 
     if activar_breb:
-        lineas_transacciones += f"""
-        <div style="display:flex; justify-content:space-between; margin-top:10px;">
-            <span>Bre-B</span>
-            <span><b>{number_fmt(tx_breb_actual)}</b> ({percent(pct_breb)})</span>
-        </div>
-        """
+        lineas_transacciones += (
+            f'<div style="display:flex; justify-content:space-between; margin-top:8px;">'
+            f'<span>Bre-B</span>'
+            f'<span><b>{number_fmt(tx_breb_actual)}</b> ({percent(pct_breb)})</span>'
+            f'</div>'
+        )
 
-    st.markdown(
-        f"""
-        <div class="card">
-            <div class="label">Transacciones actuales</div>
-
-            <div style="margin-top:18px; color:white; font-size:17px; line-height:1.6;">
-                {lineas_transacciones}
-            </div>
-
-            <br>
-            <div class="small-text">Escenario base del cliente.</div>
-        </div>
-        """,
-        unsafe_allow_html=True
+    h(
+        '<div class="card">'
+        '<div class="label">Transacciones actuales</div>'
+        f'<div style="margin-top:18px; color:white; font-size:17px; line-height:1.6;">{lineas_transacciones}</div>'
+        '<br><div class="small-text">Escenario base del cliente.</div>'
+        '</div>'
     )
 
 with c3:
