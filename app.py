@@ -815,9 +815,48 @@ with c1:
 with c2:
     h(
         '<div class="card">'
+        
         f'<div class="label">Transacciones actuales</div>'
-        f'<div class="big-number">{number_fmt(total_tx_base)}</div>'
+
+        '<div style="margin-top:18px; line-height:1.9;">'
+
+        f'''
+        <div style="display:flex; justify-content:space-between;">
+            <span> TC / TD</span>
+            <span><b>{number_fmt(tx_tc_actual)}</b></span>
+        </div>
+        '''
+
+        +
+
+        (
+            f'''
+            <div style="display:flex; justify-content:space-between;">
+                <span> PSE</span>
+                <span><b>{number_fmt(tx_pse_actual)}</b></span>
+            </div>
+            '''
+            if activar_pse else ""
+        )
+
+        +
+
+        (
+            f'''
+            <div style="display:flex; justify-content:space-between;">
+                <span> Bre-B</span>
+                <span><b>{number_fmt(tx_breb_actual)}</b></span>
+            </div>
+            '''
+            if activar_breb else ""
+        )
+
+        +
+
+        '</div>'
+
         f'<br><div class="small-text">Escenario base del cliente.</div>'
+
         '</div>'
     )
 
