@@ -1636,10 +1636,10 @@ def generar_pdf_ejecutivo(df_pdf):
         parent=styles["Title"],
         alignment=1,
         fontName="Helvetica-Bold",
-        fontSize=32,
-        leading=36,
+        fontSize=27,
+        leading=31,
         textColor=colors.HexColor("#060EF6"),
-        spaceAfter=4
+        spaceAfter=3
     )
 
     subtitle_style = ParagraphStyle(
