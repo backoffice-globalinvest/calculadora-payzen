@@ -812,52 +812,40 @@ with c1:
         '</div>'
     )
 
-with c2:
-    h(
-        '<div class="card">'
-        
-        f'<div class="label">Transacciones actuales</div>'
-
-        '<div style="margin-top:18px; line-height:1.9;">'
-
-        f'''
+    lineas_transacciones = f"""
         <div style="display:flex; justify-content:space-between;">
-            <span> TC / TD</span>
+            <span>TC / TD</span>
             <span><b>{number_fmt(tx_tc_actual)}</b></span>
         </div>
-        '''
+    """
 
-        +
-
-        (
-            f'''
+    if activar_pse:
+        lineas_transacciones += f"""
             <div style="display:flex; justify-content:space-between;">
-                <span> PSE</span>
+                <span>PSE</span>
                 <span><b>{number_fmt(tx_pse_actual)}</b></span>
             </div>
-            '''
-            if activar_pse else ""
-        )
+        """
 
-        +
-
-        (
-            f'''
+    if activar_breb:
+        lineas_transacciones += f"""
             <div style="display:flex; justify-content:space-between;">
-                <span> Bre-B</span>
+                <span>Bre-B</span>
                 <span><b>{number_fmt(tx_breb_actual)}</b></span>
             </div>
-            '''
-            if activar_breb else ""
-        )
+        """
 
-        +
-
-        '</div>'
-
-        f'<br><div class="small-text">Escenario base del cliente.</div>'
-
-        '</div>'
+    h(
+        f"""
+        <div class="card">
+            <div class="label">Transacciones actuales</div>
+            <div style="margin-top:18px; line-height:1.9; color:white; font-size:18px;">
+                {lineas_transacciones}
+            </div>
+            <br>
+            <div class="small-text">Escenario base del cliente.</div>
+        </div>
+        """
     )
 
 with c3:
