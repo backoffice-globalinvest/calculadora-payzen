@@ -1702,7 +1702,7 @@ def generar_pdf_ejecutivo(df_pdf):
     ]))
 
     story.append(datos_iniciales_table)
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 22))
 
     # ---------------------------------------------------
     # TABLA 2 - MODELO ACTUAL
@@ -1751,7 +1751,7 @@ def generar_pdf_ejecutivo(df_pdf):
     ]))
 
     story.append(modelo_actual_table)
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 22))
 
 
     # ---------------------------------------------------
@@ -1821,7 +1821,7 @@ def generar_pdf_ejecutivo(df_pdf):
         ]))
 
     story.append(modelo_payzen_table)
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 22))
 
 
     # ---------------------------------------------------
@@ -1839,7 +1839,7 @@ def generar_pdf_ejecutivo(df_pdf):
         ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F0FDF4")),
     ]))
     story.append(ahorro_table)
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 22))
 
     #-------------------------------------------------
     # CONCLUSION 
