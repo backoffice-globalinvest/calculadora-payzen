@@ -1002,8 +1002,8 @@ def generar_pdf_Comercial(df_pdf):
     doc = SimpleDocTemplate(
         buffer,
         pagesize=landscape(TABLOID),
-        rightMargin=28,
-        leftMargin=28,
+        rightMargin=120,
+        leftMargin=120,
         topMargin=10,
         bottomMargin=18
     )
