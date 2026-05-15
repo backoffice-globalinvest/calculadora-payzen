@@ -1564,6 +1564,8 @@ def generar_pdf_ejecutivo(df_pdf):
         "ExecutiveHeader",
         parent=table_cell,
         fontName="Helvetica-Bold",
+        fontSize=11,
+        leading=13,
         textColor=colors.white,
         alignment=1
     )
