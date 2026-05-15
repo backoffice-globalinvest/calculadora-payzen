@@ -873,8 +873,8 @@ with c2:
 
     h(
         '<div class="card">'
-        '<div class="label">TRANSACCIONES ACTUALES</div>'
-        f'<div class="big-number" style="margin-top:10px;">{number_fmt(total_tx_base)}</div>'
+        '<div class="label" style="text-align:center;">TRANSACCIONES ACTUALES</div>'
+        f'<div class="big-number" style="margin-top:10px; text-align:center;">{number_fmt(total_tx_base)}</div>'
         f'<div style="margin-top:14px; color:white; font-size:17px; line-height:1.6;">{lineas_transacciones}</div>'
         '<br><div class="small-text">Escenario base del cliente.</div>'
         '</div>'
