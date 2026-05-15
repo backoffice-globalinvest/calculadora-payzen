@@ -805,6 +805,7 @@ c1, c2, c3, c4 = st.columns(4, gap="large")
 
 with c1:
     if modo_ticket == "Ticket diferente por canal":
+
         lineas_ticket = (
             f'<div style="display:flex; justify-content:space-between; margin-top:8px;">'
             f'<span>TC / TD</span>'
@@ -833,14 +834,30 @@ with c1:
             f'{lineas_ticket}'
             f'</div>'
         )
+
     else:
-        contenido_ticket = f'<div class="big-number">{money(ticket_promedio)}</div>'
+
+        contenido_ticket = (
+            f'<div class="big-number" style="text-align:center;">'
+            f'{money(ticket_promedio)}'
+            f'</div>'
+        )
 
     h(
         '<div class="card">'
-        '<div class="label">Ticket promedio</div>'
+
+        '<div class="label" style="text-align:center;">'
+        'TICKET PROMEDIO'
+        '</div>'
+
         f'{contenido_ticket}'
-        '<br><div class="small-text">Valor promedio por transacción.</div>'
+
+        '<br>'
+
+        '<div class="small-text" style="text-align:center;">'
+        'Valor promedio por transacción.'
+        '</div>'
+
         '</div>'
     )
 
