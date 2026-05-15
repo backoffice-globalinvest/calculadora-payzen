@@ -1759,7 +1759,7 @@ def generar_pdf_ejecutivo(df_pdf):
     modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
 
     try:
-        logo = Image("Logo_Globalinvest_PayZen.png", width=1.70 * inch, height=0.52 * inch)
+        from reportlab.lib.utils import ImageReader
     except Exception:
         logo = Paragraph("", table_cell)
 
