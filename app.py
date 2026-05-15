@@ -1671,10 +1671,7 @@ def generar_pdf_ejecutivo(df_pdf):
             Paragraph('<font color="white"><b>Datos iniciales del escenario</b></font>', table_header),
             ""
         ],
-        [
-            Paragraph('<font color="white"><b>Concepto</b></font>', table_header),
-            Paragraph('<font color="white"><b>Valor</b></font>', table_header)
-        ],
+
         [
             Paragraph("Ticket promedio", table_cell),
             Paragraph(money(ticket_promedio), table_cell_right)
