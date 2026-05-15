@@ -1077,7 +1077,7 @@ def generar_pdf_Comercial(df_pdf):
 
     encabezado_pdf = Table(
         [[logo, titulo_pdf]],
-        colWidths=[1.65 * inch, 8.20 * inch]
+        colWidths=[2.60 * inch, 7.40 * inch]
         )
 
     encabezado_pdf.hAlign = "LEFT"
