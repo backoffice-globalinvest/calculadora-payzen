@@ -1126,8 +1126,10 @@ def generar_pdf_Comercial(df_pdf):
         "TitleCenter",
         parent=styles["Title"],
         alignment=1,
-        fontSize=22,
-        leading=26,
+        fontName="Helvetica-Bold",
+        fontSize=32,
+        leading=36,
+        textColor=colors.HexColor("#38BDF8"),
         spaceAfter=4
     )
 
