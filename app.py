@@ -1127,8 +1127,8 @@ def generar_pdf_Comercial(df_pdf):
         parent=styles["Title"],
         alignment=1,
         fontName="Helvetica-Bold",
-        fontSize=32,
-        leading=36,
+        fontSize=28,
+        leading=32,
         textColor=colors.HexColor("#060EF6"),
         spaceAfter=4
     )
@@ -1183,7 +1183,7 @@ def generar_pdf_Comercial(df_pdf):
     story = []
 
     try:
-        logo = Image("Logo_Globalinvest_PayZen.png", width=2.1 * inch, height=7.1 * inch)
+        logo = Image("Logo_Globalinvest_PayZen.png", width=1.35 * inch, height=0.42 * inch)
     except Exception:
         logo = Paragraph("", table_cell)
 
@@ -1191,7 +1191,7 @@ def generar_pdf_Comercial(df_pdf):
 
     encabezado_pdf = Table(
         [[logo, titulo_pdf]],
-        colWidths=[2.60 * inch, 7.40 * inch]
+        colWidths=[2.00 * inch, 7.80 * inch]
         )
 
     encabezado_pdf.hAlign = "LEFT"
