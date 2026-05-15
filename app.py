@@ -1632,24 +1632,25 @@ def generar_pdf_ejecutivo(df_pdf):
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-        "TitleCenter",
+        "TitleExecutive",
         parent=styles["Title"],
-        alignment=1,
         fontName="Helvetica-Bold",
-        fontSize=27,
-        leading=31,
-        textColor=colors.HexColor("#060EF6"),
-        spaceAfter=3
+        fontSize=26,
+        leading=28,
+        textColor=colors.HexColor("#2563EB"),
+        alignment=1,
+        spaceAfter=2
     )
 
     subtitle_style = ParagraphStyle(
         "SubtitleExecutive",
         parent=styles["BodyText"],
-        fontSize=9,
-        leading=11,
+        fontName="Helvetica",
+        fontSize=10,
+        leading=12,
         alignment=1,
         textColor=colors.HexColor("#64748B"),
-        spaceAfter=8
+        spaceAfter=14
     )
 
     section_style = ParagraphStyle(
@@ -1763,8 +1764,14 @@ def generar_pdf_ejecutivo(df_pdf):
         logo = Paragraph("", table_cell)
 
     header_table = Table(
-        [[logo, Paragraph("Resumen Ejecutivo PayZen", title_style)]],
-        colWidths=[1.7 * inch, 7.5 * inch]
+        [[
+            logo,
+            Paragraph(
+                '<font color="#2563EB"><b>Resumen Ejecutivo PayZen</b></font>',
+                title_style
+            )
+        ]],
+        colWidths=[2.0 * inch, 7.0 * inch]
     )
     header_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
