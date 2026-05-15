@@ -31,7 +31,7 @@ USERS = {
     },
     "desarrollo": {
         "name": "Desarrollo",
-        "password_hash": "c648919311c73fc5f855e3bdf3b163e6443adfda670352d5f5fadbe9ddf12b1a"
+        "password_hash": "caf8afcba8860a08c3289ba5ea5e3f3e9ecbc2425482ddffc67ad72788c0133c"
     }
 }
 
