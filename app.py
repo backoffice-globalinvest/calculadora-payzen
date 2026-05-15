@@ -883,13 +883,13 @@ with c2:
 with c3:
     h(
         '<div class="card">'
-        '<div class="label">PASARELA ACTUAL</div>'
+        '<div class="label" style="text-align:center;">PASARELA ACTUAL</div>'
         '<div style="margin-top:22px; color:#F97316; font-weight:900; text-align:center;">'
         f'<div style="font-size:38px; line-height:1;">{money(costo_fijo_actual)}</div>'
         '<div style="font-size:22px; line-height:1.1;">+</div>'
         f'<div style="font-size:38px; line-height:1;">{percent(porcentaje_actual)}</div>'
         '</div>'
-        '<div class="small-text" style="margin-top:10px;">por transacción</div>'
+        '<div class="small-text" style="margin-top:14px; text-align:center; color:#FDBA74;">por transacción</div>'
         '</div>'
     )
 
