@@ -1819,8 +1819,8 @@ def generar_pdf_ejecutivo(df_pdf):
 
             ("LEFTPADDING", (0, 0), (-1, -1), 7),
             ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
         ]))
 
     story.append(modelo_payzen_table)
@@ -1828,7 +1828,7 @@ def generar_pdf_ejecutivo(df_pdf):
 
 
     # ---------------------------------------------------
-    # TABLA 5 - AHORRO ESTIMADO
+    # TABLA 4 - AHORRO ESTIMADO
     # ---------------------------------------------------
     
     ahorro_data = [
@@ -1845,7 +1845,7 @@ def generar_pdf_ejecutivo(df_pdf):
     story.append(Spacer(1, 20))
 
     #-------------------------------------------------
-    #CONCLUSION 
+    # CONCLUSION 
     #-------------------------------------------------
 
     conclusion = (
