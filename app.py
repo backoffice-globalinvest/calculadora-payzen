@@ -3,10 +3,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import hashlib
 import hmac
-from reportlab.lib.pagesizes import ledger
+from reportlab.lib.pagesizes import letter, landscape, TABLOID
 from io import BytesIO
 
-from reportlab.lib.pagesizes import letter, landscape
+
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -1001,7 +1001,7 @@ def generar_pdf_Comercial(df_pdf):
 
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=landscape(ledger),
+        pagesize=landscape(TABLOID),
         rightMargin=28,
         leftMargin=28,
         topMargin=10,
