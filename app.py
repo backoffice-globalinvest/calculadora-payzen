@@ -600,7 +600,40 @@ with st.sidebar:
 
     porcentaje_banco = st.number_input("% adquirencia banco TC", min_value=0.0, value=1.84, step=0.01) if activar_tc else 0.0
     costo_pse_payzen = st.number_input("Costo PSE por tx", min_value=0, value=400, step=50) if activar_pse else 0
-    costo_breb_payzen = st.number_input("Costo Bre-B por tx", min_value=0, value=600, step=50) if activar_breb else 0
+    
+    if activar_breb:
+
+        rango_breb = st.selectbox(
+            "Rango Bre-B",
+            [
+                "Hasta 1.000 tx",
+                "1.001 a 5.000 tx",
+                "5.001 a 10.000 tx",
+                "Más de 10.000 tx"
+            ]
+        )
+
+        if rango_breb == "Hasta 1.000 tx":
+            valor_default_breb = 600
+
+        elif rango_breb == "1.001 a 5.000 tx":
+            valor_default_breb = 500
+
+        elif rango_breb == "5.001 a 10.000 tx":
+            valor_default_breb = 400
+
+        else:
+            valor_default_breb = 300
+
+        costo_breb_payzen = st.number_input(
+            "Costo Bre-B por tx",
+            min_value=0,
+            value=valor_default_breb,
+            step=50
+        )
+
+    else:
+        costo_breb_payzen = 0
 
     st.divider()
     st.subheader("Plan PayZen")
