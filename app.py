@@ -1519,8 +1519,8 @@ def generar_pdf_ejecutivo(df_pdf):
     title_style = ParagraphStyle(
         "TitleExecutive",
         parent=styles["Title"],
-        fontSize=22,
-        leading=25,
+        fontSize=20,
+        leading=23,
         textColor=colors.HexColor("#0F172A"),
         alignment=1,
         spaceAfter=4
@@ -1549,8 +1549,8 @@ def generar_pdf_ejecutivo(df_pdf):
     table_cell = ParagraphStyle(
         "ExecutiveCell",
         parent=styles["BodyText"],
-        fontSize=7.6,
-        leading=9.2,
+        fontSize=8.5,
+        leading=10.5,
         textColor=colors.HexColor("#111827")
     )
 
