@@ -1574,8 +1574,8 @@ def generar_pdf_ejecutivo(df_pdf):
         "ExecutiveTotal",
         parent=table_cell,
         fontName="Helvetica-Bold",
-        fontSize=10,
-        leading=12,
+        fontSize=9,
+        leading=11,
         textColor=colors.white
     )
 
