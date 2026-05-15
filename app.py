@@ -804,11 +804,43 @@ h('<div class="section-title">📌 Parámetros base</div>')
 c1, c2, c3, c4 = st.columns(4, gap="large")
 
 with c1:
+    if modo_ticket == "Ticket diferente por canal":
+        lineas_ticket = (
+            f'<div style="display:flex; justify-content:space-between; margin-top:8px;">'
+            f'<span>TC / TD</span>'
+            f'<span><b>{money(ticket_tc)}</b></span>'
+            f'</div>'
+        )
+
+        if activar_pse:
+            lineas_ticket += (
+                f'<div style="display:flex; justify-content:space-between; margin-top:8px;">'
+                f'<span>PSE</span>'
+                f'<span><b>{money(ticket_pse)}</b></span>'
+                f'</div>'
+            )
+
+        if activar_breb:
+            lineas_ticket += (
+                f'<div style="display:flex; justify-content:space-between; margin-top:8px;">'
+                f'<span>Bre-B</span>'
+                f'<span><b>{money(ticket_breb)}</b></span>'
+                f'</div>'
+            )
+
+        contenido_ticket = (
+            f'<div style="margin-top:18px; color:#38BDF8; font-size:20px; line-height:1.7;">'
+            f'{lineas_ticket}'
+            f'</div>'
+        )
+    else:
+        contenido_ticket = f'<div class="big-number">{money(ticket_promedio)}</div>'
+
     h(
         '<div class="card">'
-        f'<div class="label">Ticket promedio</div>'
-        f'<div class="big-number">{money(ticket_promedio)}</div>'
-        f'<br><div class="small-text">Valor promedio por transacción.</div>'
+        '<div class="label">Ticket promedio</div>'
+        f'{contenido_ticket}'
+        '<br><div class="small-text">Valor promedio por transacción.</div>'
         '</div>'
     )
 
