@@ -2575,7 +2575,7 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
 
-#----------------------------------------------------
+
     fila_operativa = Table(
         [[bloque_info_operativa, bloque_metodos_pago]],
         colWidths=[3.65 * inch, 5.55 * inch]
