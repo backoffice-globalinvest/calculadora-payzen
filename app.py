@@ -2101,7 +2101,7 @@ def generar_pdf_profesional_test(df_pdf):
         img_w, img_h = img_reader.getSize()
         aspect = img_h / img_w
 
-        logo_width = 1.25 * inch
+        logo_width = 0.95 * inch
         logo_height = logo_width * aspect
 
         logo = Image(str(logo_path), width=logo_width, height=logo_height)
@@ -2152,7 +2152,7 @@ def generar_pdf_profesional_test(df_pdf):
         ],
         colWidths=[2.80 * inch],
         rowHeights=[
-            0.45 * inch,
+            0.32 * inch,
             0.10 * inch,
             0.38 * inch,
             0.40 * inch,
@@ -2164,7 +2164,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
         ("LEFTPADDING", (0, 0), (-1, -1), 18),
         ("RIGHTPADDING", (0, 0), (-1, -1), 18),
-        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
