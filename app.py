@@ -2460,7 +2460,7 @@ def generar_pdf_profesional_test(df_pdf):
 
 
 
-
+#---
 
 # ---------------------------------------------------
 # TABLA RESUMEN
