@@ -2120,7 +2120,7 @@ def generar_pdf_profesional_test(df_pdf):
                 [Paragraph(valor, kpi_value)],
                 [Paragraph("↑  " + subtitulo, kpi_note)],
             ],
-            colWidths=[2.0 * inch],
+            colWidths=[1.85 * inch],
             rowHeights=[0.24 * inch, 0.34 * inch, 0.22 * inch]
         )
 
@@ -2230,11 +2230,11 @@ def generar_pdf_profesional_test(df_pdf):
             card_4
         ]],
         colWidths=[
-            4.10 * inch,
-            2.15 * inch,
-            2.15 * inch,
-            2.15 * inch,
-            2.15 * inch
+            3.60 * inch,
+            2.45 * inch,
+            2.45 * inch,
+            2.45 * inch,
+            2.45 * inch
         ],
         rowHeights=[1.75 * inch]
     )
