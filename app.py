@@ -2152,11 +2152,11 @@ def generar_pdf_profesional_test(df_pdf):
         ],
         colWidths=[2.80 * inch],
         rowHeights=[
-            0.32 * inch,
-            0.10 * inch,
-            0.38 * inch,
-            0.40 * inch,
-            0.22 * inch
+            0.26 * inch,
+            0.05 * inch,
+            0.30 * inch,
+            0.34 * inch,
+            0.18 * inch
         ]
     )
 
@@ -2164,8 +2164,8 @@ def generar_pdf_profesional_test(df_pdf):
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
         ("LEFTPADDING", (0, 0), (-1, -1), 18),
         ("RIGHTPADDING", (0, 0), (-1, -1), 18),
-        ("TOPPADDING", (0, 0), (-1, -1), 4),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
