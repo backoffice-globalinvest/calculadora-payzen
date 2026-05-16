@@ -2000,10 +2000,10 @@ def generar_pdf_profesional_test(df_pdf):
     doc = SimpleDocTemplate(
         buffer,
         pagesize=landscape(LEGAL),
-        rightMargin=24,
-        leftMargin=24,
-        topMargin=18,
-        bottomMargin=18
+        rightMargin=12,
+        leftMargin=12,
+        topMargin=12,
+        bottomMargin=12
     )
 
     styles = getSampleStyleSheet()
