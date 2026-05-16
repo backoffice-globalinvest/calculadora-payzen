@@ -2405,8 +2405,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    #story.append(Spacer(1, 14))
-    #story.append(bloque_info_operativa)
+
 
     #---------   
 
