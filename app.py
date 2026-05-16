@@ -2336,6 +2336,72 @@ def generar_pdf_profesional_test(df_pdf):
     story.append(header_info)
     story.append(Spacer(1, 5))
 
+#-------
+    linea_azul = Table(
+        [[""]],
+        colWidths=[0.38 * inch],
+        rowHeights=[0.03 * inch]
+    )
+
+    linea_azul.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
+    ]))
+
+    story.append(linea_azul)
+    story.append(Spacer(1, 8))
+#---------
+    info_data = [
+        [
+            Paragraph("Volumen", table_text_style),
+            Paragraph(number_fmt(first["Transacciones"]), table_text_right)
+        ],
+        [
+            Paragraph("Ticket Promedio", table_text_style),
+            Paragraph(money(ticket_promedio), table_text_right)
+        ],
+    ]
+
+    tabla_info = Table(
+        info_data,
+        colWidths=[1.80 * inch, 1.10 * inch],
+        rowHeights=[0.36 * inch, 0.36 * inch]
+    )
+
+    tabla_info.setStyle(TableStyle([
+
+        ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D1D5DB")),
+
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+
+    contenedor_info = Table(
+        [[tabla_info]],
+        colWidths=[3.10 * inch]
+    )
+
+    contenedor_info.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+    ]))
+
+    story.append(contenedor_info)
 #---------   
 
     # TEMPORAL: solo para probar la parte de arriba
