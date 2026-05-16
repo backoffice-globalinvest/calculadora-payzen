@@ -1983,21 +1983,198 @@ def generar_pdf_ejecutivo(df_pdf):
     return pdf
 
 
-st.download_button(
-    label="📄 PDF Comercial para Cliente",
-    data=generar_pdf_Comercial(df),
-    file_name="Resumen_Comercial_PayZen.pdf",
-    mime="application/pdf"
-)
 
-st.download_button(
-    label="📄 PDF Ejecutivo",
-    data=generar_pdf_ejecutivo(df),
-    file_name="Resumen_Ejecutivo_PayZen.pdf",
-    mime="application/pdf"
-)
+#----------------------------------------------------
+#Nuevo PDF Profesional 
+#----------------------------------------------------
 
-h(f'<div class="disclaimer">{DISCLAIMER}</div>')
+def generar_pdf_profesional_test(df_pdf):
+    buffer = BytesIO()
+
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import landscape, letter
+    from reportlab.lib.colors import HexColor, white
+    from reportlab.lib.units import inch
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfbase.pdfmetrics import stringWidth
+
+    c = canvas.Canvas(buffer, pagesize=landscape(letter))
+
+    width, height = landscape(letter)
+
+    first = df_pdf.iloc[0]
+
+    # -----------------------------
+    # COLORES
+    # -----------------------------
+    bg_dark = HexColor("#020617")
+    header_dark = HexColor("#031B35")
+    card_dark = HexColor("#06264A")
+    card_border = HexColor("#1D4ED8")
+    blue = HexColor("#2F8CFF")
+    green = HexColor("#22C55E")
+    muted = HexColor("#CBD5E1")
+    white_color = HexColor("#FFFFFF")
+
+    # -----------------------------
+    # FONDO GENERAL
+    # -----------------------------
+    c.setFillColor(bg_dark)
+    c.rect(0, 0, width, height, fill=1, stroke=0)
+
+    # -----------------------------
+    # HEADER PRINCIPAL
+    # -----------------------------
+    header_h = 130
+    c.setFillColor(header_dark)
+    c.roundRect(0, height - header_h, width, header_h, 0, fill=1, stroke=0)
+
+    # BLOQUE IZQUIERDO
+    left_w = 245
+    c.setFillColor(HexColor("#041426"))
+    c.roundRect(0, height - header_h, left_w, header_h, 26, fill=1, stroke=0)
+
+    # LOGO
+    try:
+        logo = ImageReader("Logo_Globalinvest_PayZen.png")
+        c.drawImage(
+            logo,
+            14,
+            height - 38,
+            width=115,
+            height=30,
+            mask="auto"
+        )
+    except Exception:
+        c.setFillColor(white_color)
+        c.setFont("Helvetica-Bold", 13)
+        c.drawString(14, height - 26, "Globalinvest")
+        c.setFont("Helvetica", 7)
+        c.drawString(62, height - 37, "PayZen")
+
+    # TÍTULO IZQUIERDO
+    c.setFillColor(white_color)
+    c.setFont("Helvetica-Bold", 15)
+    c.drawString(14, height - 70, "RESUMEN COMERCIAL")
+
+    c.setFillColor(blue)
+    c.setFont("Helvetica-Bold", 24)
+    c.drawString(14, height - 96, "PAYZEN")
+
+    c.setStrokeColor(blue)
+    c.setLineWidth(1)
+    c.line(14, height - 111, 20, height - 111)
+
+    c.setFillColor(muted)
+    c.setFont("Helvetica", 7.5)
+    c.drawString(25, height - 114, "Propuesta de costos y ahorro estimado")
+
+    # -----------------------------
+    # FUNCIÓN CARD KPI
+    # -----------------------------
+    def draw_kpi_card(x, y, w, h, icon, title, value, subtitle, color_value=blue):
+        c.setFillColor(card_dark)
+        c.setStrokeColor(card_border)
+        c.setLineWidth(0.7)
+        c.roundRect(x, y, w, h, 9, fill=1, stroke=1)
+
+        # icono círculo
+        c.setStrokeColor(white_color)
+        c.setLineWidth(1)
+        c.circle(x + 27, y + h - 30, 13, fill=0, stroke=1)
+
+        c.setFillColor(white_color)
+        c.setFont("Helvetica-Bold", 13)
+        c.drawCentredString(x + 27, y + h - 35, icon)
+
+        # título
+        c.setFillColor(white_color)
+        c.setFont("Helvetica-Bold", 6.7)
+        c.drawString(x + 50, y + h - 33, title.upper())
+
+        # valor
+        c.setFillColor(color_value)
+        c.setFont("Helvetica-Bold", 18)
+        c.drawString(x + 14, y + 43, value)
+
+        # indicador
+        c.setFillColor(green)
+        c.setFont("Helvetica-Bold", 8)
+        c.drawString(x + 15, y + 18, "↑")
+
+        c.setFillColor(white_color)
+        c.setFont("Helvetica", 6.5)
+        c.drawString(x + 25, y + 18, subtitle)
+
+    # -----------------------------
+    # KPI CARDS
+    # -----------------------------
+    card_y = height - 120
+    card_w = 150
+    card_h = 95
+    gap = 12
+    start_x = 270
+
+    draw_kpi_card(
+        start_x,
+        card_y,
+        card_w,
+        card_h,
+        "$",
+        "Ahorro mensual",
+        money(first["Ahorro mensual"]),
+        "vs Pasarela Actual"
+    )
+
+    draw_kpi_card(
+        start_x + (card_w + gap),
+        card_y,
+        card_w,
+        card_h,
+        "▣",
+        "Ahorro anual",
+        money(first["Ahorro anual"]),
+        "vs Pasarela Actual"
+    )
+
+    draw_kpi_card(
+        start_x + 2 * (card_w + gap),
+        card_y,
+        card_w,
+        card_h,
+        "▥",
+        "Ahorro potencial",
+        percent(first["Ahorro %"]),
+        "vs Pasarela Actual"
+    )
+
+    draw_kpi_card(
+        start_x + 3 * (card_w + gap),
+        card_y,
+        card_w,
+        card_h,
+        "◌",
+        "Transacciones",
+        number_fmt(first["Transacciones"]),
+        "Total mensual"
+    )
+
+    # -----------------------------
+    # CUERPO TEMPORAL
+    # -----------------------------
+    c.setFillColor(white_color)
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(34, height - 170, "Aquí empezaremos a construir el resto del PDF profesional.")
+
+    c.showPage()
+    c.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
+
+
+
 
 
 # ---------------------------------------------------
@@ -2037,3 +2214,32 @@ df_mostrar["Transacciones"] = df_mostrar["Transacciones"].apply(number_fmt)
 df_mostrar["Tx adicionales"] = df_mostrar["Tx adicionales"].apply(number_fmt)
 
 st.dataframe(df_mostrar, use_container_width=True)
+
+
+
+#----------------------------------------------------
+# BOTONES
+#----------------------------------------------------
+
+st.download_button(
+    label="📄 PDF Comercial para Cliente",
+    data=generar_pdf_Comercial(df),
+    file_name="Resumen_Comercial_PayZen.pdf",
+    mime="application/pdf"
+)
+
+st.download_button(
+    label="📄 PDF Ejecutivo",
+    data=generar_pdf_ejecutivo(df),
+    file_name="Resumen_Ejecutivo_PayZen.pdf",
+    mime="application/pdf"
+)
+
+st.download_button(
+    label="📄 PDF Profesional Test",
+    data=generar_pdf_profesional_test(df),
+    file_name="PDF_Profesional_Test_PayZen.pdf",
+    mime="application/pdf"
+)
+
+h(f'<div class="disclaimer">{DISCLAIMER}</div>')
