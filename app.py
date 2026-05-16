@@ -2336,7 +2336,7 @@ def generar_pdf_profesional_test(df_pdf):
     story.append(header_info)
     story.append(Spacer(1, 5))
 
-#-------
+    #-------
     linea_azul = Table(
         [[""]],
         colWidths=[0.38 * inch],
@@ -2349,7 +2349,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     story.append(linea_azul)
     story.append(Spacer(1, 8))
-#---------
+    #---------
     info_data = [
         [
             Paragraph("Volumen", table_text_style),
@@ -2402,7 +2402,7 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     story.append(contenedor_info)
-#---------   
+    #---------   
 
     # TEMPORAL: solo para probar la parte de arriba
     story.append(Spacer(1, 20))
