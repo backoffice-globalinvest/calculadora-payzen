@@ -1125,14 +1125,14 @@ def generar_pdf_Comercial(df_pdf):
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-        "TitleCenter",
+        "ProTitle",
         parent=styles["Title"],
-        alignment=1,
         fontName="Helvetica-Bold",
-        fontSize=28,
-        leading=32,
-        textColor=colors.HexColor("#060EF6"),
-        spaceAfter=4
+        fontSize=14,
+        leading=15,
+        textColor=colors.white,
+        alignment=0,
+        spaceAfter=0
     )
 
     section_style = ParagraphStyle(
@@ -2029,7 +2029,7 @@ def generar_pdf_profesional_test(df_pdf):
         parent=styles["Title"],
         fontName="Helvetica-Bold",
         fontSize=24,
-        leading=26,
+        leading=24,
         textColor=colors.HexColor("#2F80FF"),
         alignment=0,
         spaceAfter=0
@@ -2101,7 +2101,7 @@ def generar_pdf_profesional_test(df_pdf):
         img_w, img_h = img_reader.getSize()
         aspect = img_h / img_w
 
-        logo_width = 0.95 * inch
+        logo_width = 0.92 * inch
         logo_height = logo_width * aspect
 
         logo = Image(str(logo_path), width=logo_width, height=logo_height)
@@ -2139,33 +2139,53 @@ def generar_pdf_profesional_test(df_pdf):
         return card
 
     # ---------------------------------------------------
-    # 5. BLOQUE IZQUIERDO
+    # 5. BLOQUE IZQUIERDO PREMIUM
     # ---------------------------------------------------
 
+    contenido_izq = Table(
+        [[
+            logo,
+
+            Table(
+                [
+                    [Paragraph("RESUMEN", title_style)],
+                    [Paragraph("COMERCIAL", title_style)],
+                    [Paragraph("PAYZEN", title_blue_style)],
+                    [Spacer(1, 4)],
+                    [Paragraph("— Propuesta de costos y ahorro estimado", subtitle_style)],
+                ],
+                colWidths=[3.20 * inch]
+            )
+        ]],
+        colWidths=[1.10 * inch, 2.10 * inch]
+    )
+
+    contenido_izq.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+
     bloque_titulo = Table(
-        [
-            [logo],
-            [Spacer(1, 5)],
-            [Paragraph("RESUMEN COMERCIAL", title_style)],
-            [Paragraph("PAYZEN", title_blue_style)],
-            [Paragraph("— Propuesta de costos y ahorro estimado", subtitle_style)],
-        ],
-        colWidths=[2.80 * inch],
-        rowHeights=[
-            0.26 * inch,
-            0.05 * inch,
-            0.30 * inch,
-            0.34 * inch,
-            0.18 * inch
-        ]
+        [[contenido_izq]],
+        colWidths=[3.20 * inch],
+        rowHeights=[1.60 * inch]
     )
 
     bloque_titulo.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 18),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 18),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 16),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 14),
+
+        ("TOPPADDING", (0, 0), (-1, -1), 12),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
