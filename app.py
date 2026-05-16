@@ -1098,7 +1098,7 @@ for row in resultados:
 
 
 # ---------------------------------------------------
-# PDF RESUMEN COMERCILA JULI
+# PDF RESUMEN COMERCIAL JULI
 # ---------------------------------------------------
 
 DISCLAIMER = """
@@ -2084,6 +2084,49 @@ def generar_pdf_profesional_test(df_pdf):
         textColor=colors.white
     )
 
+    section_title_style = ParagraphStyle(
+        "SectionTitle",
+        parent=styles["Heading2"],
+        fontName="Helvetica-Bold",
+        fontSize=10,
+        leading=12,
+        textColor=colors.HexColor("#111827"),
+        alignment=0,
+    )
+
+    section_icon_style = ParagraphStyle(
+        "SectionIcon",
+        parent=styles["BodyText"],
+        fontName="Helvetica-Bold",
+        fontSize=11,
+        textColor=colors.white,
+        alignment=1,
+    )
+
+    table_text_style = ParagraphStyle(
+        "TableText",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor("#111827"),
+    )
+
+    table_text_right = ParagraphStyle(
+        "TableTextRight",
+        parent=table_text_style,
+        alignment=2,
+    )
+
+    table_text_bold = ParagraphStyle(
+        "TableTextBold",
+        parent=table_text_style,
+        fontName="Helvetica-Bold",
+    )
+
+
+
+
     # ---------------------------------------------------
     # 2. STORY
     # ---------------------------------------------------
@@ -2148,11 +2191,11 @@ def generar_pdf_profesional_test(df_pdf):
 
             Table(
                 [
-                    [Paragraph("RESUMEN", title_style)],
-                    [Paragraph("COMERCIAL", title_style)],
-                    [Paragraph("PAYZEN", title_blue_style)],
+                    [Paragraph("Resumen", title_style)],
+                    [Paragraph("Comercial", title_style)],
+                    [Paragraph("PayZen", title_blue_style)],
                     [Spacer(1, 4)],
-                    [Paragraph("— Propuesta de costos y ahorro estimado", subtitle_style)],
+                    [Paragraph("Propuesta de costos y ahorro estimado", subtitle_style)],
                 ],
                 colWidths=[3.20 * inch]
             )
@@ -2196,19 +2239,19 @@ def generar_pdf_profesional_test(df_pdf):
     card_1 = crear_card_kpi(
         "AHORRO MENSUAL",
         money(first["Ahorro mensual"]),
-        "vs Pasarela Actual"
+        "Con PayZen"
     )
 
     card_2 = crear_card_kpi(
         "AHORRO ANUAL",
         money(first["Ahorro anual"]),
-        "vs Pasarela Actual"
+        "Con PayZen"
     )
 
     card_3 = crear_card_kpi(
         "AHORRO POTENCIAL",
         percent(first["Ahorro %"]),
-        "vs Pasarela Actual"
+        "Con PayZen"
     )
 
     card_4 = crear_card_kpi(
@@ -2250,6 +2293,50 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
     parte_superior.hAlign = "CENTER"
     story.append(parte_superior)
+
+#----------
+
+    story.append(Spacer(1, 18))
+
+    # ---------------------------------------------------
+    # HEADER INFORMACION OPERATIVA
+    # ---------------------------------------------------
+
+    icono_info = Table(
+        [[Paragraph("▣", section_icon_style)]],
+        colWidths=[0.22 * inch],
+        rowHeights=[0.22 * inch]
+    )
+
+    icono_info.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
+        ("BOX", (0, 0), (-1, -1), 0, colors.white),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+
+    titulo_info = Paragraph(
+        "INFORMACIÓN OPERATIVA INICIAL",
+        section_title_style
+    )
+
+    header_info = Table(
+        [[icono_info, titulo_info]],
+        colWidths=[0.30 * inch, 2.60 * inch]
+    )
+
+    header_info.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    story.append(header_info)
+    story.append(Spacer(1, 5))
+
+#---------   
 
     # TEMPORAL: solo para probar la parte de arriba
     story.append(Spacer(1, 20))
