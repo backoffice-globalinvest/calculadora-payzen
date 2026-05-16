@@ -2298,9 +2298,9 @@ def generar_pdf_profesional_test(df_pdf):
 
     story.append(Spacer(1, 18))
 
-    # ---------------------------------------------------
-    # HEADER INFORMACION OPERATIVA
-    # ---------------------------------------------------
+# ---------------------------------------------------
+# INFORMACION OPERATIVA INICIAL
+# ---------------------------------------------------
 
     icono_info = Table(
         [[Paragraph("▣", section_icon_style)]],
@@ -2333,10 +2333,6 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(header_info)
-    story.append(Spacer(1, 5))
-
-    #-------
     linea_azul = Table(
         [[""]],
         colWidths=[0.38 * inch],
@@ -2347,9 +2343,6 @@ def generar_pdf_profesional_test(df_pdf):
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
     ]))
 
-    story.append(linea_azul)
-    story.append(Spacer(1, 8))
-    #---------
     info_data = [
         [
             Paragraph("Volumen", table_text_style),
@@ -2368,19 +2361,13 @@ def generar_pdf_profesional_test(df_pdf):
     )
 
     tabla_info.setStyle(TableStyle([
-
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-
         ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D1D5DB")),
-
         ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 10),
         ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-
         ("TOPPADDING", (0, 0), (-1, -1), 8),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
@@ -2391,17 +2378,36 @@ def generar_pdf_profesional_test(df_pdf):
 
     contenedor_info.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-
         ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 10),
         ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-
         ("TOPPADDING", (0, 0), (-1, -1), 10),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
     ]))
 
-    story.append(contenedor_info)
+    bloque_info_operativa = Table(
+        [
+            [header_info],
+            [Spacer(1, 5)],
+            [linea_azul],
+            [Spacer(1, 8)],
+            [contenedor_info],
+        ],
+        colWidths=[3.35 * inch]
+    )
+
+    bloque_info_operativa.hAlign = "LEFT"
+
+    bloque_info_operativa.setStyle(TableStyle([
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    story.append(Spacer(1, 14))
+    story.append(bloque_info_operativa)
+
     #---------   
 
     # TEMPORAL: solo para probar la parte de arriba
