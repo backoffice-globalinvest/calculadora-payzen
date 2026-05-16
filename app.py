@@ -3,7 +3,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import hashlib
 import hmac
-from reportlab.lib.pagesizes import letter, landscape, TABLOID
+from reportlab.lib.pagesizes import letter, landscape, TABLOID, LEGAL
+from reportlab.lib.utils import ImageReader
 from io import BytesIO
 
 
