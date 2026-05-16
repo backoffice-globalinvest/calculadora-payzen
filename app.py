@@ -2405,8 +2405,8 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(Spacer(1, 14))
-    story.append(bloque_info_operativa)
+    #story.append(Spacer(1, 14))
+    #story.append(bloque_info_operativa)
 
     #---------   
 
@@ -2422,7 +2422,176 @@ def generar_pdf_profesional_test(df_pdf):
 
 
 
-#---
+#----------------------------------------------------
+
+
+# ---------------------------------------------------
+# METODOS DE PAGO ACEPTADOS
+# ---------------------------------------------------
+#----------------------------------------------------
+# 1. Bloque de metodos de pago Aceptados 
+#----------------------------------------------------
+
+    icono_metodos = Table(
+        [[Paragraph("▭", section_icon_style)]],
+        colWidths=[0.22 * inch],
+        rowHeights=[0.22 * inch]
+    )
+
+    icono_metodos.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
+        ("BOX", (0, 0), (-1, -1), 0, colors.white),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+
+    titulo_metodos = Paragraph(
+        "MÉTODOS DE PAGO ACEPTADOS",
+        section_title_style
+    )
+
+    header_metodos = Table(
+        [[icono_metodos, titulo_metodos]],
+        colWidths=[0.30 * inch, 2.90 * inch]
+    )
+
+    header_metodos.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    linea_azul_metodos = Table(
+        [[""]],
+        colWidths=[0.38 * inch],
+        rowHeights=[0.03 * inch]
+    )
+
+    linea_azul_metodos.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
+    ]))
+
+#----------------------------------------------------
+# Tabla de Metedos de pago 
+#----------------------------------------------------
+
+    metodos_data = [
+        [
+            Paragraph("Método de pago", table_text_bold),
+            Paragraph("Número de transacciones", table_text_bold),
+            Paragraph("% Transaccional", table_text_bold),
+        ],
+        [
+            Paragraph("Tarjeta Crédito / Tarjeta Débito", table_text_style),
+            Paragraph(number_fmt(first["TC"]), table_text_right),
+            Paragraph(percent(pct_tc_pdf), table_text_right),
+        ],
+        [
+            Paragraph("PSE", table_text_style),
+            Paragraph(number_fmt(first["PSE"]), table_text_right),
+            Paragraph(percent(pct_pse_pdf), table_text_right),
+        ],
+        [
+            Paragraph("Bre-B", table_text_style),
+            Paragraph(number_fmt(first["Bre-B"]), table_text_right),
+            Paragraph(percent(pct_breb_pdf), table_text_right),
+        ],
+        [
+            Paragraph("TOTAL", table_text_bold),
+            Paragraph(number_fmt(total_tx), table_text_right),
+            Paragraph(percent(pct_tc_pdf + pct_pse_pdf + pct_breb_pdf), table_text_right),
+        ],
+    ]
+
+    tabla_metodos = Table(
+        metodos_data,
+        colWidths=[2.25 * inch, 1.45 * inch, 1.15 * inch],
+        rowHeights=[
+            0.32 * inch,
+            0.34 * inch,
+            0.34 * inch,
+            0.34 * inch,
+            0.34 * inch,
+        ]
+    )
+
+    tabla_metodos.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EFF6FF")),
+        ("BACKGROUND", (0, 1), (-1, -2), colors.white),
+        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#EFF6FF")),
+
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D1D5DB")),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
+
+        ("TEXTCOLOR", (0, -1), (-1, -1), colors.HexColor("#0955F9")),
+        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+
+        ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]))
+
+    contenedor_metodos = Table(
+        [[tabla_metodos]],
+        colWidths=[5.05 * inch]
+    )
+
+    contenedor_metodos.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+    ]))
+
+
+#----------------------------------------------------
+# Arma el bloque completo
+#----------------------------------------------------
+
+    bloque_metodos_pago = Table(
+        [
+            [header_metodos],
+            [Spacer(1, 5)],
+            [linea_azul_metodos],
+            [Spacer(1, 8)],
+            [contenedor_metodos],
+        ],
+        colWidths=[5.25 * inch]
+    )
+
+    bloque_metodos_pago.setStyle(TableStyle([
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+
+#----------------------------------------------------
+    fila_operativa = Table(
+        [[bloque_info_operativa, bloque_metodos_pago]],
+        colWidths=[3.65 * inch, 5.55 * inch]
+    )
+
+    fila_operativa.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 14),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    story.append(Spacer(1, 14))
+    story.append(fila_operativa)
+#----------------------------------------------------
 
 # ---------------------------------------------------
 # TABLA RESUMEN
