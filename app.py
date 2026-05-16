@@ -2101,7 +2101,7 @@ def generar_pdf_profesional_test(df_pdf):
         img_w, img_h = img_reader.getSize()
         aspect = img_h / img_w
 
-        logo_width = 1.45 * inch
+        logo_width = 1.25 * inch
         logo_height = logo_width * aspect
 
         logo = Image(str(logo_path), width=logo_width, height=logo_height)
@@ -2145,20 +2145,27 @@ def generar_pdf_profesional_test(df_pdf):
     bloque_titulo = Table(
         [
             [logo],
-            [Spacer(1, 8)],
+            [Spacer(1, 5)],
             [Paragraph("RESUMEN COMERCIAL", title_style)],
             [Paragraph("PAYZEN", title_blue_style)],
             [Paragraph("— Propuesta de costos y ahorro estimado", subtitle_style)],
         ],
-        colWidths=[2.80 * inch]
+        colWidths=[2.80 * inch],
+        rowHeights=[
+            0.45 * inch,
+            0.10 * inch,
+            0.38 * inch,
+            0.40 * inch,
+            0.22 * inch
+        ]
     )
 
     bloque_titulo.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
         ("LEFTPADDING", (0, 0), (-1, -1), 18),
         ("RIGHTPADDING", (0, 0), (-1, -1), 18),
-        ("TOPPADDING", (0, 0), (-1, -1), 12),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
