@@ -2230,11 +2230,11 @@ def generar_pdf_profesional_test(df_pdf):
             card_4
         ]],
         colWidths=[
-            3.10 * inch,
-            2.20 * inch,
-            2.20 * inch,
-            2.20 * inch,
-            2.20 * inch
+            3.60 * inch,
+            2.45 * inch,
+            2.45 * inch,
+            2.45 * inch,
+            2.45 * inch
         ],
         rowHeights=[1.75 * inch]
     )
@@ -2248,7 +2248,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("TOPPADDING", (0, 0), (-1, -1), 10),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
     ]))
-
+    parte_superior.hAlign = "CENTER"
     story.append(parte_superior)
 
     # TEMPORAL: solo para probar la parte de arriba
