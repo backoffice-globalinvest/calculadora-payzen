@@ -2121,7 +2121,7 @@ def generar_pdf_profesional_test(df_pdf):
                 [Paragraph("↑  " + subtitulo, kpi_note)],
             ],
             colWidths=[1.85 * inch],
-            rowHeights=[0.24 * inch, 0.34 * inch, 0.22 * inch]
+            rowHeights=[0.32 * inch, 0.48 * inch, 0.30 * inch]
         )
 
         card.setStyle(TableStyle([
@@ -2236,7 +2236,7 @@ def generar_pdf_profesional_test(df_pdf):
             2.45 * inch,
             2.45 * inch
         ],
-        rowHeights=[1.75 * inch]
+        rowHeights=[2.05 * inch]
     )
 
     parte_superior.setStyle(TableStyle([
