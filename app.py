@@ -2731,6 +2731,157 @@ def generar_pdf_profesional_test(df_pdf):
 
     story.append(bloque_costos_payzen)
 
+
+    # ---------------------------------------------------
+    # 9. COSTOS PASARELA ACTUAL
+    # ---------------------------------------------------
+
+# ---------------------------------------------------
+# 9. COSTOS PASARELA ACTUAL
+# ---------------------------------------------------
+
+    story.append(Spacer(1, 12))
+
+    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
+
+    icono_actual = Table(
+        [[Paragraph("▣", section_icon_style)]],
+        colWidths=[0.22 * inch],
+        rowHeights=[0.22 * inch]
+    )
+
+    icono_actual.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F97316")),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+
+    titulo_actual = Paragraph(
+        "COSTOS PASARELA ACTUAL",
+        section_title_style
+    )
+
+    header_actual = Table(
+        [[icono_actual, titulo_actual]],
+        colWidths=[0.30 * inch, 2.90 * inch]
+    )
+
+    header_actual.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    linea_naranja = Table(
+        [[""]],
+        colWidths=[0.38 * inch],
+        rowHeights=[0.03 * inch]
+    )
+
+    linea_naranja.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F97316")),
+    ]))
+
+    actual_data = [
+        [
+            Paragraph('<font color="white"><b>Concepto</b></font>', table_text_style),
+            Paragraph('<font color="white"><b>Modelo Agregador</b></font>', table_text_right),
+        ],
+        [
+            Paragraph("Plan actual", table_text_style),
+            Paragraph(modelo_actual, table_text_right),
+        ],
+        [
+            Paragraph("Ticket Promedio", table_text_style),
+            Paragraph(money(ticket_promedio), table_text_right),
+        ],
+        [
+            Paragraph("Volumen (Número de transacciones)", table_text_style),
+            Paragraph(number_fmt(total_tx), table_text_right),
+        ],
+        [
+            Paragraph('<font color="#EA580C"><b>Costo Total pasarela agregadora</b></font>', table_text_style),
+            Paragraph(f'<font color="#EA580C"><b>{money(first["Pasarela actual"])}</b></font>', table_text_right),
+        ],
+    ]
+
+    tabla_actual = Table(
+        actual_data,
+        colWidths=[2.25 * inch, 1.45 * inch],
+        rowHeights=[
+            0.34 * inch,
+            0.34 * inch,
+            0.34 * inch,
+            0.34 * inch,
+            0.36 * inch,
+        ]
+    )
+
+    tabla_actual.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F97316")),
+        ("BACKGROUND", (0, 1), (-1, -2), colors.white),
+        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#FFF1E8")),
+
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#FDBA74")),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#FDBA74")),
+
+        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]))
+
+    contenedor_actual = Table(
+        [[tabla_actual]],
+        colWidths=[3.95 * inch]
+    )
+
+    contenedor_actual.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#FDE7D7")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+    ]))
+
+    bloque_pasarela_actual = Table(
+        [
+            [header_actual],
+            [Spacer(1, 5)],
+            [linea_naranja],
+            [Spacer(1, 8)],
+            [contenedor_actual],
+        ],
+        colWidths=[4.15 * inch]
+    )
+
+    bloque_pasarela_actual.hAlign = "LEFT"
+
+    bloque_pasarela_actual.setStyle(TableStyle([
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    story.append(bloque_pasarela_actual)
+
+
+
+
+
+
+
+
+
+    # ----
+
     # ---------------------------------------------------
     # CIERRE PDF
     # ---------------------------------------------------
