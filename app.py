@@ -2590,7 +2590,7 @@ def generar_pdf_profesional_test(df_pdf):
         [Paragraph("Costo total de las transacciones Adicionales", table_text_style), Paragraph(money(first["Costo adicionales"]), table_text_right)],
         [Paragraph(f"Costo del Plan Escogido {plan}", table_text_style), Paragraph(money(first["Costo plan"]), table_text_right)],
         [Paragraph("Total Costo PayZen", table_text_bold), Paragraph(money(first["Total PayZen Gateway"]), table_text_right)],
-        [Paragraph("Total PayZen + Total Adquirientes", table_text_bold_blue), Paragraph(money(first["PayZen"]), table_text_bold_blue_right)],
+        [Paragraph('<font color="white"><b>Total PayZen + Total Adquirientes</b></font>', table_text_style), Paragraph(f'<font color="white"><b>{money(first["PayZen"])}</b></font>', table_text_right)],
     ]
 
     tabla_payzen = Table(
