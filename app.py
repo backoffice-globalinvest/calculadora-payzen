@@ -2729,7 +2729,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(bloque_costos_payzen)
+    
 
   
 
@@ -2738,7 +2738,7 @@ def generar_pdf_profesional_test(df_pdf):
 # 9. COSTOS PASARELA ACTUAL
 # ---------------------------------------------------
 
-    story.append(Spacer(1, 12))
+    
 
     modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
 
