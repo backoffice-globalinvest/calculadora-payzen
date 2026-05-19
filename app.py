@@ -2869,8 +2869,6 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     
-    story.append(Spacer(1, 12))
-    story.append(bloque_pasarela_actual)  
 
 
     story.append(Spacer(1, 12))
@@ -2884,14 +2882,7 @@ def generar_pdf_profesional_test(df_pdf):
 
 
 
-    # ----
-
-    # ---------------------------------------------------
-    # CIERRE PDF
-    # ---------------------------------------------------
-
-
-
+  
 
 
 # ---------------------------------------------------
