@@ -1984,15 +1984,9 @@ def generar_pdf_ejecutivo(df_pdf):
     buffer.close()
     return pdf
 
-
-
-#----------------------------------------------------
-# Nuevo PDF Profesional - MAFE
-#----------------------------------------------------
-
-# ---------------------------------------------------
-# PDF PROFESIONAL TEST
-# ---------------------------------------------------
+# -----------
+# MAFE PDF DASHBOARD LINDO
+# ----------------
 
 def generar_pdf_profesional_test(df_pdf):
     buffer = BytesIO()
@@ -2018,7 +2012,7 @@ def generar_pdf_profesional_test(df_pdf):
         parent=styles["Title"],
         fontName="Helvetica-Bold",
         fontSize=15,
-        leading=17,
+        leading=18,
         textColor=colors.white,
         alignment=0,
         spaceAfter=0
@@ -2028,8 +2022,8 @@ def generar_pdf_profesional_test(df_pdf):
         "ProTitleBlue",
         parent=styles["Title"],
         fontName="Helvetica-Bold",
-        fontSize=24,
-        leading=24,
+        fontSize=23,
+        leading=25,
         textColor=colors.HexColor("#2F80FF"),
         alignment=0,
         spaceAfter=0
@@ -2039,8 +2033,8 @@ def generar_pdf_profesional_test(df_pdf):
         "ProSubtitle",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=7,
-        leading=9,
+        fontSize=6,
+        leading=8,
         textColor=colors.white,
         alignment=0
     )
@@ -2049,7 +2043,7 @@ def generar_pdf_profesional_test(df_pdf):
         "KpiLabel",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=6.5,
+        fontSize=6,
         leading=8,
         textColor=colors.white,
         alignment=0
@@ -2059,7 +2053,7 @@ def generar_pdf_profesional_test(df_pdf):
         "KpiValue",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=16,
+        fontSize=15,
         leading=18,
         textColor=colors.HexColor("#2F80FF"),
         alignment=0
@@ -2069,8 +2063,8 @@ def generar_pdf_profesional_test(df_pdf):
         "KpiNote",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=6,
-        leading=8,
+        fontSize=5.5,
+        leading=7,
         textColor=colors.white,
         alignment=0
     )
@@ -2098,7 +2092,7 @@ def generar_pdf_profesional_test(df_pdf):
         "SectionIcon",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=11,
+        fontSize=10,
         textColor=colors.white,
         alignment=1,
     )
@@ -2124,17 +2118,23 @@ def generar_pdf_profesional_test(df_pdf):
         fontName="Helvetica-Bold",
     )
 
+    table_text_bold_blue = ParagraphStyle(
+        "TableTextBoldBlue",
+        parent=table_text_style,
+        fontName="Helvetica-Bold",
+        textColor=colors.HexColor("#0955F9"),
+    )
 
-
-
-    # ---------------------------------------------------
-    # 2. STORY
-    # ---------------------------------------------------
+    table_text_bold_blue_right = ParagraphStyle(
+        "TableTextBoldBlueRight",
+        parent=table_text_bold_blue,
+        alignment=2,
+    )
 
     story = []
 
     # ---------------------------------------------------
-    # 3. LOGO
+    # 2. LOGO
     # ---------------------------------------------------
 
     try:
@@ -2153,7 +2153,7 @@ def generar_pdf_profesional_test(df_pdf):
         logo = Paragraph("", text_white)
 
     # ---------------------------------------------------
-    # 4. CARD KPI
+    # 3. HEADER SUPERIOR
     # ---------------------------------------------------
 
     def crear_card_kpi(titulo, valor, subtitulo):
@@ -2161,146 +2161,108 @@ def generar_pdf_profesional_test(df_pdf):
             [
                 [Paragraph(titulo, kpi_label)],
                 [Paragraph(valor, kpi_value)],
-                [Paragraph("↑  " + subtitulo, kpi_note)],
+                [Paragraph("↑ " + subtitulo, kpi_note)],
             ],
-            colWidths=[1.85 * inch],
-            rowHeights=[0.32 * inch, 0.48 * inch, 0.30 * inch]
+            colWidths=[2.00 * inch],
+            rowHeights=[0.30 * inch, 0.45 * inch, 0.28 * inch]
         )
 
         card.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#082D57")),
             ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
-
             ("LEFTPADDING", (0, 0), (-1, -1), 12),
             ("RIGHTPADDING", (0, 0), (-1, -1), 12),
             ("TOPPADDING", (0, 0), (-1, -1), 9),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ]))
 
         return card
 
-    # ---------------------------------------------------
-    # 5. BLOQUE IZQUIERDO PREMIUM
-    # ---------------------------------------------------
-
     contenido_izq = Table(
         [[
             logo,
-
             Table(
                 [
                     [Paragraph("Resumen", title_style)],
                     [Paragraph("Comercial", title_style)],
                     [Paragraph("PayZen", title_blue_style)],
-                    [Spacer(1, 4)],
+                    [Spacer(1, 3)],
                     [Paragraph("Propuesta de costos y ahorro estimado", subtitle_style)],
                 ],
-                colWidths=[3.20 * inch]
+                colWidths=[1.90 * inch]
             )
         ]],
-        colWidths=[1.10 * inch, 2.10 * inch]
+        colWidths=[1.05 * inch, 2.05 * inch]
     )
 
     contenido_izq.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-
     bloque_titulo = Table(
         [[contenido_izq]],
-        colWidths=[3.20 * inch],
-        rowHeights=[1.60 * inch]
+        colWidths=[3.35 * inch],
+        rowHeights=[1.45 * inch]
     )
 
     bloque_titulo.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
-
-        ("LEFTPADDING", (0, 0), (-1, -1), 16),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 14),
-
+        ("LEFTPADDING", (0, 0), (-1, -1), 14),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 12),
         ("TOPPADDING", (0, 0), (-1, -1), 12),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
-    # ---------------------------------------------------
-    # 6. CARDS SUPERIORES
-    # ---------------------------------------------------
-
-    card_1 = crear_card_kpi(
-        "AHORRO MENSUAL",
-        money(first["Ahorro mensual"]),
-        "Con PayZen"
-    )
-
-    card_2 = crear_card_kpi(
-        "AHORRO ANUAL",
-        money(first["Ahorro anual"]),
-        "Con PayZen"
-    )
-
-    card_3 = crear_card_kpi(
-        "AHORRO POTENCIAL",
-        percent(first["Ahorro %"]),
-        "Con PayZen"
-    )
-
-    card_4 = crear_card_kpi(
-        "TRANSACCIONES",
-        number_fmt(first["Transacciones"]),
-        "Total mensual"
-    )
-
-    # ---------------------------------------------------
-    # 7. PARTE SUPERIOR COMPLETA
-    # ---------------------------------------------------
+    card_1 = crear_card_kpi("AHORRO MENSUAL", money(first["Ahorro mensual"]), "Con PayZen")
+    card_2 = crear_card_kpi("AHORRO ANUAL", money(first["Ahorro anual"]), "Con PayZen")
+    card_3 = crear_card_kpi("AHORRO POTENCIAL", percent(first["Ahorro %"]), "Con PayZen")
+    card_4 = crear_card_kpi("TRANSACCIONES", number_fmt(first["Transacciones"]), "Total mensual")
 
     parte_superior = Table(
-        [[
-            bloque_titulo,
-            card_1,
-            card_2,
-            card_3,
-            card_4
-        ]],
+        [[bloque_titulo, card_1, card_2, card_3, card_4]],
         colWidths=[
             3.60 * inch,
-            2.45 * inch,
-            2.45 * inch,
-            2.45 * inch,
-            2.45 * inch
+            2.15 * inch,
+            2.15 * inch,
+            2.15 * inch,
+            2.15 * inch
         ],
-        rowHeights=[2.05 * inch]
+        rowHeights=[1.75 * inch]
     )
+
+    parte_superior.hAlign = "CENTER"
 
     parte_superior.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#020617")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 6),
         ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ("TOPPADDING", (0, 0), (-1, -1), 10),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
     ]))
-    parte_superior.hAlign = "CENTER"
+
     story.append(parte_superior)
 
-#----------
+    # ---------------------------------------------------
+    # 4. CALCULOS PARA SECCIONES
+    # ---------------------------------------------------
 
-    story.append(Spacer(1, 18))
+    total_tx = first["Transacciones"]
+    total_methods = max(total_tx, 1)
 
-# ---------------------------------------------------
-# INFORMACION OPERATIVA INICIAL
-# ---------------------------------------------------
+    pct_tc_pdf = (first["TC"] / total_methods * 100) if total_methods > 0 else 0
+    pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
+    pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
+
+    # ---------------------------------------------------
+    # 5. BLOQUE INFORMACION OPERATIVA INICIAL
+    # ---------------------------------------------------
 
     icono_info = Table(
         [[Paragraph("▣", section_icon_style)]],
@@ -2396,8 +2358,6 @@ def generar_pdf_profesional_test(df_pdf):
         colWidths=[3.35 * inch]
     )
 
-    bloque_info_operativa.hAlign = "LEFT"
-
     bloque_info_operativa.setStyle(TableStyle([
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
@@ -2405,32 +2365,9 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(Spacer(1, 14))
-    story.append(bloque_info_operativa)
-
-    #---------   
-
-    # TEMPORAL: solo para probar la parte de arriba
-    story.append(Spacer(1, 20))
-    story.append(Paragraph("Aquí construiremos el resto del PDF profesional.", text_white))
-
-    doc.build(story)
-
-    pdf = buffer.getvalue()
-    buffer.close()
-    return pdf
-
-
-
-#----------------------------------------------------
-
-
-# ---------------------------------------------------
-# METODOS DE PAGO ACEPTADOS
-# ---------------------------------------------------
-#----------------------------------------------------
-# 1. Bloque de metodos de pago Aceptados 
-#----------------------------------------------------
+    # ---------------------------------------------------
+    # 6. BLOQUE METODOS DE PAGO ACEPTADOS
+    # ---------------------------------------------------
 
     icono_metodos = Table(
         [[Paragraph("▭", section_icon_style)]],
@@ -2473,10 +2410,6 @@ def generar_pdf_profesional_test(df_pdf):
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
     ]))
 
-#----------------------------------------------------
-# Tabla de Metedos de pago 
-#----------------------------------------------------
-
     metodos_data = [
         [
             Paragraph("Método de pago", table_text_bold),
@@ -2499,9 +2432,9 @@ def generar_pdf_profesional_test(df_pdf):
             Paragraph(percent(pct_breb_pdf), table_text_right),
         ],
         [
-            Paragraph("TOTAL", table_text_bold),
-            Paragraph(number_fmt(total_tx), table_text_right),
-            Paragraph(percent(pct_tc_pdf + pct_pse_pdf + pct_breb_pdf), table_text_right),
+            Paragraph("TOTAL", table_text_bold_blue),
+            Paragraph(number_fmt(total_tx), table_text_bold_blue_right),
+            Paragraph(percent(pct_tc_pdf + pct_pse_pdf + pct_breb_pdf), table_text_bold_blue_right),
         ],
     ]
 
@@ -2521,16 +2454,10 @@ def generar_pdf_profesional_test(df_pdf):
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EFF6FF")),
         ("BACKGROUND", (0, 1), (-1, -2), colors.white),
         ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#EFF6FF")),
-
         ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D1D5DB")),
         ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
-
-        ("TEXTCOLOR", (0, -1), (-1, -1), colors.HexColor("#0955F9")),
-        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
-
         ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
         ("LEFTPADDING", (0, 0), (-1, -1), 8),
         ("RIGHTPADDING", (0, 0), (-1, -1), 8),
         ("TOPPADDING", (0, 0), (-1, -1), 6),
@@ -2551,11 +2478,6 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
     ]))
 
-
-#----------------------------------------------------
-# Arma el bloque completo
-#----------------------------------------------------
-
     bloque_metodos_pago = Table(
         [
             [header_metodos],
@@ -2574,12 +2496,16 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-
+    # ---------------------------------------------------
+    # 7. FILA OPERATIVA
+    # ---------------------------------------------------
 
     fila_operativa = Table(
         [[bloque_info_operativa, bloque_metodos_pago]],
         colWidths=[3.65 * inch, 5.55 * inch]
     )
+
+    fila_operativa.hAlign = "LEFT"
 
     fila_operativa.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -2591,7 +2517,19 @@ def generar_pdf_profesional_test(df_pdf):
 
     story.append(Spacer(1, 14))
     story.append(fila_operativa)
-#----------------------------------------------------
+
+    # ---------------------------------------------------
+    # CIERRE PDF
+    # ---------------------------------------------------
+
+    doc.build(story)
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
+
+
+
 
 # ---------------------------------------------------
 # TABLA RESUMEN
