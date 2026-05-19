@@ -2732,9 +2732,7 @@ def generar_pdf_profesional_test(df_pdf):
     story.append(bloque_costos_payzen)
 
 
-    # ---------------------------------------------------
-    # 9. COSTOS PASARELA ACTUAL
-    # ---------------------------------------------------
+
 
 # ---------------------------------------------------
 # 9. COSTOS PASARELA ACTUAL
