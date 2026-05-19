@@ -2870,9 +2870,23 @@ def generar_pdf_profesional_test(df_pdf):
 
     
 
+    fila_costos_final = Table(
+        [[bloque_costos_payzen, bloque_pasarela_actual]],
+        colWidths=[7.25 * inch, 4.20 * inch]
+    )
 
-    story.append(Spacer(1, 12))
-    story.append(bloque_pasarela_actual)
+    fila_costos_final.hAlign = "LEFT"
+
+    fila_costos_final.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    story.append(Spacer(1, 14))
+    story.append(fila_costos_final)
 
     doc.build(story)
 
