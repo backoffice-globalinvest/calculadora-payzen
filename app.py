@@ -2106,6 +2106,17 @@ def generar_pdf_profesional_test(df_pdf):
         textColor=colors.HexColor("#111827"),
     )
 
+
+    table_header = ParagraphStyle(
+        "table_header",
+        parent=styles["Normal"],
+        fontName="Helvetica-Bold",
+        fontSize=9,
+        leading=11,
+        textColor=colors.white,
+        alignment=1,
+    )
+
     table_text_right = ParagraphStyle(
         "TableTextRight",
         parent=table_text_style,
@@ -2517,6 +2528,208 @@ def generar_pdf_profesional_test(df_pdf):
 
     story.append(Spacer(1, 14))
     story.append(fila_operativa)
+    
+    
+
+    # ---------------------------------------------------
+    # 8. COSTOS PAYZEN + COSTOS ADQUIRENTES
+    # ---------------------------------------------------
+
+    story.append(Spacer(1, 14))
+
+    icono_costos = Table(
+        [[Paragraph("▣", section_icon_style)]],
+        colWidths=[0.22 * inch],
+        rowHeights=[0.22 * inch]
+    )
+
+    icono_costos.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+
+    titulo_costos = Paragraph(
+        "COSTOS PAYZEN + COSTOS ADQUIRENTES",
+        section_title_style
+    )
+
+    header_costos = Table(
+        [[icono_costos, titulo_costos]],
+        colWidths=[0.30 * inch, 3.60 * inch]
+    )
+
+    header_costos.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    linea_azul_costos = Table(
+        [[""]],
+        colWidths=[0.38 * inch],
+        rowHeights=[0.03 * inch]
+    )
+
+    linea_azul_costos.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#2563EB")),
+    ]))
+
+    # Tabla izquierda: Costos PayZen
+    payzen_data = [
+        [
+            Paragraph("Costos PayZen (Modelo Gateway)", table_header),
+            Paragraph("", table_header),
+        ],
+        [Paragraph("Ticket Promedio", table_text_style), Paragraph(money(ticket_promedio), table_text_right)],
+        [Paragraph("Volumen (Número de transacciones)", table_text_style), Paragraph(number_fmt(total_tx), table_text_right)],
+        [Paragraph("Costo de la transacción Adicional", table_text_style), Paragraph(money(first["Tarifa adicional"]), table_text_right)],
+        [Paragraph("Cantidad de transacciones Adicionales", table_text_style), Paragraph(number_fmt(first["Tx adicionales"]), table_text_right)],
+        [Paragraph("Costo total de las transacciones Adicionales", table_text_style), Paragraph(money(first["Costo adicionales"]), table_text_right)],
+        [Paragraph(f"Costo del Plan Escogido {plan}", table_text_style), Paragraph(money(first["Costo plan"]), table_text_right)],
+        [Paragraph("Total Costo PayZen", table_text_bold), Paragraph(money(first["Total PayZen Gateway"]), table_text_right)],
+        [Paragraph("Total PayZen + Total Adquirientes", table_text_bold_blue), Paragraph(money(first["PayZen"]), table_text_bold_blue_right)],
+    ]
+
+    tabla_payzen = Table(
+        payzen_data,
+        colWidths=[2.55 * inch, 1.25 * inch]
+    )
+
+    tabla_payzen.setStyle(TableStyle([
+        ("SPAN", (0, 0), (1, 0)),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0955F9")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+
+        ("BACKGROUND", (0, 1), (-1, -3), colors.white),
+        ("BACKGROUND", (0, -2), (-1, -2), colors.HexColor("#DBEAFE")),
+        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#0955F9")),
+
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D1D5DB")),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
+
+        ("ALIGN", (1, 1), (1, -1), "RIGHT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]))
+
+    # Tabla derecha: Costos Adquirente
+    adquirente_data = [
+        [
+            Paragraph("Costos Adquirente", table_header),
+            "",
+            "",
+            "",
+            "",
+        ],
+        [
+            Paragraph("Método de pago", table_text_bold),
+            Paragraph("Valor", table_text_bold),
+            Paragraph("Número de transacciones", table_text_bold),
+            Paragraph("Ticket Promedio", table_text_bold),
+            Paragraph("Total Adquirente", table_text_bold),
+        ],
+        [
+            Paragraph("Tarjeta Crédito / Tarjeta Débito", table_text_style),
+            Paragraph(percent(porcentaje_banco), table_text_right),
+            Paragraph(number_fmt(first["TC"]), table_text_right),
+            Paragraph(money(first["Ticket TC"]), table_text_right),
+            Paragraph(money(first["Costo banco TC"]), table_text_right),
+        ],
+        [
+            Paragraph("PSE", table_text_style),
+            Paragraph(money(costo_pse_payzen), table_text_right),
+            Paragraph(number_fmt(first["PSE"]), table_text_right),
+            Paragraph("N/A", table_text_right),
+            Paragraph(money(first["Costo PSE PayZen"]), table_text_right),
+        ],
+        [
+            Paragraph("Bre-B", table_text_style),
+            Paragraph(money(costo_breb_payzen), table_text_right),
+            Paragraph(number_fmt(first["Bre-B"]), table_text_right),
+            Paragraph("N/A", table_text_right),
+            Paragraph(money(first["Costo Bre-B PayZen"]), table_text_right),
+        ],
+        [
+            Paragraph("Total de los Adquirientes", table_text_bold),
+            "",
+            "",
+            "",
+            Paragraph(money(first["Total adquirencia"]), table_text_bold_blue_right),
+        ],
+    ]
+
+    tabla_adquirente = Table(
+        adquirente_data,
+        colWidths=[1.55 * inch, 0.75 * inch, 1.10 * inch, 1.00 * inch, 1.15 * inch]
+    )
+
+    tabla_adquirente.setStyle(TableStyle([
+        ("SPAN", (0, 0), (4, 0)),
+        ("SPAN", (0, 5), (3, 5)),
+
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0B3A75")),
+        ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#EFF6FF")),
+        ("BACKGROUND", (0, 2), (-1, -2), colors.white),
+        ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#DBEAFE")),
+
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D1D5DB")),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#E5E7EB")),
+
+        ("ALIGN", (0, 0), (4, 0), "CENTER"),
+        ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
+        ("ALIGN", (0, 5), (3, 5), "CENTER"),
+
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]))
+
+    bloque_tablas_costos = Table(
+        [[tabla_payzen, tabla_adquirente]],
+        colWidths=[4.00 * inch, 5.80 * inch]
+    )
+
+    bloque_tablas_costos.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    bloque_costos_payzen = Table(
+        [
+            [header_costos],
+            [Spacer(1, 5)],
+            [linea_azul_costos],
+            [Spacer(1, 8)],
+            [bloque_tablas_costos],
+        ],
+        colWidths=[9.95 * inch]
+    )
+
+    bloque_costos_payzen.hAlign = "LEFT"
+
+    bloque_costos_payzen.setStyle(TableStyle([
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    story.append(bloque_costos_payzen)
 
     # ---------------------------------------------------
     # CIERRE PDF
