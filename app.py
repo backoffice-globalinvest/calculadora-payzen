@@ -2731,7 +2731,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     story.append(bloque_costos_payzen)
 
-
+  
 
 
 # ---------------------------------------------------
@@ -2872,7 +2872,8 @@ def generar_pdf_profesional_test(df_pdf):
 
 
 
-
+    story.append(Spacer(1, 12))
+    story.append(bloque_pasarela_actual)  
 
 
 
