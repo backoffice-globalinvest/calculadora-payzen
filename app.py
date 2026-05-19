@@ -2868,13 +2868,15 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(bloque_pasarela_actual)
-
-
-
+    
     story.append(Spacer(1, 12))
     story.append(bloque_pasarela_actual)  
 
+    doc.build(story)
+
+    pdf =buffer.getvalue()
+    buffer.close()
+    return pdf
 
 
 
