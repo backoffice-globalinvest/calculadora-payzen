@@ -2517,9 +2517,7 @@ def generar_pdf_profesional_test(df_pdf):
     # =========================
     # AHORRO
     # =========================
-        # =========================
-    # AHORRO
-    # =========================
+    
     header_ahorro, linea_ahorro = crear_header_seccion("AHORRO ESTIMADO CON PAYZEN", "#16A34A")
 
     tabla_ahorro = Table(
@@ -2550,8 +2548,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     contenedor_ahorro = Table(
         [[tabla_ahorro]],
-        colWidths=[4.05 * inch],
-        rowHeights=[1.85 * inch]
+        colWidths=[4.05 * inch]
     )
 
     contenedor_ahorro.setStyle(TableStyle([
@@ -2569,7 +2566,7 @@ def generar_pdf_profesional_test(df_pdf):
             [header_ahorro],
             [Spacer(1, 4)],
             [linea_ahorro],
-            [Spacer(1, 14)],
+            [Spacer(1, 6)],
             [contenedor_ahorro],
         ],
         colWidths=[W_RIGHT]
