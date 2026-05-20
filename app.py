@@ -2518,6 +2518,9 @@ def generar_pdf_profesional_test(df_pdf):
     # AHORRO
     # =========================
     
+        # =========================
+    # AHORRO
+    # =========================
     header_ahorro, linea_ahorro = crear_header_seccion("AHORRO ESTIMADO CON PAYZEN", "#16A34A")
 
     tabla_ahorro = Table(
@@ -2532,41 +2535,40 @@ def generar_pdf_profesional_test(df_pdf):
              Paragraph(f'<b>{percent(first["Ahorro %"])}</b>', table_text_right)],
         ],
         colWidths=[2.35 * inch, 1.45 * inch],
-        rowHeights=[0.38 * inch, 0.40 * inch, 0.40 * inch, 0.40 * inch]
+        rowHeights=[0.34 * inch, 0.38 * inch, 0.38 * inch, 0.38 * inch]
     )
 
     tabla_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#16A34A")),
         ("BACKGROUND", (0, 1), (-1, -1), colors.white),
         ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#BBF7D0")),
-        ("BOX", (0, 0), (-1, -1), 0.7, colors.HexColor("#BBF7D0")),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#BBF7D0")),
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 9),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 9),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
     contenedor_ahorro = Table(
         [[tabla_ahorro]],
-        colWidths=[4.05 * inch]
+        colWidths=[4.00 * inch]
     )
 
     contenedor_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("BOX", (0, 0), (-1, -1), 0.7, colors.HexColor("#DCFCE7")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 9),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 9),
-        ("TOPPADDING", (0, 0), (-1, -1), 10),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#DCFCE7")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
     ]))
 
     bloque_ahorro = Table(
         [
             [header_ahorro],
-            [Spacer(1, 4)],
+            [Spacer(1, 3)],
             [linea_ahorro],
-            [Spacer(1, 6)],
+            [Spacer(1, 8)],
             [contenedor_ahorro],
         ],
         colWidths=[W_RIGHT]
@@ -2574,11 +2576,10 @@ def generar_pdf_profesional_test(df_pdf):
 
     bloque_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#E5E7EB")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 10),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-        ("TOPPADDING", (0, 0), (-1, -1), 10),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
     fila_costos_ahorro = Table(
@@ -2588,15 +2589,6 @@ def generar_pdf_profesional_test(df_pdf):
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
-    ]))
-
-    fila_costos_ahorro.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (0, 0), "TOP"),
-        ("VALIGN", (1, 0), (1, 0), "MIDDLE"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
