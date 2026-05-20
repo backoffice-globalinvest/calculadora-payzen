@@ -2534,7 +2534,7 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Ahorro porcentual", table_text_style),
              Paragraph(f'<b>{percent(first["Ahorro %"])}</b>', table_text_right)],
         ],
-        colWidths=[2.35 * inch, 1.45 * inch],
+        colWidths=[2.15 * inch, 1.35 * inch],
         rowHeights=[0.34 * inch, 0.38 * inch, 0.38 * inch, 0.38 * inch]
     )
 
@@ -2551,7 +2551,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     contenedor_ahorro = Table(
         [[tabla_ahorro]],
-        colWidths=[4.00 * inch]
+        colWidths=[3.70 * inch]
     )
 
     contenedor_ahorro.setStyle(TableStyle([
@@ -2571,7 +2571,7 @@ def generar_pdf_profesional_test(df_pdf):
             [Spacer(1, 8)],
             [contenedor_ahorro],
         ],
-        colWidths=[W_RIGHT]
+        colWidths=[4.00 * inch]
     )
 
     bloque_ahorro.setStyle(TableStyle([
@@ -2584,13 +2584,13 @@ def generar_pdf_profesional_test(df_pdf):
 
     fila_costos_ahorro = Table(
         [[bloque_costos_payzen, bloque_ahorro]],
-        colWidths=[W_LEFT, W_RIGHT]
+        colWidths=[9.35 * inch, 4.00 * inch]
     )
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 2),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
