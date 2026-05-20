@@ -2517,54 +2517,86 @@ def generar_pdf_profesional_test(df_pdf):
     # =========================
     # AHORRO
     # =========================
+        # =========================
+    # AHORRO
+    # =========================
     header_ahorro, linea_ahorro = crear_header_seccion("AHORRO ESTIMADO CON PAYZEN", "#16A34A")
 
     tabla_ahorro = Table(
         [
-            [Paragraph('<font color="white"><b>Indicador</b></font>', table_text_style), Paragraph('<font color="white"><b>Resultado</b></font>', table_text_right)],
-            [Paragraph("Ahorro mensual", table_text_style), Paragraph(money(first["Ahorro mensual"]), green_bold_right)],
-            [Paragraph("Ahorro anual", table_text_style), Paragraph(money(first["Ahorro anual"]), green_bold_right)],
-            [Paragraph("Ahorro porcentual", table_text_style), Paragraph(percent(first["Ahorro %"]), green_bold_right)],
+            [Paragraph('<font color="white"><b>Indicador</b></font>', table_text_style),
+             Paragraph('<font color="white"><b>Resultado</b></font>', table_text_right)],
+            [Paragraph("Ahorro mensual", table_text_style),
+             Paragraph(f'<b>{money(first["Ahorro mensual"])}</b>', table_text_right)],
+            [Paragraph("Ahorro anual", table_text_style),
+             Paragraph(f'<b>{money(first["Ahorro anual"])}</b>', table_text_right)],
+            [Paragraph("Ahorro porcentual", table_text_style),
+             Paragraph(f'<b>{percent(first["Ahorro %"])}</b>', table_text_right)],
         ],
         colWidths=[2.35 * inch, 1.45 * inch],
-        rowHeights=[0.36 * inch, 0.36 * inch, 0.36 * inch, 0.36 * inch]
+        rowHeights=[0.38 * inch, 0.40 * inch, 0.40 * inch, 0.40 * inch]
     )
 
     tabla_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#16A34A")),
         ("BACKGROUND", (0, 1), (-1, -1), colors.white),
-        ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#BBF7D0")),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#BBF7D0")),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#BBF7D0")),
+        ("BOX", (0, 0), (-1, -1), 0.7, colors.HexColor("#BBF7D0")),
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("LEFTPADDING", (0, 0), (-1, -1), 9),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 9),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
-    contenedor_ahorro = Table([[tabla_ahorro]], colWidths=[4.00 * inch])
+    contenedor_ahorro = Table(
+        [[tabla_ahorro]],
+        colWidths=[4.05 * inch],
+        rowHeights=[1.85 * inch]
+    )
+
     contenedor_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#DCFCE7")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 9),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 9),
+        ("BOX", (0, 0), (-1, -1), 0.7, colors.HexColor("#DCFCE7")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 9),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 9),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
     bloque_ahorro = Table(
-        [[header_ahorro], [Spacer(1, 3)], [linea_ahorro], [Spacer(1, 6)], [contenedor_ahorro]],
+        [
+            [header_ahorro],
+            [Spacer(1, 4)],
+            [linea_ahorro],
+            [Spacer(1, 14)],
+            [contenedor_ahorro],
+        ],
         colWidths=[W_RIGHT]
     )
 
+    bloque_ahorro.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#E5E7EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+    ]))
+
     fila_costos_ahorro = Table(
         [[bloque_costos_payzen, bloque_ahorro]],
-        colWidths=[W_LEFT, W_RIGHT]
+        colWidths=[W_LEFT, W_RIGHT],
+        rowHeights=[2.90 * inch]
     )
 
     fila_costos_ahorro.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("VALIGN", (0, 0), (0, 0), "TOP"),
+        ("VALIGN", (1, 0), (1, 0), "MIDDLE"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
     story.append(Spacer(1, 8))
