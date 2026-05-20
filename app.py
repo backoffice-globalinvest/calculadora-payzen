@@ -2478,7 +2478,7 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Bre-B", table_text_style), Paragraph(money(costo_breb_payzen), table_text_right), Paragraph(number_fmt(first["Bre-B"]), table_text_right), Paragraph("N/A", table_text_right), Paragraph(money(first["Costo Bre-B PayZen"]), table_text_right)],
             [Paragraph("Total de los Adquirientes", table_text_bold), "", "", "", Paragraph(money(first["Total adquirencia"]), blue_bold_right)],
         ],
-        colWidths=[1.45 * inch, 0.75 * inch, 1.05 * inch, 1.00 * inch, 1.10 * inch],
+        colWidths=[1.25 * inch, 0.65 * inch, 0.90 * inch, 0.90 * inch, 1.00 * inch],
         rowHeights=[0.31 * inch, 0.38 * inch, 0.48 * inch, 0.34 * inch, 0.34 * inch, 0.34 * inch]
     )
 
@@ -2500,7 +2500,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     bloque_tablas_costos = Table(
         [[tabla_payzen, tabla_adquirente]],
-        colWidths=[4.15 * inch, 5.00 * inch]
+        colWidths=[4.25 * inch, 4.65 * inch]
     )
 
     bloque_tablas_costos.setStyle(TableStyle([
