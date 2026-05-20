@@ -2571,7 +2571,7 @@ def generar_pdf_profesional_test(df_pdf):
             [Spacer(1, 8)],
             [contenedor_ahorro],
         ],
-        colWidths=[4.00 * inch]
+        colWidths=[4.15 * inch]
     )
 
     bloque_ahorro.setStyle(TableStyle([
@@ -2582,15 +2582,17 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
+    espacio_invisible = Spacer(0.25 * inch, 1)
+
     fila_costos_ahorro = Table(
-        [[bloque_costos_payzen, bloque_ahorro]],
-        colWidths=[9.35 * inch, 4.30 * inch]
+        [[bloque_costos_payzen, espacio_invisible, bloque_ahorro]],
+        colWidths=[8.90 * inch, 0.30 * inch, 4.15 * inch]
     )
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 2),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
