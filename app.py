@@ -2551,7 +2551,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     contenedor_ahorro = Table(
         [[tabla_ahorro]],
-        colWidths=[3.70 * inch]
+        colWidths=[3.95 * inch]
     )
 
     contenedor_ahorro.setStyle(TableStyle([
@@ -2584,7 +2584,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     fila_costos_ahorro = Table(
         [[bloque_costos_payzen, bloque_ahorro]],
-        colWidths=[9.35 * inch, 4.00 * inch]
+        colWidths=[9.35 * inch, 4.30 * inch]
     )
 
     fila_costos_ahorro.setStyle(TableStyle([
