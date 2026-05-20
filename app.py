@@ -2586,9 +2586,16 @@ def generar_pdf_profesional_test(df_pdf):
 
     fila_costos_ahorro = Table(
         [[bloque_costos_payzen, bloque_ahorro]],
-        colWidths=[W_LEFT, W_RIGHT],
-        rowHeights=[2.90 * inch]
+        colWidths=[W_LEFT, W_RIGHT]
     )
+
+    fila_costos_ahorro.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (0, 0), "TOP"),
