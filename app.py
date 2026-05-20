@@ -2518,9 +2518,7 @@ def generar_pdf_profesional_test(df_pdf):
     # AHORRO
     # =========================
     
-        # =========================
-    # AHORRO
-    # =========================
+    
     header_ahorro, linea_ahorro = crear_header_seccion("AHORRO ESTIMADO CON PAYZEN", "#16A34A")
 
     tabla_ahorro = Table(
@@ -2568,7 +2566,7 @@ def generar_pdf_profesional_test(df_pdf):
             [header_ahorro],
             [Spacer(1, 3)],
             [linea_ahorro],
-            [Spacer(1, 21)],
+            [Spacer(1, 30)],
             [contenedor_ahorro],
         ],
         colWidths=[4.15 * inch]
@@ -2607,27 +2605,26 @@ def generar_pdf_profesional_test(df_pdf):
         "DisclaimerPro",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=6,
-        leading=7.2,
+        fontSize=5.8,
+        leading=6.8,
         textColor=colors.white,
     )
 
     footer = Table(
         [[Paragraph(DISCLAIMER, disclaimer_style)]],
-        colWidths=[W_FULL],
-        rowHeights=[0.42 * inch]
+        colWidths=[W_FULL]
     )
 
     footer.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 20),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 20),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("LEFTPADDING", (0, 0), (-1, -1), 18),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 18),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
-    story.append(Spacer(1, 18))
+    story.append(Spacer(1, 2))
     story.append(footer)
 
     doc.build(story)
