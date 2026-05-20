@@ -2568,7 +2568,7 @@ def generar_pdf_profesional_test(df_pdf):
             [header_ahorro],
             [Spacer(1, 3)],
             [linea_ahorro],
-            [Spacer(1, 18)],
+            [Spacer(1, 21)],
             [contenedor_ahorro],
         ],
         colWidths=[4.15 * inch]
