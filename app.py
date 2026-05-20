@@ -2734,11 +2734,9 @@ def generar_pdf_profesional_test(df_pdf):
   
 
 
-# ---------------------------------------------------
-# 9. COSTOS PASARELA ACTUAL
-# ---------------------------------------------------
-
-    
+    # ---------------------------------------------------
+    # 7. COSTOS PASARELA ACTUAL
+    # ---------------------------------------------------
 
     modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
 
@@ -2754,10 +2752,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
-    titulo_actual = Paragraph(
-        "COSTOS PASARELA ACTUAL",
-        section_title_style
-    )
+    titulo_actual = Paragraph("COSTOS PASARELA ACTUAL", section_title_style)
 
     header_actual = Table(
         [[icono_actual, titulo_actual]],
@@ -2772,12 +2767,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    linea_naranja = Table(
-        [[""]],
-        colWidths=[0.38 * inch],
-        rowHeights=[0.03 * inch]
-    )
-
+    linea_naranja = Table([[""]], colWidths=[0.38 * inch], rowHeights=[0.03 * inch])
     linea_naranja.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F97316")),
     ]))
@@ -2787,18 +2777,9 @@ def generar_pdf_profesional_test(df_pdf):
             Paragraph('<font color="white"><b>Concepto</b></font>', table_text_style),
             Paragraph('<font color="white"><b>Modelo Agregador</b></font>', table_text_right),
         ],
-        [
-            Paragraph("Plan actual", table_text_style),
-            Paragraph(modelo_actual, table_text_right),
-        ],
-        [
-            Paragraph("Ticket Promedio", table_text_style),
-            Paragraph(money(ticket_promedio), table_text_right),
-        ],
-        [
-            Paragraph("Volumen (Número de transacciones)", table_text_style),
-            Paragraph(number_fmt(total_tx), table_text_right),
-        ],
+        [Paragraph("Plan actual", table_text_style), Paragraph(modelo_actual, table_text_right)],
+        [Paragraph("Ticket Promedio", table_text_style), Paragraph(money(ticket_promedio), table_text_right)],
+        [Paragraph("Volumen (Número de transacciones)", table_text_style), Paragraph(number_fmt(total_tx), table_text_right)],
         [
             Paragraph('<font color="#EA580C"><b>Costo Total pasarela agregadora</b></font>', table_text_style),
             Paragraph(f'<font color="#EA580C"><b>{money(first["Pasarela actual"])}</b></font>', table_text_right),
@@ -2807,38 +2788,25 @@ def generar_pdf_profesional_test(df_pdf):
 
     tabla_actual = Table(
         actual_data,
-        colWidths=[2.25 * inch, 1.45 * inch],
-        rowHeights=[
-            0.34 * inch,
-            0.34 * inch,
-            0.34 * inch,
-            0.34 * inch,
-            0.36 * inch,
-        ]
+        colWidths=[2.20 * inch, 1.35 * inch],
+        rowHeights=[0.34 * inch, 0.34 * inch, 0.34 * inch, 0.34 * inch, 0.36 * inch]
     )
 
     tabla_actual.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F97316")),
         ("BACKGROUND", (0, 1), (-1, -2), colors.white),
         ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#FFF1E8")),
-
         ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#FDBA74")),
         ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#FDBA74")),
-
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
         ("TOPPADDING", (0, 0), (-1, -1), 6),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
 
-    contenedor_actual = Table(
-        [[tabla_actual]],
-        colWidths=[3.95 * inch]
-    )
-
+    contenedor_actual = Table([[tabla_actual]], colWidths=[3.75 * inch])
     contenedor_actual.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
         ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#FDE7D7")),
@@ -2856,10 +2824,8 @@ def generar_pdf_profesional_test(df_pdf):
             [Spacer(1, 8)],
             [contenedor_actual],
         ],
-        colWidths=[4.15 * inch]
+        colWidths=[3.95 * inch]
     )
-
-    bloque_pasarela_actual.hAlign = "LEFT"
 
     bloque_pasarela_actual.setStyle(TableStyle([
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
@@ -2868,32 +2834,44 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    
+    # ---------------------------------------------------
+    # 8. FILA OPERATIVA SUPERIOR
+    # ---------------------------------------------------
 
-    fila_costos_final = Table(
-        [[bloque_costos_payzen, bloque_pasarela_actual]],
-        colWidths=[7.25 * inch, 4.20 * inch]
+    fila_operativa = Table(
+        [[bloque_info_operativa, bloque_metodos_pago, bloque_pasarela_actual]],
+        colWidths=[3.35 * inch, 5.25 * inch, 3.95 * inch]
     )
 
-    fila_costos_final.hAlign = "LEFT"
+    fila_operativa.hAlign = "LEFT"
 
-    fila_costos_final.setStyle(TableStyle([
+    fila_operativa.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
     story.append(Spacer(1, 14))
-    story.append(fila_costos_final)
+    story.append(fila_operativa)
+
+    # ---------------------------------------------------
+    # 9. COSTOS PAYZEN + COSTOS ADQUIRENTES
+    # ---------------------------------------------------
+
+    story.append(Spacer(1, 14))
+    story.append(bloque_costos_payzen)
+
+    # ---------------------------------------------------
+    # CIERRE PDF
+    # ---------------------------------------------------
 
     doc.build(story)
 
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
-
 
 
   
