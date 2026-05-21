@@ -2598,91 +2598,45 @@ def generar_pdf_profesional_test(df_pdf):
     story.append(Spacer(1, 8))
     story.append(fila_costos_ahorro)
 
+   
+
+
     # =========================
-    # DISCLAIMER FIJO ABAJO
+    # DISCLAIMER
     # =========================
     disclaimer_style = ParagraphStyle(
         "DisclaimerPro",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=5.6,
-        leading=6.5,
+        fontSize=5.5,
+        leading=6.2,
         textColor=colors.white,
     )
 
-    def draw_footer(canvas, doc):
-        footer = Table(
-            [[Paragraph(DISCLAIMER, disclaimer_style)]],
-            colWidths=[W_FULL],
-            rowHeights=[0.36 * inch]
-        )
-
-        footer.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 18),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 18),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ]))
-
-        footer.wrapOn(canvas, W_FULL, 0.36 * inch)
-        footer.drawOn(canvas, doc.leftMargin, 0.18 * inch)
-
-    doc.build(
-        story,
-        onFirstPage=draw_footer,
-        onLaterPages=draw_footer
+    footer = Table(
+        [[Paragraph(DISCLAIMER, disclaimer_style)]],
+        colWidths=[W_FULL]
     )
+
+    footer.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 14),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 14),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+
+    story.append(Spacer(1, 2))
+    story.append(footer)
+
+    doc.build(story)
 
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
 
 
-
-
-
-        # =========================
-    # DISCLAIMER FIJO ABAJO
-    # =========================
-    disclaimer_style = ParagraphStyle(
-        "DisclaimerPro",
-        parent=styles["BodyText"],
-        fontName="Helvetica",
-        fontSize=5.6,
-        leading=6.5,
-        textColor=colors.white,
-    )
-
-    def draw_footer(canvas, doc):
-        footer = Table(
-            [[Paragraph(DISCLAIMER, disclaimer_style)]],
-            colWidths=[W_FULL],
-            rowHeights=[0.36 * inch]
-        )
-
-        footer.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 18),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 18),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ]))
-
-        footer.wrapOn(canvas, W_FULL, 0.36 * inch)
-        footer.drawOn(canvas, doc.leftMargin, 0.18 * inch)
-
-    doc.build(
-        story,
-        onFirstPage=draw_footer,
-        onLaterPages=draw_footer
-    )
-
-    pdf = buffer.getvalue()
-    buffer.close()
-    return pdf
 
 
 # ---------------------------------------------------
