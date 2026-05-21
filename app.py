@@ -1995,22 +1995,19 @@ def generar_pdf_profesional_test(df_pdf):
     doc = SimpleDocTemplate(
         buffer,
         pagesize=landscape(LEGAL),
-        rightMargin=8,
-        leftMargin=8,
-        topMargin=8,
-        bottomMargin=38
+        rightMargin=6,
+        leftMargin=6,
+        topMargin=6,
+        bottomMargin=6
     )
 
     styles = getSampleStyleSheet()
     first = df_pdf.iloc[0]
     story = []
 
-    # =========================
-    # MEDIDAS GENERALES
-    # =========================
-    W_FULL = 13.55 * inch
-    W_LEFT = 9.15 * inch
-    W_RIGHT = 4.25 * inch
+    W_FULL = doc.width
+    W_RIGHT = 4.28 * inch
+    W_LEFT = W_FULL - W_RIGHT - 0.12 * inch
 
     # =========================
     # ESTILOS
@@ -2019,8 +2016,8 @@ def generar_pdf_profesional_test(df_pdf):
         "ProTitle",
         parent=styles["Title"],
         fontName="Helvetica-Bold",
-        fontSize=17,
-        leading=18,
+        fontSize=15,
+        leading=16,
         textColor=colors.white,
         alignment=0,
         spaceAfter=0
@@ -2030,9 +2027,9 @@ def generar_pdf_profesional_test(df_pdf):
         "ProTitleBlue",
         parent=styles["Title"],
         fontName="Helvetica-Bold",
-        fontSize=27,
-        leading=28,
-        textColor=colors.HexColor("#2F80FF"),
+        fontSize=22,
+        leading=23,
+        textColor=colors.HexColor("#1E90FF"),
         alignment=0,
         spaceAfter=0
     )
@@ -2040,75 +2037,55 @@ def generar_pdf_profesional_test(df_pdf):
     subtitle_style = ParagraphStyle(
         "ProSubtitle",
         parent=styles["BodyText"],
-        fontName="Helvetica",
-        fontSize=7,
-        leading=8.5,
+        fontName="Helvetica-Bold",
+        fontSize=6.6,
+        leading=7.5,
         textColor=colors.white,
-        alignment=0
     )
 
     kpi_label = ParagraphStyle(
         "KpiLabel",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=7.3,
-        leading=8.5,
+        fontSize=6.4,
+        leading=7.2,
         textColor=colors.white,
-        alignment=0
     )
 
     kpi_value = ParagraphStyle(
         "KpiValue",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=18,
-        leading=20,
-        textColor=colors.HexColor("#2F80FF"),
-        alignment=0
+        fontSize=15.5,
+        leading=16.5,
+        textColor=colors.HexColor("#1E90FF"),
     )
 
     kpi_note = ParagraphStyle(
         "KpiNote",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=6.3,
-        leading=7.5,
+        fontSize=5.5,
+        leading=6.2,
         textColor=colors.white,
-        alignment=0
     )
 
-    section_title_style = ParagraphStyle(
+    section_title = ParagraphStyle(
         "SectionTitle",
-        parent=styles["Heading2"],
-        fontName="Helvetica-Bold",
-        fontSize=9.3,
-        leading=11,
-        textColor=colors.HexColor("#111827"),
-        alignment=0,
-    )
-
-    section_icon_style = ParagraphStyle(
-        "SectionIcon",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=8,
-        textColor=colors.white,
-        alignment=1,
+        fontSize=7.2,
+        leading=8,
+        textColor=colors.HexColor("#020617"),
     )
 
     table_text_style = ParagraphStyle(
         "TableText",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=7.4,
-        leading=8.7,
-        textColor=colors.HexColor("#111827"),
-    )
-
-    table_text_right = ParagraphStyle(
-        "TableTextRight",
-        parent=table_text_style,
-        alignment=2,
+        fontSize=6.2,
+        leading=7.2,
+        textColor=colors.HexColor("#020617"),
     )
 
     table_text_bold = ParagraphStyle(
@@ -2117,14 +2094,18 @@ def generar_pdf_profesional_test(df_pdf):
         fontName="Helvetica-Bold",
     )
 
+    table_text_right = ParagraphStyle(
+        "TableTextRight",
+        parent=table_text_style,
+        alignment=2,
+    )
+
     table_header = ParagraphStyle(
         "TableHeader",
-        parent=styles["Normal"],
+        parent=table_text_style,
         fontName="Helvetica-Bold",
-        fontSize=7.2,
-        leading=8.4,
-        textColor=colors.white,
         alignment=1,
+        textColor=colors.white,
     )
 
     blue_bold = ParagraphStyle(
@@ -2145,139 +2126,39 @@ def generar_pdf_profesional_test(df_pdf):
         parent=table_text_style,
         fontName="Helvetica-Bold",
         alignment=2,
+        textColor=colors.HexColor("#020617"),
     )
 
     # =========================
-    # LOGO
-    # =========================
-    try:
-        logo_path = Path(__file__).parent / "Logo_Globalinvest_PayZen.png"
-        img_reader = ImageReader(str(logo_path))
-        img_w, img_h = img_reader.getSize()
-        aspect = img_h / img_w
-        logo_width = 1.35 * inch
-        logo_height = logo_width * aspect
-        logo = Image(str(logo_path), width=logo_width, height=logo_height)
-    except Exception:
-        logo = Paragraph("", table_text_style)
-
-    # =========================
-    # HEADER SUPERIOR
-    # =========================
-    def crear_card_kpi(titulo, valor, subtitulo):
-        card = Table(
-            [
-                [Paragraph(titulo, kpi_label)],
-                [Paragraph(valor, kpi_value)],
-                [Paragraph("↑ " + subtitulo, kpi_note)],
-            ],
-            colWidths=[2.10 * inch],
-            rowHeights=[0.30 * inch, 0.47 * inch, 0.28 * inch]
-        )
-
-        card.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#082D57")),
-            ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#2563EB")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 12),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 12),
-            ("TOPPADDING", (0, 0), (-1, -1), 8),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ]))
-        return card
-
-    contenido_izq = Table(
-        [[
-            logo,
-            Table(
-                [
-                    [Paragraph("Resumen", title_style)],
-                    [Paragraph("Comercial", title_style)],
-                    [Paragraph("PayZen", title_blue_style)],
-                    [Spacer(1, 3)],
-                    [Paragraph("Propuesta de costos y ahorro estimado", subtitle_style)],
-                ],
-                colWidths=[2.10 * inch]
-            )
-        ]],
-        colWidths=[1.45 * inch, 2.15 * inch]
-    )
-
-    contenido_izq.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
-    ]))
-
-    bloque_titulo = Table(
-        [[contenido_izq]],
-        colWidths=[3.75 * inch],
-        rowHeights=[1.42 * inch]
-    )
-
-    bloque_titulo.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 16),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-        ("TOPPADDING", (0, 0), (-1, -1), 12),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ]))
-
-    parte_superior = Table(
-        [[
-            bloque_titulo,
-            crear_card_kpi("AHORRO MENSUAL", money(first["Ahorro mensual"]), "Con PayZen"),
-            crear_card_kpi("AHORRO ANUAL", money(first["Ahorro anual"]), "Con PayZen"),
-            crear_card_kpi("AHORRO POTENCIAL", percent(first["Ahorro %"]), "Con PayZen"),
-            crear_card_kpi("TRANSACCIONES", number_fmt(first["Transacciones"]), "Total mensual")
-        ]],
-        colWidths=[3.95 * inch, 2.40 * inch, 2.40 * inch, 2.40 * inch, 2.40 * inch],
-        rowHeights=[1.55 * inch]
-    )
-
-    parte_superior.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#020617")),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 5),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-        ("TOPPADDING", (0, 0), (-1, -1), 8),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-    ]))
-
-    story.append(parte_superior)
-
-    # =========================
-    # CÁLCULOS
-    # =========================
-    total_tx = first["Transacciones"]
-    total_methods = max(total_tx, 1)
-
-    pct_tc_pdf = (first["TC"] / total_methods * 100) if total_methods > 0 else 0
-    pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
-    pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
-    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
-
-    # =========================
-    # HEADER SECCIÓN
+    # HELPERS
     # =========================
     def crear_header_seccion(titulo, color):
-        icono = Table(
-            [[Paragraph("▣", section_icon_style)]],
-            colWidths=[0.20 * inch],
-            rowHeights=[0.20 * inch]
+        cuadro = Table(
+            [[Paragraph("■", ParagraphStyle(
+                "IconSection" + titulo,
+                parent=styles["BodyText"],
+                fontName="Helvetica-Bold",
+                fontSize=8,
+                leading=8,
+                textColor=colors.white,
+                alignment=1
+            ))]],
+            colWidths=[0.16 * inch],
+            rowHeights=[0.16 * inch]
         )
-        icono.setStyle(TableStyle([
+        cuadro.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor(color)),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 0),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
         ]))
 
         header = Table(
-            [[icono, Paragraph(titulo, section_title_style)]],
-            colWidths=[0.28 * inch, 3.60 * inch]
+            [[cuadro, Paragraph(titulo, section_title)]],
+            colWidths=[0.22 * inch, 3.40 * inch]
         )
         header.setStyle(TableStyle([
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -2287,15 +2168,131 @@ def generar_pdf_profesional_test(df_pdf):
             ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
         ]))
 
-        linea = Table([[""]], colWidths=[0.42 * inch], rowHeights=[0.03 * inch])
+        linea = Table([[""]], colWidths=[0.42 * inch], rowHeights=[0.025 * inch])
         linea.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor(color)),
+            ("LEFTPADDING", (0, 0), (-1, -1), 0),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
         ]))
-
         return header, linea
 
+    def crear_card_kpi(titulo, valor, subtitulo):
+        card = Table(
+            [
+                [Paragraph(titulo, kpi_label)],
+                [Paragraph(valor, kpi_value)],
+                [Paragraph("↑ " + subtitulo, kpi_note)],
+            ],
+            colWidths=[2.20 * inch],
+            rowHeights=[0.23 * inch, 0.38 * inch, 0.20 * inch]
+        )
+        card.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#082D57")),
+            ("BOX", (0, 0), (-1, -1), 0.65, colors.HexColor("#2563EB")),
+            ("LEFTPADDING", (0, 0), (-1, -1), 10),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+            ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ]))
+        return card
+
     # =========================
-    # INFO OPERATIVA
+    # LOGO
+    # =========================
+    try:
+        logo_path = Path("Logo_Globalinvest_PayZen.png")
+        img_reader = ImageReader(str(logo_path))
+        img_w, img_h = img_reader.getSize()
+        aspect = img_h / img_w
+        logo_width = 1.30 * inch
+        logo_height = logo_width * aspect
+        logo = Image(str(logo_path), width=logo_width, height=logo_height)
+    except Exception:
+        logo = Paragraph("", table_text_style)
+
+    # =========================
+    # HEADER SUPERIOR
+    # =========================
+    contenido_izq = Table(
+        [[
+            logo,
+            Table(
+                [
+                    [Paragraph("Resumen", title_style)],
+                    [Paragraph("Comercial", title_style)],
+                    [Paragraph("PayZen", title_blue_style)],
+                    [Spacer(1, 1)],
+                    [Paragraph("Propuesta de costos y ahorro estimado", subtitle_style)],
+                ],
+                colWidths=[2.05 * inch]
+            )
+        ]],
+        colWidths=[1.35 * inch, 2.15 * inch]
+    )
+
+    contenido_izq.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 1),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 1),
+    ]))
+
+    bloque_titulo = Table(
+        [[contenido_izq]],
+        colWidths=[3.65 * inch],
+        rowHeights=[1.18 * inch]
+    )
+
+    bloque_titulo.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 12),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+
+    parte_superior = Table(
+        [[
+            bloque_titulo,
+            crear_card_kpi("AHORRO MENSUAL", money(first["Ahorro mensual"]), "vs Pasarela Actual"),
+            crear_card_kpi("AHORRO ANUAL", money(first["Ahorro anual"]), "vs Pasarela Actual"),
+            crear_card_kpi("AHORRO POTENCIAL", percent(first["Ahorro %"]), "vs Pasarela Actual"),
+            crear_card_kpi("TRANSACCIONES", number_fmt(first["Transacciones"]), "Total mensual")
+        ]],
+        colWidths=[3.75 * inch, 2.40 * inch, 2.40 * inch, 2.40 * inch, 2.40 * inch],
+        rowHeights=[1.28 * inch]
+    )
+
+    parte_superior.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#020617")),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+    ]))
+
+    story.append(parte_superior)
+
+    # =========================
+    # CÁLCULOS BASE
+    # =========================
+    total_tx = first["Transacciones"]
+    total_methods = max(total_tx, 1)
+
+    pct_tc_pdf = (first["TC"] / total_methods * 100) if total_methods > 0 else 0
+    pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
+    pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
+
+    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
+
+    # =========================
+    # INFORMACIÓN OPERATIVA
     # =========================
     header_info, linea_info = crear_header_seccion("INFORMACIÓN OPERATIVA INICIAL", "#2563EB")
 
@@ -2304,31 +2301,31 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Volumen", table_text_style), Paragraph(number_fmt(total_tx), table_text_right)],
             [Paragraph("Ticket Promedio", table_text_style), Paragraph(money(ticket_promedio), table_text_right)],
         ],
-        colWidths=[2.10 * inch, 1.20 * inch],
-        rowHeights=[0.36 * inch, 0.36 * inch]
+        colWidths=[2.25 * inch, 1.15 * inch],
+        rowHeights=[0.30 * inch, 0.30 * inch]
     )
 
     tabla_info.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
         ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#D1D5DB")),
         ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#E5E7EB")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 9),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 9),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
-    contenedor_info = Table([[tabla_info]], colWidths=[3.50 * inch])
+    contenedor_info = Table([[tabla_info]], colWidths=[3.55 * inch])
     contenedor_info.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#E5E7EB")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 9),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 9),
+        ("BOX", (0, 0), (-1, -1), 0.45, colors.HexColor("#E5E7EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
 
     bloque_info_operativa = Table(
-        [[header_info], [linea_info], [Spacer(1, 4)], [contenedor_info]],
+        [[header_info], [linea_info], [Spacer(1, 3)], [contenedor_info]],
         colWidths=[3.75 * inch]
     )
 
@@ -2345,8 +2342,8 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Bre-B", table_text_style), Paragraph(number_fmt(first["Bre-B"]), table_text_right), Paragraph(percent(pct_breb_pdf), table_text_right)],
             [Paragraph("TOTAL", blue_bold), Paragraph(number_fmt(total_tx), blue_bold_right), Paragraph(percent(pct_tc_pdf + pct_pse_pdf + pct_breb_pdf), blue_bold_right)],
         ],
-        colWidths=[2.20 * inch, 1.50 * inch, 1.20 * inch],
-        rowHeights=[0.31 * inch, 0.34 * inch, 0.34 * inch, 0.34 * inch, 0.36 * inch]
+        colWidths=[2.25 * inch, 1.50 * inch, 1.20 * inch],
+        rowHeights=[0.27 * inch, 0.29 * inch, 0.29 * inch, 0.29 * inch, 0.30 * inch]
     )
 
     tabla_metodos.setStyle(TableStyle([
@@ -2357,23 +2354,23 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#E5E7EB")),
         ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
     ]))
 
     contenedor_metodos = Table([[tabla_metodos]], colWidths=[5.10 * inch])
     contenedor_metodos.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#E5E7EB")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 8),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("BOX", (0, 0), (-1, -1), 0.45, colors.HexColor("#E5E7EB")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
 
     bloque_metodos_pago = Table(
-        [[header_metodos], [linea_metodos], [Spacer(1, 4)], [contenedor_metodos]],
-        colWidths=[5.40 * inch]
+        [[header_metodos], [linea_metodos], [Spacer(1, 3)], [contenedor_metodos]],
+        colWidths=[5.35 * inch]
     )
 
     # =========================
@@ -2390,7 +2387,7 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph('<font color="#EA580C"><b>Costo Total pasarela agregadora</b></font>', table_text_style), Paragraph(f'<font color="#EA580C"><b>{money(first["Pasarela actual"])}</b></font>', table_text_right)],
         ],
         colWidths=[2.35 * inch, 1.45 * inch],
-        rowHeights=[0.34 * inch, 0.34 * inch, 0.34 * inch, 0.34 * inch, 0.36 * inch]
+        rowHeights=[0.30 * inch, 0.30 * inch, 0.30 * inch, 0.30 * inch, 0.32 * inch]
     )
 
     tabla_actual.setStyle(TableStyle([
@@ -2401,22 +2398,22 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#FDBA74")),
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
     ]))
 
     contenedor_actual = Table([[tabla_actual]], colWidths=[4.00 * inch])
     contenedor_actual.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#FDE7D7")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 8),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("BOX", (0, 0), (-1, -1), 0.45, colors.HexColor("#FDE7D7")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
 
     bloque_pasarela_actual = Table(
-        [[header_actual], [linea_actual], [Spacer(1, 4)], [contenedor_actual]],
+        [[header_actual], [linea_actual], [Spacer(1, 3)], [contenedor_actual]],
         colWidths=[W_RIGHT]
     )
 
@@ -2428,12 +2425,12 @@ def generar_pdf_profesional_test(df_pdf):
     fila_operativa.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 1),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 1),
     ]))
 
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 4))
     story.append(fila_operativa)
 
     # =========================
@@ -2453,8 +2450,8 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Total Costo PayZen", table_text_bold), Paragraph(money(first["Total PayZen Gateway"]), table_text_right)],
             [Paragraph('<font color="white"><b>Total PayZen + Total Adquirientes</b></font>', table_text_style), Paragraph(f'<font color="white"><b>{money(first["PayZen"])}</b></font>', table_text_right)],
         ],
-        colWidths=[2.85 * inch, 1.20 * inch],
-        rowHeights=[0.31 * inch, 0.29 * inch, 0.29 * inch, 0.29 * inch, 0.29 * inch, 0.29 * inch, 0.29 * inch, 0.31 * inch, 0.33 * inch]
+        colWidths=[2.80 * inch, 1.15 * inch],
+        rowHeights=[0.27 * inch, 0.25 * inch, 0.25 * inch, 0.25 * inch, 0.25 * inch, 0.25 * inch, 0.25 * inch, 0.27 * inch, 0.29 * inch]
     )
 
     tabla_payzen.setStyle(TableStyle([
@@ -2466,8 +2463,8 @@ def generar_pdf_profesional_test(df_pdf):
         ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#D1D5DB")),
         ("ALIGN", (1, 1), (1, -1), "RIGHT"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
     ]))
 
     tabla_adquirente = Table(
@@ -2479,8 +2476,8 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Bre-B", table_text_style), Paragraph(money(costo_breb_payzen), table_text_right), Paragraph(number_fmt(first["Bre-B"]), table_text_right), Paragraph("N/A", table_text_right), Paragraph(money(first["Costo Bre-B PayZen"]), table_text_right)],
             [Paragraph("Total de los Adquirientes", table_text_bold), "", "", "", Paragraph(money(first["Total adquirencia"]), blue_bold_right)],
         ],
-        colWidths=[1.25 * inch, 0.65 * inch, 0.90 * inch, 0.90 * inch, 1.00 * inch],
-        rowHeights=[0.31 * inch, 0.38 * inch, 0.48 * inch, 0.34 * inch, 0.34 * inch, 0.34 * inch]
+        colWidths=[1.25 * inch, 0.62 * inch, 0.90 * inch, 0.90 * inch, 0.95 * inch],
+        rowHeights=[0.27 * inch, 0.34 * inch, 0.41 * inch, 0.30 * inch, 0.30 * inch, 0.31 * inch]
     )
 
     tabla_adquirente.setStyle(TableStyle([
@@ -2495,139 +2492,127 @@ def generar_pdf_profesional_test(df_pdf):
         ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
         ("ALIGN", (0, 5), (3, 5), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 6),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("LEFTPADDING", (0, 0), (-1, -1), 5),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
     ]))
 
     bloque_tablas_costos = Table(
         [[tabla_payzen, tabla_adquirente]],
-        colWidths=[4.25 * inch, 4.65 * inch]
+        colWidths=[4.05 * inch, 4.85 * inch]
     )
 
     bloque_tablas_costos.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    bloque_costos_payzen = Table(
-        [[header_costos], [linea_costos], [Spacer(1, 4)], [bloque_tablas_costos]],
+    bloque_costos = Table(
+        [[header_costos], [linea_costos], [Spacer(1, 3)], [bloque_tablas_costos]],
         colWidths=[W_LEFT]
     )
 
     # =========================
-    # AHORRO
+    # AHORRO ESTIMADO
     # =========================
-    
-    
     header_ahorro, linea_ahorro = crear_header_seccion("AHORRO ESTIMADO CON PAYZEN", "#16A34A")
 
     tabla_ahorro = Table(
         [
-            [Paragraph('<font color="white"><b>Indicador</b></font>', table_text_style),
-             Paragraph('<font color="white"><b>Resultado</b></font>', table_text_right)],
-            [Paragraph("Ahorro mensual", table_text_style),
-             Paragraph(f'<b>{money(first["Ahorro mensual"])}</b>', table_text_right)],
-            [Paragraph("Ahorro anual", table_text_style),
-             Paragraph(f'<b>{money(first["Ahorro anual"])}</b>', table_text_right)],
-            [Paragraph("Ahorro porcentual", table_text_style),
-             Paragraph(f'<b>{percent(first["Ahorro %"])}</b>', table_text_right)],
+            [Paragraph('<font color="white"><b>Indicador</b></font>', table_header), Paragraph('<font color="white"><b>Resultado</b></font>', table_header)],
+            [Paragraph("Ahorro mensual", table_text_style), Paragraph(money(first["Ahorro mensual"]), green_bold_right)],
+            [Paragraph("Ahorro anual", table_text_style), Paragraph(money(first["Ahorro anual"]), green_bold_right)],
+            [Paragraph("Ahorro porcentual", table_text_style), Paragraph(percent(first["Ahorro %"]), green_bold_right)],
         ],
-        colWidths=[2.15 * inch, 1.35 * inch],
-        rowHeights=[0.34 * inch, 0.38 * inch, 0.38 * inch, 0.38 * inch]
+        colWidths=[2.15 * inch, 1.55 * inch],
+        rowHeights=[0.30 * inch, 0.38 * inch, 0.38 * inch, 0.38 * inch]
     )
 
     tabla_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#16A34A")),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.white),
-        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#BBF7D0")),
-        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#BBF7D0")),
+        ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F0FDF4")),
+        ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#BBF7D0")),
+        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#86EFAC")),
         ("ALIGN", (1, 0), (1, -1), "RIGHT"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
     ]))
 
-    contenedor_ahorro = Table(
-        [[tabla_ahorro]],
-        colWidths=[3.95 * inch]
-    )
-
+    contenedor_ahorro = Table([[tabla_ahorro]], colWidths=[4.00 * inch])
     contenedor_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#DCFCE7")),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 8),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("BOX", (0, 0), (-1, -1), 0.45, colors.HexColor("#DCFCE7")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("TOPPADDING", (0, 0), (-1, -1), 7),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
     ]))
 
     bloque_ahorro = Table(
-        [
-            [header_ahorro],
-            [linea_ahorro],
-            [Spacer(1, 4)],
-            [contenedor_ahorro],
-        ],
-        colWidths=[4.15 * inch]
+        [[header_ahorro], [linea_ahorro], [Spacer(1, 3)], [contenedor_ahorro]],
+        colWidths=[W_RIGHT]
     )
 
-    bloque_ahorro.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
-    ]))
-
-    espacio_invisible = Spacer(0.25 * inch, 1)
-
     fila_costos_ahorro = Table(
-        [[bloque_costos_payzen, espacio_invisible, bloque_ahorro]],
-        colWidths=[8.90 * inch, 0.30 * inch, 4.15 * inch]
+        [[bloque_costos, bloque_ahorro]],
+        colWidths=[W_LEFT, W_RIGHT]
     )
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 5))
     story.append(fila_costos_ahorro)
 
-   
-
-
     # =========================
-    # DISCLAIMER
+    # FOOTER / DISCLAIMER
     # =========================
     disclaimer_style = ParagraphStyle(
         "DisclaimerPro",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=5.5,
-        leading=6.2,
+        fontSize=5.4,
+        leading=6.1,
         textColor=colors.white,
     )
 
+    footer_fecha_style = ParagraphStyle(
+        "FooterFecha",
+        parent=styles["BodyText"],
+        fontName="Helvetica-Bold",
+        fontSize=6.2,
+        leading=7,
+        textColor=colors.white,
+        alignment=2,
+    )
+
     footer = Table(
-        [[Paragraph(DISCLAIMER, disclaimer_style)]],
-        colWidths=[W_FULL]
+        [[
+            Paragraph(DISCLAIMER, disclaimer_style),
+            Paragraph("Fecha del análisis:<br/>15 de mayo de 2026", footer_fecha_style)
+        ]],
+        colWidths=[W_FULL - 2.10 * inch, 2.10 * inch],
+        rowHeights=[0.55 * inch]
     )
 
     footer.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
         ("LEFTPADDING", (0, 0), (-1, -1), 14),
         ("RIGHTPADDING", (0, 0), (-1, -1), 14),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
 
-    story.append(Spacer(1, 2))
+    story.append(Spacer(1, 5))
     story.append(footer)
 
     doc.build(story)
@@ -2635,7 +2620,7 @@ def generar_pdf_profesional_test(df_pdf):
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
-
+   
 
 
 
