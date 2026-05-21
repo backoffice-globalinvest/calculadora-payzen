@@ -1984,6 +1984,7 @@ def generar_pdf_ejecutivo(df_pdf):
     buffer.close()
     return pdf
 
+
 # -----------
 # MAFE PDF DASHBOARD LINDO
 # ----------------
@@ -1997,7 +1998,7 @@ def generar_pdf_profesional_test(df_pdf):
         rightMargin=8,
         leftMargin=8,
         topMargin=8,
-        bottomMargin=8
+        bottomMargin=38
     )
 
     styles = getSampleStyleSheet()
@@ -2206,8 +2207,8 @@ def generar_pdf_profesional_test(df_pdf):
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
     ]))
 
     bloque_titulo = Table(
@@ -2327,7 +2328,7 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_info_operativa = Table(
-        [[header_info], [Spacer(1, 3)], [linea_info], [Spacer(1, 6)], [contenedor_info]],
+        [[header_info], [linea_info], [Spacer(1, 4)], [contenedor_info]],
         colWidths=[3.75 * inch]
     )
 
@@ -2371,7 +2372,7 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_metodos_pago = Table(
-        [[header_metodos], [Spacer(1, 3)], [linea_metodos], [Spacer(1, 6)], [contenedor_metodos]],
+        [[header_metodos], [linea_metodos], [Spacer(1, 4)], [contenedor_metodos]],
         colWidths=[5.40 * inch]
     )
 
@@ -2415,7 +2416,7 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_pasarela_actual = Table(
-        [[header_actual], [Spacer(1, 3)], [linea_actual], [Spacer(1, 6)], [contenedor_actual]],
+        [[header_actual], [linea_actual], [Spacer(1, 4)], [contenedor_actual]],
         colWidths=[W_RIGHT]
     )
 
@@ -2428,8 +2429,8 @@ def generar_pdf_profesional_test(df_pdf):
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
     ]))
 
     story.append(Spacer(1, 8))
@@ -2510,7 +2511,7 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_costos_payzen = Table(
-        [[header_costos], [Spacer(1, 3)], [linea_costos], [Spacer(1, 5)], [bloque_tablas_costos]],
+        [[header_costos], [linea_costos], [Spacer(1, 4)], [bloque_tablas_costos]],
         colWidths=[W_LEFT]
     )
 
@@ -2564,9 +2565,8 @@ def generar_pdf_profesional_test(df_pdf):
     bloque_ahorro = Table(
         [
             [header_ahorro],
-            [Spacer(1, 3)],
             [linea_ahorro],
-            [Spacer(1, 30)],
+            [Spacer(1, 4)],
             [contenedor_ahorro],
         ],
         colWidths=[4.15 * inch]
@@ -2576,8 +2576,8 @@ def generar_pdf_profesional_test(df_pdf):
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
         ("LEFTPADDING", (0, 0), (-1, -1), 8),
         ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
     ]))
 
     espacio_invisible = Spacer(0.25 * inch, 1)
@@ -2591,12 +2591,57 @@ def generar_pdf_profesional_test(df_pdf):
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
     ]))
 
     story.append(Spacer(1, 8))
     story.append(fila_costos_ahorro)
+
+    # =========================
+    # DISCLAIMER FIJO ABAJO
+    # =========================
+    disclaimer_style = ParagraphStyle(
+        "DisclaimerPro",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=5.6,
+        leading=6.5,
+        textColor=colors.white,
+    )
+
+    def draw_footer(canvas, doc):
+        footer = Table(
+            [[Paragraph(DISCLAIMER, disclaimer_style)]],
+            colWidths=[W_FULL],
+            rowHeights=[0.36 * inch]
+        )
+
+        footer.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#061A33")),
+            ("LEFTPADDING", (0, 0), (-1, -1), 18),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 18),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ]))
+
+        footer.wrapOn(canvas, W_FULL, 0.36 * inch)
+        footer.drawOn(canvas, doc.leftMargin, 0.18 * inch)
+
+    doc.build(
+        story,
+        onFirstPage=draw_footer,
+        onLaterPages=draw_footer
+    )
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
+
+
+
+
 
         # =========================
     # DISCLAIMER FIJO ABAJO
