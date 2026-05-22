@@ -2325,12 +2325,12 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_info_operativa = Table(
-        [[header_info], [linea_info], [Spacer(1, 3)], [contenedor_info]],
+        [[header_info], [linea_info], [Spacer(1, 1)], [contenedor_info]],
         colWidths=[3.75 * inch]
     )
 
     # =========================
-    # MÉTODOS DE PAGO
+    # MÉTODOS DE PAGO MAFE
     # =========================
     header_metodos, linea_metodos = crear_header_seccion("MÉTODOS DE PAGO ACEPTADOS", "#2563EB")
 
@@ -2369,12 +2369,12 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_metodos_pago = Table(
-        [[header_metodos], [linea_metodos], [Spacer(1, 3)], [contenedor_metodos]],
+        [[header_metodos], [linea_metodos], [Spacer(1, 1)], [contenedor_metodos]],
         colWidths=[5.35 * inch]
     )
 
     # =========================
-    # PASARELA ACTUAL
+    # PASARELA ACTUAL MAFE
     # =========================
     header_actual, linea_actual = crear_header_seccion("COSTOS PASARELA ACTUAL", "#F97316")
 
@@ -2413,7 +2413,7 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_pasarela_actual = Table(
-        [[header_actual], [linea_actual], [Spacer(1, 3)], [contenedor_actual]],
+        [[header_actual], [linea_actual], [Spacer(1, 1)], [contenedor_actual]],
         colWidths=[W_RIGHT]
     )
 
@@ -2430,7 +2430,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 1),
     ]))
 
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 2))
     story.append(fila_operativa)
 
     # =========================
@@ -2510,12 +2510,12 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_costos = Table(
-        [[header_costos], [linea_costos], [Spacer(1, 3)], [bloque_tablas_costos]],
+        [[header_costos], [linea_costos], [Spacer(1, 1)], [bloque_tablas_costos]],
         colWidths=[9.00 * inch]
     )
 
     # =========================
-    # AHORRO ESTIMADO
+    # AHORRO ESTIMADO MAFE
     # =========================
     header_ahorro, linea_ahorro = crear_header_seccion("AHORRO ESTIMADO CON PAYZEN", "#16A34A")
 
@@ -2569,7 +2569,7 @@ def generar_pdf_profesional_test(df_pdf):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 1))
     story.append(fila_costos_ahorro)
 
     # =========================
