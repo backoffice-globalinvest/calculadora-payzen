@@ -1186,7 +1186,16 @@ def generar_pdf_Comercial(df_pdf):
     story = []
 
     try:
-        logo = Image("Logo_Globalinvest_PayZen.png", width=1.35 * inch, height=0.42 * inch)
+        logo_path = Path("Logo_Globalinvest_PayZen.png")
+        img_reader = ImageReader(str(logo_path))
+        img_w, img_h = img_reader.getSize()
+        aspect = img_h / img_w
+
+        logo_width = 1.30 * inch
+        logo_height = logo_width * aspect
+
+        logo = Image(str(logo_path), width=logo_width, height=logo_height)
+
     except Exception:
         logo = Paragraph("", table_cell)
 
