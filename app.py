@@ -2048,7 +2048,7 @@ def generar_pdf_profesional_test(df_pdf):
         "KpiLabel",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=6.4,
+        fontSize=7.5,
         leading=7.2,
         textColor=colors.white,
     )
@@ -2057,7 +2057,7 @@ def generar_pdf_profesional_test(df_pdf):
         "KpiValue",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=15.5,
+        fontSize=17.5,
         leading=16.5,
         textColor=colors.HexColor("#1E90FF"),
     )
@@ -2066,7 +2066,7 @@ def generar_pdf_profesional_test(df_pdf):
         "KpiNote",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=5.5,
+        fontSize=6.5,
         leading=6.2,
         textColor=colors.white,
     )
@@ -2075,8 +2075,8 @@ def generar_pdf_profesional_test(df_pdf):
         "SectionTitle",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=7.2,
-        leading=8,
+        fontSize=8.8,
+        leading=10,
         textColor=colors.HexColor("#020617"),
     )
 
@@ -2084,8 +2084,8 @@ def generar_pdf_profesional_test(df_pdf):
         "TableText",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=6.2,
-        leading=7.2,
+        fontSize=7.0,
+        leading=8.2,
         textColor=colors.HexColor("#020617"),
     )
 
@@ -2601,7 +2601,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("LEFTPADDING", (0, 0), (-1, -1), -4),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
@@ -2617,8 +2617,8 @@ def generar_pdf_profesional_test(df_pdf):
         "DisclaimerPro",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=5.4,
-        leading=6.1,
+        fontSize=6.8,
+        leading=8,
         textColor=colors.white,
     )
 
@@ -2626,8 +2626,8 @@ def generar_pdf_profesional_test(df_pdf):
         "FooterFecha",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=6.2,
-        leading=7,
+        fontSize=8.1,
+        leading=9,
         textColor=colors.white,
         alignment=2,
     )
