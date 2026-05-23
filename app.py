@@ -1995,14 +1995,35 @@ def generar_pdf_ejecutivo(df_pdf):
     # CONCLUSION 
     #-------------------------------------------------
 
+    conclusion_style_centrado = ParagraphStyle(
+        "ConclusionCentrada",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=9,
+        leading=11,
+        alignment=1,
+        textColor=colors.HexColor("#111827"),
+    )
+
+    disclaimer_style_centrado = ParagraphStyle(
+        "DisclaimerCentrado",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=6.2,
+        leading=7.2,
+        alignment=1,
+        textColor=colors.HexColor("#4B5563"),
+    )
+
     conclusion = (
         "Con base en el escenario analizado, la propuesta PayZen permite "
         f"una reducción estimada del {percent(first['Ahorro %'])} "
         "en costos transaccionales mensuales frente al modelo agregador actual."
     )
-    story.append(Paragraph(conclusion, conclusion_style))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(DISCLAIMER, disclaimer_style))
+
+    story.append(Paragraph(conclusion, conclusion_style_centrado))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(DISCLAIMER, disclaimer_style_centrado))
 
     doc.build(story)
     pdf = buffer.getvalue()
