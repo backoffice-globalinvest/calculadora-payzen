@@ -2011,7 +2011,7 @@ def generar_pdf_profesional_test(df_pdf):
     W_LEFT = W_FULL - W_RIGHT - 0.12 * inch
 
     # =========================
-    # ESTILOS
+    # ESTILOS MAFE
     # =========================
     title_style = ParagraphStyle(
         "ProTitle",
@@ -2131,7 +2131,7 @@ def generar_pdf_profesional_test(df_pdf):
     )
 
     # =========================
-    # HELPERS
+    # HELPERS MAFE
     # =========================
     def crear_header_seccion(titulo, color):
         cuadro = Table(
@@ -2201,7 +2201,7 @@ def generar_pdf_profesional_test(df_pdf):
         return card
 
     # =========================
-    # LOGO
+    # LOGO MAFE 
     # =========================
     try:
         logo_path = Path("Logo_Globalinvest_PayZen.png")
@@ -2318,7 +2318,7 @@ def generar_pdf_profesional_test(df_pdf):
     story.append(parte_superior)
 
     # =========================
-    # CÁLCULOS BASE
+    # CÁLCULOS BASE MAFE
     # =========================
     total_tx = first["Transacciones"]
     total_methods = max(total_tx, 1)
@@ -2330,7 +2330,7 @@ def generar_pdf_profesional_test(df_pdf):
     modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
 
     # =========================
-    # INFORMACIÓN OPERATIVA
+    # INFORMACIÓN OPERATIVA MAFE
     # =========================
     header_info, linea_info = crear_header_seccion("INFORMACIÓN OPERATIVA INICIAL", "#2563EB")
 
@@ -2472,7 +2472,7 @@ def generar_pdf_profesional_test(df_pdf):
     story.append(fila_operativa)
 
     # =========================
-    # COSTOS PAYZEN + ADQUIRENTES
+    # COSTOS PAYZEN + ADQUIRENTES MAFE
     # =========================
     header_costos, linea_costos = crear_header_seccion("COSTOS PAYZEN + COSTOS ADQUIRENTES", "#2563EB")
 
@@ -2552,34 +2552,61 @@ def generar_pdf_profesional_test(df_pdf):
         colWidths=[9.00 * inch]
     )
 
-    # =========================
+        # =========================
     # AHORRO ESTIMADO MAFE
     # =========================
     header_ahorro, linea_ahorro = crear_header_seccion("AHORRO ESTIMADO CON PAYZEN", "#16A34A")
 
+    ahorro_text_style = ParagraphStyle(
+        "AhorroText",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=7.6,
+        leading=9,
+        textColor=colors.HexColor("#020617"),
+    )
+
+    ahorro_text_right = ParagraphStyle(
+        "AhorroTextRight",
+        parent=ahorro_text_style,
+        fontName="Helvetica-Bold",
+        alignment=2,
+    )
+
+    ahorro_header = ParagraphStyle(
+        "AhorroHeader",
+        parent=ahorro_text_style,
+        fontName="Helvetica-Bold",
+        textColor=colors.white,
+        alignment=1,
+    )
+
     tabla_ahorro = Table(
         [
-            [Paragraph('<font color="white"><b>Indicador</b></font>', table_header), Paragraph('<font color="white"><b>Resultado</b></font>', table_header)],
-            [Paragraph("Ahorro mensual", table_text_style), Paragraph(money(first["Ahorro mensual"]), green_bold_right)],
-            [Paragraph("Ahorro anual", table_text_style), Paragraph(money(first["Ahorro anual"]), green_bold_right)],
-            [Paragraph("Ahorro porcentual", table_text_style), Paragraph(percent(first["Ahorro %"]), green_bold_right)],
+            [Paragraph("Indicador", ahorro_header), Paragraph("Resultado", ahorro_header)],
+            [Paragraph("Ahorro mensual", ahorro_text_style), Paragraph(money(first["Ahorro mensual"]), ahorro_text_right)],
+            [Paragraph("Ahorro anual", ahorro_text_style), Paragraph(money(first["Ahorro anual"]), ahorro_text_right)],
+            [Paragraph("Ahorro porcentual", ahorro_text_style), Paragraph(percent(first["Ahorro %"]), ahorro_text_right)],
         ],
-        colWidths=[2.15 * inch, 1.55 * inch],
-        rowHeights=[0.30 * inch, 0.38 * inch, 0.38 * inch, 0.38 * inch]
+        colWidths=[2.35 * inch, 1.65 * inch],
+        rowHeights=[0.34 * inch, 0.44 * inch, 0.44 * inch, 0.44 * inch]
     )
 
     tabla_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#16A34A")),
         ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F0FDF4")),
-        ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#BBF7D0")),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#86EFAC")),
-        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#BBF7D0")),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#86EFAC")),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 7),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
     ]))
 
-    contenedor_ahorro = Table([[tabla_ahorro]], colWidths=[4.00 * inch])
+    contenedor_ahorro = Table(
+        [[tabla_ahorro]],
+        colWidths=[4.20 * inch]
+    )
+
     contenedor_ahorro.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), colors.white),
         ("BOX", (0, 0), (-1, -1), 0.45, colors.HexColor("#DCFCE7")),
@@ -2590,18 +2617,18 @@ def generar_pdf_profesional_test(df_pdf):
     ]))
 
     bloque_ahorro = Table(
-        [[header_ahorro], [linea_ahorro], [Spacer(1, 3)], [contenedor_ahorro]],
-        colWidths=[W_RIGHT]
+        [[header_ahorro], [linea_ahorro], [Spacer(1, 4)], [contenedor_ahorro]],
+        colWidths=[4.35 * inch]
     )
 
     fila_costos_ahorro = Table(
-        [[bloque_costos, bloque_ahorro]],
-        colWidths=[9.00 * inch, 3.95 * inch]
+        [[bloque_costos, Spacer(0.10 * inch, 1), bloque_ahorro]],
+        colWidths=[8.72 * inch, 0.12 * inch, 4.35 * inch]
     )
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), -4),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
@@ -2611,7 +2638,7 @@ def generar_pdf_profesional_test(df_pdf):
     story.append(fila_costos_ahorro)
 
     # =========================
-    # FOOTER / DISCLAIMER
+    # FOOTER / DISCLAIMER MAFE
     # =========================
     disclaimer_style = ParagraphStyle(
         "DisclaimerPro",
