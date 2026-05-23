@@ -1988,8 +1988,10 @@ def generar_pdf_ejecutivo(df_pdf):
     ahorro_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F0FDF4")),
     ]))
+
+
     story.append(ahorro_table)
-    story.append(Spacer(1, 22))
+    story.append(Spacer(1, 8))
 
     #-------------------------------------------------
     # CONCLUSION 
@@ -1999,8 +2001,8 @@ def generar_pdf_ejecutivo(df_pdf):
         "ConclusionCentrada",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=9,
-        leading=11,
+        fontSize=8.8,
+        leading=10,
         alignment=1,
         textColor=colors.HexColor("#111827"),
     )
@@ -2009,8 +2011,8 @@ def generar_pdf_ejecutivo(df_pdf):
         "DisclaimerCentrado",
         parent=styles["BodyText"],
         fontName="Helvetica",
-        fontSize=6.2,
-        leading=7.2,
+        fontSize=5.5,
+        leading=6.2,
         alignment=1,
         textColor=colors.HexColor("#4B5563"),
     )
@@ -2021,16 +2023,14 @@ def generar_pdf_ejecutivo(df_pdf):
         "en costos transaccionales mensuales frente al modelo agregador actual."
     )
 
-    story.append(Spacer(1, 2))
     story.append(Paragraph(conclusion, conclusion_style_centrado))
-    story.append(Spacer(1, 3))
+    story.append(Spacer(1, 6))
     story.append(Paragraph(DISCLAIMER, disclaimer_style_centrado))
 
     doc.build(story)
     pdf = buffer.getvalue()
     buffer.close()
     return pdf
-
 
 # -----------
 # MAFE PDF DASHBOARD LINDO
