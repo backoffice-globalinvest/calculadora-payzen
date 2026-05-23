@@ -2126,8 +2126,8 @@ def generar_pdf_profesional_test(df_pdf):
         "GreenBoldRight",
         parent=table_text_style,
         fontName="Helvetica-Bold",
-        fontSize=8.4,
-        leading=9.5,
+        fontSize=9.8,
+        leading=11,
         alignment=2,
         textColor=colors.HexColor("#020617"),
     )
@@ -2136,8 +2136,8 @@ def generar_pdf_profesional_test(df_pdf):
         "AhorroLabelStyle",
         parent=table_text_style,
         fontName="Helvetica",
-        fontSize=8.2,
-        leading=9.5,
+        fontSize=9.5,
+        leading=11,
         textColor=colors.HexColor("#020617"),
     )
 
@@ -2562,6 +2562,13 @@ def generar_pdf_profesional_test(df_pdf):
         [[header_costos], [linea_costos], [Spacer(1, 1)], [bloque_tablas_costos]],
         colWidths=[9.00 * inch]
     )
+
+    bloque_costos.setStyle(TableStyle([
+        ("LEFTPADDING", (0, 0), (-1, -1), -14),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
 
     # =========================
     # AHORRO ESTIMADO MAFE
