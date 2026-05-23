@@ -1797,10 +1797,11 @@ def generar_pdf_ejecutivo(df_pdf):
                 title_style
             )
         ]],
-        colWidths=[2.0 * inch, 7.0 * inch]
+        colWidths=[1.35 * inch, 7.65 * inch]
     )
     header_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("ALIGN", (1, 0), (1, 0), "CENTER")
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
