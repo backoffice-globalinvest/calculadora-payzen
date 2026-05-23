@@ -2126,7 +2126,18 @@ def generar_pdf_profesional_test(df_pdf):
         "GreenBoldRight",
         parent=table_text_style,
         fontName="Helvetica-Bold",
+        fontSize=8.4,
+        leading=9.5,
         alignment=2,
+        textColor=colors.HexColor("#020617"),
+    )
+
+    ahorro_label_style = ParagraphStyle(
+        "AhorroLabelStyle",
+        parent=table_text_style,
+        fontName="Helvetica",
+        fontSize=8.2,
+        leading=9.5,
         textColor=colors.HexColor("#020617"),
     )
 
@@ -2541,7 +2552,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     bloque_tablas_costos.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), -4),
+        ("LEFTPADDING", (0, 0), (-1, -1), -12),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
@@ -2560,9 +2571,9 @@ def generar_pdf_profesional_test(df_pdf):
     tabla_ahorro = Table(
         [
             [Paragraph('<font color="white"><b>Indicador</b></font>', table_header), Paragraph('<font color="white"><b>Resultado</b></font>', table_header)],
-            [Paragraph("Ahorro mensual", table_text_style), Paragraph(money(first["Ahorro mensual"]), green_bold_right)],
-            [Paragraph("Ahorro anual", table_text_style), Paragraph(money(first["Ahorro anual"]), green_bold_right)],
-            [Paragraph("Ahorro porcentual", table_text_style), Paragraph(percent(first["Ahorro %"]), green_bold_right)],
+            [Paragraph("Ahorro mensual", ahorro_label_style), Paragraph(money(first["Ahorro mensual"]), green_bold_right)],
+            [Paragraph("Ahorro anual", ahorro_label_style), Paragraph(money(first["Ahorro anual"]), green_bold_right)],
+            [Paragraph("Ahorro porcentual", ahorro_label_style), Paragraph(percent(first["Ahorro %"]), green_bold_right)],
         ],
         colWidths=[2.15 * inch, 1.55 * inch],
         rowHeights=[0.30 * inch, 0.38 * inch, 0.38 * inch, 0.38 * inch]
@@ -2601,7 +2612,7 @@ def generar_pdf_profesional_test(df_pdf):
 
     fila_costos_ahorro.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("LEFTPADDING", (0, 0), (-1, -1), -4),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
         ("TOPPADDING", (0, 0), (-1, -1), 0),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
