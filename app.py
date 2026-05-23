@@ -1800,6 +1800,7 @@ def generar_pdf_ejecutivo(df_pdf):
         colWidths=[1.35 * inch, 7.65 * inch]
     )
     header_table.setStyle(TableStyle([
+        ("LEFTPADDING", (1, 0), (1, 0), -25),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("ALIGN", (1, 0), (1, 0), "CENTER"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
