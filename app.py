@@ -7,6 +7,7 @@ from reportlab.lib.pagesizes import letter, landscape, TABLOID, LEGAL
 from reportlab.lib.utils import ImageReader
 from pathlib import Path
 from io import BytesIO
+from datetime import datetime
 
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
@@ -2216,29 +2217,66 @@ def generar_pdf_profesional_test(df_pdf):
     # =========================
     # HEADER SUPERIOR
     # =========================
-    contenido_izq = Table(
-        [[
-            logo,
-            Table(
-                [
-                    [Paragraph("Resumen", title_style)],
-                    [Paragraph("Comercial", title_style)],
-                    [Paragraph("PayZen", title_blue_style)],
-                    [Spacer(1, 1)],
-                    [Paragraph("Propuesta de costos y ahorro estimado", subtitle_style)],
-                ],
-                colWidths=[2.05 * inch]
-            )
-        ]],
-        colWidths=[1.35 * inch, 2.15 * inch]
+    # Ajuste:
+    # - El logo se baja un poco con una mini-tabla.
+    # - La frase "Propuesta de costos y ahorro estimado" queda controlada
+    #   dentro del bloque de texto, sin montarse ni quedar pegada.
+    bloque_logo = Table(
+        [
+            [Spacer(1, 6)],
+            [logo],
+        ],
+        colWidths=[1.35 * inch],
+        rowHeights=[0.10 * inch, 0.62 * inch]
     )
 
-    contenido_izq.setStyle(TableStyle([
+    bloque_logo.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    bloque_texto_titulo = Table(
+        [
+            [Paragraph("Resumen", title_style)],
+            [Paragraph("Comercial", title_style)],
+            [Paragraph("PayZen", title_blue_style)],
+            [Spacer(1, 4)],
+            [Paragraph("Propuesta de costos y ahorro estimado", subtitle_style)],
+        ],
+        colWidths=[2.05 * inch],
+        rowHeights=[
+            0.21 * inch,
+            0.21 * inch,
+            0.32 * inch,
+            0.04 * inch,
+            0.15 * inch
+        ]
+    )
+
+    bloque_texto_titulo.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 1),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 1),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+
+    contenido_izq = Table(
+        [[bloque_logo, bloque_texto_titulo]],
+        colWidths=[1.45 * inch, 2.15 * inch]
+    )
+
+    contenido_izq.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (0, 0), "TOP"),
+        ("VALIGN", (1, 0), (1, 0), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
     bloque_titulo = Table(
@@ -2594,10 +2632,19 @@ def generar_pdf_profesional_test(df_pdf):
         alignment=2,
     )
 
+    meses = {
+        1: "enero", 2: "febrero", 3: "marzo", 4: "abril",
+        5: "mayo", 6: "junio", 7: "julio", 8: "agosto",
+        9: "septiembre", 10: "octubre", 11: "noviembre", 12: "diciembre"
+    }
+
+    hoy = datetime.today()
+    fecha_analisis = f"{hoy.day} de {meses[hoy.month]} de {hoy.year}"
+
     footer = Table(
         [[
             Paragraph(DISCLAIMER, disclaimer_style),
-            Paragraph("Fecha del análisis:<br/>15 de mayo de 2026", footer_fecha_style)
+            Paragraph(f"Fecha del análisis:<br/>{fecha_analisis}", footer_fecha_style)
         ]],
         colWidths=[W_FULL - 2.10 * inch, 2.10 * inch],
         rowHeights=[0.55 * inch]
