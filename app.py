@@ -1797,7 +1797,7 @@ def generar_pdf_ejecutivo(df_pdf):
                 title_style
             )
         ]],
-        colWidths=[1.00 * inch, 8.00 * inch]
+        colWidths=[0.80 * inch, 8.20 * inch]
     )
     header_table.setStyle(TableStyle([
         ("LEFTPADDING", (1, 0), (1, 0), -20),
