@@ -2039,8 +2039,8 @@ def generar_pdf_profesional_test(df_pdf):
         "ProSubtitle",
         parent=styles["BodyText"],
         fontName="Helvetica-Bold",
-        fontSize=6.6,
-        leading=7.5,
+        fontSize=8.2,
+        leading=9,
         textColor=colors.white,
     )
 
@@ -2244,7 +2244,7 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Resumen", title_style)],
             [Paragraph("Comercial", title_style)],
             [Paragraph("PayZen", title_blue_style)],
-            [Spacer(1, 4)],
+            [Spacer(1, 7)],
             [Paragraph("Propuesta de costos y ahorro estimado", subtitle_style)],
         ],
         colWidths=[2.05 * inch],
