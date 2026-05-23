@@ -2021,8 +2021,9 @@ def generar_pdf_ejecutivo(df_pdf):
         "en costos transaccionales mensuales frente al modelo agregador actual."
     )
 
+    story.append(Spacer(1, 2))
     story.append(Paragraph(conclusion, conclusion_style_centrado))
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 3))
     story.append(Paragraph(DISCLAIMER, disclaimer_style_centrado))
 
     doc.build(story)
