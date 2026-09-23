@@ -222,21 +222,30 @@ PAYZEN_PLANS = {
 }
 
 
-def calcular_pasarela_actual(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_actual, pct_actual):
-    costo_tc = tx_tc * (fijo_actual + (ticket_tc * pct_actual / 100))
-    costo_pse = tx_pse * (fijo_actual + (ticket_pse * pct_actual / 100))
-    costo_breb = tx_breb * (fijo_actual + (ticket_breb * pct_actual / 100))
+def costo_tarifa_actual(ticket, tx, porcentaje, fijo):
+    """Costo de la pasarela actual: porcentaje sobre la venta + fijo por transacción.
+    Cualquiera de los dos componentes puede ser 0.
+    """
+    if tx <= 0:
+        return 0
+    return tx * ((ticket * porcentaje / 100) + fijo)
+
+
+def calcular_pasarela_actual(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales):
+    costo_tc = costo_tarifa_actual(ticket_tc, tx_tc, **tarifas_actuales["TC"])
+    costo_pse = costo_tarifa_actual(ticket_pse, tx_pse, **tarifas_actuales["PSE"])
+    costo_breb = costo_tarifa_actual(ticket_breb, tx_breb, **tarifas_actuales["Bre-B"])
     total = costo_tc + costo_pse + costo_breb
     return costo_tc, costo_pse, costo_breb, total
 
 
-def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_actual, pct_actual,
+def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales,
                             pct_banco_tc, plan_mensual, tx_incluidas, tx_adicional_unitario,
                             costo_pse_payzen, costo_breb_payzen):
     total_tx = tx_tc + tx_pse + tx_breb
 
     costo_actual_tc, costo_actual_pse, costo_actual_breb, costo_actual_total = calcular_pasarela_actual(
-        ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, fijo_actual, pct_actual
+        ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales
     )
 
     tx_adicionales = max(total_tx - tx_incluidas, 0)
@@ -593,10 +602,55 @@ with st.sidebar:
     st.divider()
     st.subheader("Pasarela actual")
 
-    costo_fijo_actual = st.number_input("Costo fijo actual por transacción", min_value=0, value=750, step=50)
-    porcentaje_actual = st.number_input("% actual de la pasarela", min_value=0.0, value=2.90, step=0.10)
+    modo_tarifa_actual = st.radio(
+        "¿La pasarela actual cobra igual en todos los métodos?",
+        ["Una tarifa para todos", "Tarifa diferente por método"],
+        horizontal=False
+    )
 
-    st.caption("Modelo agregador: porcentaje + fijo por transacción, aplicado a todos los métodos activos.")
+    def pedir_tarifa_actual(prefijo, key_base, pct_default=1.78, fijo_default=0):
+        pct = st.number_input(
+            f"% actual {prefijo}" if prefijo else "% actual de la pasarela",
+            min_value=0.0,
+            value=float(pct_default),
+            step=0.01,
+            key=f"pct_actual_{key_base}"
+        )
+        fijo = st.number_input(
+            f"Costo fijo actual {prefijo} por transacción" if prefijo else "Costo fijo actual por transacción",
+            min_value=0,
+            value=int(fijo_default),
+            step=1,
+            key=f"fijo_actual_{key_base}"
+        )
+        return {"porcentaje": pct, "fijo": fijo}
+
+    if modo_tarifa_actual == "Una tarifa para todos":
+        # Mantiene el modelo original: porcentaje + fijo, aplicado a todos los métodos activos.
+        # Si la competencia cobra solo porcentaje, deja el fijo en 0.
+        # Si cobra solo fijo, deja el porcentaje en 0.
+        tarifa_unica_actual = pedir_tarifa_actual("", "unica", 1.78, 0)
+        tarifas_actuales = {
+            "TC": tarifa_unica_actual.copy(),
+            "PSE": tarifa_unica_actual.copy(),
+            "Bre-B": tarifa_unica_actual.copy(),
+        }
+        st.caption("Modelo agregador: porcentaje + fijo por transacción, aplicado a todos los métodos activos. Puedes dejar cualquiera de los dos en 0.")
+    else:
+        # Cada medio de pago queda completamente independiente.
+        tarifas_actuales = {
+            "TC": pedir_tarifa_actual("TC / TD", "tc", 1.78, 0) if activar_tc else {"porcentaje": 0.0, "fijo": 0},
+            "PSE": pedir_tarifa_actual("PSE", "pse", 1.10, 300) if activar_pse else {"porcentaje": 0.0, "fijo": 0},
+            "Bre-B": pedir_tarifa_actual("Bre-B", "breb", 0.0, 400) if activar_breb else {"porcentaje": 0.0, "fijo": 0},
+        }
+        st.caption("Cada método se calcula por separado. En cada uno puedes usar solo %, solo fijo o % + fijo dejando en 0 el componente que no aplique.")
+
+    # Compatibilidad con las secciones/PDF existentes.
+    # Si hay tarifa única, estos valores representan esa tarifa.
+    # Si es por método, se usa TC como referencia visual y el detalle por canal se conserva en resultados.
+    porcentaje_actual = tarifas_actuales["TC"]["porcentaje"]
+    costo_fijo_actual = tarifas_actuales["TC"]["fijo"]
+
 
     st.divider()
     st.subheader("Costos adquirencia / procesamiento")
@@ -661,6 +715,31 @@ plan_mensual = plan_info["mensualidad"]
 tx_incluidas = plan_info["tx_incluidas"]
 creacion_tienda = plan_info["creacion_tienda"]
 tx_adicional_unitario = plan_info["tx_adicional"]
+
+
+def descripcion_tarifa_actual(tarifa):
+    pct = tarifa["porcentaje"]
+    fijo = tarifa["fijo"]
+    if pct > 0 and fijo > 0:
+        return f"{percent(pct)} + {money(fijo)}"
+    if pct > 0:
+        return percent(pct)
+    if fijo > 0:
+        return f"{money(fijo)} por tx"
+    return "$0"
+
+
+def descripcion_pasarela_actual():
+    if modo_tarifa_actual == "Una tarifa para todos":
+        return descripcion_tarifa_actual(tarifas_actuales["TC"])
+    partes = []
+    if activar_tc:
+        partes.append(f"TC/TD: {descripcion_tarifa_actual(tarifas_actuales['TC'])}")
+    if activar_pse:
+        partes.append(f"PSE: {descripcion_tarifa_actual(tarifas_actuales['PSE'])}")
+    if activar_breb:
+        partes.append(f"Bre-B: {descripcion_tarifa_actual(tarifas_actuales['Bre-B'])}")
+    return " | ".join(partes)
 
 
 # ---------------------------------------------------
@@ -733,8 +812,7 @@ for nombre, tx in escenarios:
         tx_tc_calc,
         tx_pse_calc,
         tx_breb_calc,
-        costo_fijo_actual,
-        porcentaje_actual,
+        tarifas_actuales,
         porcentaje_banco,
         plan_mensual,
         tx_incluidas,
@@ -901,15 +979,12 @@ with c2:
     )
 
 with c3:
+    detalle_actual_card = descripcion_pasarela_actual()
     h(
         '<div class="card">'
         '<div class="label" style="text-align:center;">PASARELA ACTUAL</div>'
-        '<div style="margin-top:22px; color:#F97316; font-weight:900; text-align:center;">'
-        f'<div style="font-size:38px; line-height:1;">{money(costo_fijo_actual)}</div>'
-        '<div style="font-size:22px; line-height:1.1;">+</div>'
-        f'<div style="font-size:38px; line-height:1;">{percent(porcentaje_actual)}</div>'
-        '</div>'
-        '<div class="small-text" style="margin-top:14px; text-align:center; color:#FDBA74;">por transacción</div>'
+        f'<div style="margin-top:22px; color:#F97316; font-weight:900; text-align:center; font-size:25px; line-height:1.35;">{detalle_actual_card}</div>'
+        f'<div class="small-text" style="margin-top:14px; text-align:center; color:#FDBA74;">{modo_tarifa_actual}</div>'
         '</div>'
     )
 
@@ -1065,7 +1140,8 @@ for row in resultados:
         h(
             '<div class="math-box">'
             '<div class="math-title">Pasarela actual / modelo agregador</div>'
-            f'<div class="math-line">Total: {number_fmt(row["Transacciones"])} × ({percent(porcentaje_actual)} × ticket + {money(costo_fijo_actual)})</div>'
+            f'<div class="math-line">Modelo: {descripcion_pasarela_actual()}</div>'
+            f'<div class="math-line">TC: {money(row["Costo actual TC"])} | PSE: {money(row["Costo actual PSE"])} | Bre-B: {money(row["Costo actual Bre-B"])}</div>'
             f'<div class="math-result-orange">= {money(row["Pasarela actual"])}</div>'
             '</div>'
         )
@@ -1352,7 +1428,7 @@ def generar_pdf_Comercial(df_pdf):
         section_style
     ))
 
-    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
+    modelo_actual = descripcion_pasarela_actual()
 
     actual_data = [
         [
@@ -1768,7 +1844,7 @@ def generar_pdf_ejecutivo(df_pdf):
     story = []
     first = df_pdf.iloc[0]
     total_tx = first["Transacciones"]
-    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
+    modelo_actual = descripcion_pasarela_actual()
 
     try:
         logo_path = Path("Logo_Globalinvest_PayZen.png")
@@ -2307,7 +2383,7 @@ def generar_pdf_profesional_test(df_pdf):
     pct_tc_pdf = (first["TC"] / total_methods * 100) if total_methods > 0 else 0
     pct_pse_pdf = (first["PSE"] / total_methods * 100) if total_methods > 0 else 0
     pct_breb_pdf = (first["Bre-B"] / total_methods * 100) if total_methods > 0 else 0
-    modelo_actual = f"{percent(porcentaje_actual)} + {money(costo_fijo_actual)}"
+    modelo_actual = descripcion_pasarela_actual()
 
     # =========================
     # FUNCIÓN ENCABEZADO SECCIÓN
