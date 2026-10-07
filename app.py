@@ -223,7 +223,8 @@ PAYZEN_PLANS = {
 
 
 def costo_tarifa_actual(ticket, tx, porcentaje, fijo):
-    """Costo de la pasarela actual: porcentaje sobre la venta + fijo por transacción.
+    """Costo del modelo agregador o del fee de un Gateway:
+    porcentaje sobre la venta + fijo por transacción.
     Cualquiera de los dos componentes puede ser 0.
     """
     if tx <= 0:
@@ -231,7 +232,7 @@ def costo_tarifa_actual(ticket, tx, porcentaje, fijo):
     return tx * ((ticket * porcentaje / 100) + fijo)
 
 
-def calcular_pasarela_actual(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales):
+def calcular_pasarela_agregador(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales):
     costo_tc = costo_tarifa_actual(ticket_tc, tx_tc, **tarifas_actuales["TC"])
     costo_pse = costo_tarifa_actual(ticket_pse, tx_pse, **tarifas_actuales["PSE"])
     costo_breb = costo_tarifa_actual(ticket_breb, tx_breb, **tarifas_actuales["Bre-B"])
@@ -239,15 +240,67 @@ def calcular_pasarela_actual(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, 
     return costo_tc, costo_pse, costo_breb, total
 
 
-def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales,
+def calcular_pasarela_gateway(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb,
+                              tarifas_gateway, pct_adquirencia_gateway,
+                              costo_pse_gateway, costo_breb_gateway):
+    """
+    Competencia Gateway = fee de la pasarela + adquirencia/procesamiento.
+    El fee del Gateway puede ser porcentaje, fijo por transacción o ambos.
+    """
+    fee_tc = costo_tarifa_actual(ticket_tc, tx_tc, **tarifas_gateway["TC"])
+    fee_pse = costo_tarifa_actual(ticket_pse, tx_pse, **tarifas_gateway["PSE"])
+    fee_breb = costo_tarifa_actual(ticket_breb, tx_breb, **tarifas_gateway["Bre-B"])
+
+    adq_tc = ticket_tc * tx_tc * pct_adquirencia_gateway / 100
+    proc_pse = tx_pse * costo_pse_gateway
+    proc_breb = tx_breb * costo_breb_gateway
+
+    costo_tc = fee_tc + adq_tc
+    costo_pse = fee_pse + proc_pse
+    costo_breb = fee_breb + proc_breb
+
+    return {
+        "costo_tc": costo_tc,
+        "costo_pse": costo_pse,
+        "costo_breb": costo_breb,
+        "total": costo_tc + costo_pse + costo_breb,
+        "total_pasarela": fee_tc + fee_pse + fee_breb,
+        "total_adquirencia": adq_tc + proc_pse + proc_breb,
+    }
+
+
+def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb,
+                            modelo_competencia, tarifas_actuales,
                             pct_banco_tc, plan_mensual, tx_incluidas, tx_adicional_unitario,
-                            costo_pse_payzen, costo_breb_payzen):
+                            costo_pse_payzen, costo_breb_payzen,
+                            pct_adquirencia_gateway=0.0,
+                            costo_pse_gateway=0,
+                            costo_breb_gateway=0):
     total_tx = tx_tc + tx_pse + tx_breb
 
-    costo_actual_tc, costo_actual_pse, costo_actual_breb, costo_actual_total = calcular_pasarela_actual(
-        ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales
-    )
+    if modelo_competencia == "Gateway":
+        actual = calcular_pasarela_gateway(
+            ticket_tc, ticket_pse, ticket_breb,
+            tx_tc, tx_pse, tx_breb,
+            tarifas_actuales,
+            pct_adquirencia_gateway,
+            costo_pse_gateway,
+            costo_breb_gateway
+        )
+        costo_actual_tc = actual["costo_tc"]
+        costo_actual_pse = actual["costo_pse"]
+        costo_actual_breb = actual["costo_breb"]
+        costo_actual_total = actual["total"]
+        costo_actual_pasarela = actual["total_pasarela"]
+        costo_actual_adquirencia = actual["total_adquirencia"]
+    else:
+        costo_actual_tc, costo_actual_pse, costo_actual_breb, costo_actual_total = calcular_pasarela_agregador(
+            ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, tx_breb, tarifas_actuales
+        )
+        costo_actual_pasarela = costo_actual_total
+        costo_actual_adquirencia = 0
 
+    # PAYZEN: se conserva exactamente la lógica existente.
     tx_adicionales = max(total_tx - tx_incluidas, 0)
     costo_tx_adicionales = tx_adicionales * tx_adicional_unitario
     costo_banco_tc = ticket_tc * tx_tc * pct_banco_tc / 100
@@ -264,6 +317,8 @@ def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, t
         "costo_actual_tc": costo_actual_tc,
         "costo_actual_pse": costo_actual_pse,
         "costo_actual_breb": costo_actual_breb,
+        "costo_actual_pasarela": costo_actual_pasarela,
+        "costo_actual_adquirencia": costo_actual_adquirencia,
         "tx_adicionales": tx_adicionales,
         "tarifa_adicional": tx_adicional_unitario,
         "costo_tx_adicionales": costo_tx_adicionales,
@@ -275,7 +330,6 @@ def calcular_costos_canales(ticket_tc, ticket_pse, ticket_breb, tx_tc, tx_pse, t
         "total_adquirencia": total_adquirencia,
         "payzen_total": payzen_total
     }
-
 
 def grafica_base(fig, titulo_y="COP", altura=560):
     fig.update_layout(
@@ -602,22 +656,22 @@ with st.sidebar:
     st.divider()
     st.subheader("Pasarela actual")
 
-    modo_tarifa_actual = st.radio(
-        "¿La pasarela actual cobra igual en todos los métodos?",
-        ["Una tarifa para todos", "Tarifa diferente por método"],
-        horizontal=False
+    modelo_competencia = st.radio(
+        "Modelo de la competencia",
+        ["Agregador", "Gateway"],
+        horizontal=True
     )
 
-    def pedir_tarifa_actual(prefijo, key_base, pct_default=1.78, fijo_default=0):
+    def pedir_tarifa_actual(prefijo, key_base, pct_default=1.78, fijo_default=0, etiqueta="actual"):
         pct = st.number_input(
-            f"% actual {prefijo}" if prefijo else "% actual de la pasarela",
+            f"% {etiqueta} {prefijo}" if prefijo else f"% {etiqueta} de la pasarela",
             min_value=0.0,
             value=float(pct_default),
             step=0.01,
             key=f"pct_actual_{key_base}"
         )
         fijo = st.number_input(
-            f"Costo fijo actual {prefijo} por transacción" if prefijo else "Costo fijo actual por transacción",
+            f"Costo fijo {etiqueta} {prefijo} por transacción" if prefijo else f"Costo fijo {etiqueta} por transacción",
             min_value=0,
             value=int(fijo_default),
             step=1,
@@ -625,32 +679,108 @@ with st.sidebar:
         )
         return {"porcentaje": pct, "fijo": fijo}
 
-    if modo_tarifa_actual == "Una tarifa para todos":
-        # Mantiene el modelo original: porcentaje + fijo, aplicado a todos los métodos activos.
-        # Si la competencia cobra solo porcentaje, deja el fijo en 0.
-        # Si cobra solo fijo, deja el porcentaje en 0.
-        tarifa_unica_actual = pedir_tarifa_actual("", "unica", 1.78, 0)
-        tarifas_actuales = {
-            "TC": tarifa_unica_actual.copy(),
-            "PSE": tarifa_unica_actual.copy(),
-            "Bre-B": tarifa_unica_actual.copy(),
-        }
-        st.caption("Modelo agregador: porcentaje + fijo por transacción, aplicado a todos los métodos activos. Puedes dejar cualquiera de los dos en 0.")
-    else:
-        # Cada medio de pago queda completamente independiente.
-        tarifas_actuales = {
-            "TC": pedir_tarifa_actual("TC / TD", "tc", 1.78, 0) if activar_tc else {"porcentaje": 0.0, "fijo": 0},
-            "PSE": pedir_tarifa_actual("PSE", "pse", 1.10, 300) if activar_pse else {"porcentaje": 0.0, "fijo": 0},
-            "Bre-B": pedir_tarifa_actual("Bre-B", "breb", 0.0, 400) if activar_breb else {"porcentaje": 0.0, "fijo": 0},
-        }
-        st.caption("Cada método se calcula por separado. En cada uno puedes usar solo %, solo fijo o % + fijo dejando en 0 el componente que no aplique.")
+    # Valores neutros para mantener una sola función de cálculo.
+    pct_adquirencia_gateway = 0.0
+    costo_pse_gateway = 0
+    costo_breb_gateway = 0
 
-    # Compatibilidad con las secciones/PDF existentes.
-    # Si hay tarifa única, estos valores representan esa tarifa.
-    # Si es por método, se usa TC como referencia visual y el detalle por canal se conserva en resultados.
+    if modelo_competencia == "Agregador":
+        # Se conserva el comportamiento que ya funcionaba.
+        modo_tarifa_actual = st.radio(
+            "¿La pasarela actual cobra igual en todos los métodos?",
+            ["Una tarifa para todos", "Tarifa diferente por método"],
+            horizontal=False
+        )
+
+        if modo_tarifa_actual == "Una tarifa para todos":
+            tarifa_unica_actual = pedir_tarifa_actual("", "unica", 1.78, 0)
+            tarifas_actuales = {
+                "TC": tarifa_unica_actual.copy(),
+                "PSE": tarifa_unica_actual.copy(),
+                "Bre-B": tarifa_unica_actual.copy(),
+            }
+            st.caption(
+                "Modelo agregador: porcentaje + fijo por transacción, aplicado a todos los métodos activos. "
+                "Puedes dejar cualquiera de los dos en 0."
+            )
+        else:
+            tarifas_actuales = {
+                "TC": pedir_tarifa_actual("TC / TD", "tc", 1.78, 0) if activar_tc else {"porcentaje": 0.0, "fijo": 0},
+                "PSE": pedir_tarifa_actual("PSE", "pse", 1.10, 300) if activar_pse else {"porcentaje": 0.0, "fijo": 0},
+                "Bre-B": pedir_tarifa_actual("Bre-B", "breb", 0.0, 400) if activar_breb else {"porcentaje": 0.0, "fijo": 0},
+            }
+            st.caption(
+                "Cada método se calcula por separado. Puedes usar solo %, solo fijo o % + fijo."
+            )
+
+    else:
+        # NUEVO: competencia que también trabaja como Gateway.
+        modo_tarifa_actual = st.radio(
+            "¿El Gateway cobra igual en todos los métodos?",
+            ["Una tarifa para todos", "Tarifa diferente por método"],
+            horizontal=False,
+            key="modo_tarifa_gateway"
+        )
+
+        st.markdown("**Cobro de la pasarela Gateway**")
+
+        if modo_tarifa_actual == "Una tarifa para todos":
+            tarifa_unica_actual = pedir_tarifa_actual("", "gateway_unica", 0.0, 0, "Gateway")
+            tarifas_actuales = {
+                "TC": tarifa_unica_actual.copy(),
+                "PSE": tarifa_unica_actual.copy(),
+                "Bre-B": tarifa_unica_actual.copy(),
+            }
+        else:
+            tarifas_actuales = {
+                "TC": pedir_tarifa_actual("TC / TD", "gateway_tc", 0.0, 0, "Gateway") if activar_tc else {"porcentaje": 0.0, "fijo": 0},
+                "PSE": pedir_tarifa_actual("PSE", "gateway_pse", 0.0, 0, "Gateway") if activar_pse else {"porcentaje": 0.0, "fijo": 0},
+                "Bre-B": pedir_tarifa_actual("Bre-B", "gateway_breb", 0.0, 0, "Gateway") if activar_breb else {"porcentaje": 0.0, "fijo": 0},
+            }
+
+        st.markdown("**Adquirencia / procesamiento de la competencia**")
+
+        pct_adquirencia_gateway = (
+            st.number_input(
+                "% adquirencia competencia TC / TD",
+                min_value=0.0,
+                value=1.84,
+                step=0.01,
+                key="pct_adquirencia_gateway"
+            )
+            if activar_tc else 0.0
+        )
+
+        costo_pse_gateway = (
+            st.number_input(
+                "Costo procesamiento competencia PSE por tx",
+                min_value=0,
+                value=400,
+                step=50,
+                key="costo_pse_gateway"
+            )
+            if activar_pse else 0
+        )
+
+        costo_breb_gateway = (
+            st.number_input(
+                "Costo procesamiento competencia Bre-B por tx",
+                min_value=0,
+                value=0,
+                step=50,
+                key="costo_breb_gateway"
+            )
+            if activar_breb else 0
+        )
+
+        st.caption(
+            "Costo total competencia Gateway = cobro del Gateway + adquirencia/procesamiento. "
+            "El cobro del Gateway puede ser %, fijo por transacción o ambos."
+        )
+
+    # Compatibilidad con todo lo que ya usa estas variables.
     porcentaje_actual = tarifas_actuales["TC"]["porcentaje"]
     costo_fijo_actual = tarifas_actuales["TC"]["fijo"]
-
 
     st.divider()
     st.subheader("Costos adquirencia / procesamiento")
@@ -731,7 +861,9 @@ def descripcion_tarifa_actual(tarifa):
 
 def descripcion_pasarela_actual():
     if modo_tarifa_actual == "Una tarifa para todos":
-        return descripcion_tarifa_actual(tarifas_actuales["TC"])
+        tarifa = descripcion_tarifa_actual(tarifas_actuales["TC"])
+        return f"{modelo_competencia}: {tarifa}"
+
     partes = []
     if activar_tc:
         partes.append(f"TC/TD: {descripcion_tarifa_actual(tarifas_actuales['TC'])}")
@@ -739,7 +871,7 @@ def descripcion_pasarela_actual():
         partes.append(f"PSE: {descripcion_tarifa_actual(tarifas_actuales['PSE'])}")
     if activar_breb:
         partes.append(f"Bre-B: {descripcion_tarifa_actual(tarifas_actuales['Bre-B'])}")
-    return " | ".join(partes)
+    return f"{modelo_competencia} | " + " | ".join(partes)
 
 
 # ---------------------------------------------------
@@ -812,13 +944,17 @@ for nombre, tx in escenarios:
         tx_tc_calc,
         tx_pse_calc,
         tx_breb_calc,
+        modelo_competencia,
         tarifas_actuales,
         porcentaje_banco,
         plan_mensual,
         tx_incluidas,
         tx_adicional_unitario,
         costo_pse_payzen,
-        costo_breb_payzen
+        costo_breb_payzen,
+        pct_adquirencia_gateway,
+        costo_pse_gateway,
+        costo_breb_gateway
     )
 
     costo_actual_total = canales["costo_actual_total"]
@@ -841,6 +977,8 @@ for nombre, tx in escenarios:
         "Costo actual TC": canales["costo_actual_tc"],
         "Costo actual PSE": canales["costo_actual_pse"],
         "Costo actual Bre-B": canales["costo_actual_breb"],
+        "Costo pasarela competencia": canales["costo_actual_pasarela"],
+        "Adquirencia competencia": canales["costo_actual_adquirencia"],
         "PayZen": payzen_total,
         "Ahorro mensual": ahorro,
         "Ahorro anual": ahorro_anual,
@@ -1146,6 +1284,16 @@ for row in resultados:
             '</div>'
         )
 
+        if modelo_competencia == "Gateway":
+            h(
+                '<div class="math-box">'
+                '<div class="math-title">Competencia Gateway</div>'
+                f'<div class="math-line">Costo de la pasarela Gateway: {money(row["Costo pasarela competencia"])}</div>'
+                f'<div class="math-line">Adquirencia / procesamiento: {money(row["Adquirencia competencia"])}</div>'
+                f'<div class="math-result-orange">= {money(row["Pasarela actual"])}</div>'
+                '</div>'
+            )
+
         h(
             '<div class="math-box">'
             '<div class="math-title">PayZen Gateway</div>'
@@ -1433,7 +1581,7 @@ def generar_pdf_Comercial(df_pdf):
     actual_data = [
         [
             Paragraph('<font color="white"><b>Costos Pasarela Actual</b></font>', table_header),
-            Paragraph('<font color="white"><b>MODELO AGREGADOR</b></font>', table_header)
+            Paragraph(f'<font color="white"><b>MODELO {modelo_competencia.upper()}</b></font>', table_header)
         ],
         [
             paragraph_cell("Plan actual", table_cell),
@@ -1448,7 +1596,7 @@ def generar_pdf_Comercial(df_pdf):
             paragraph_cell(number_fmt(total_tx), table_cell_right)
         ],
         [
-            Paragraph("<b>Costo Total pasarela agregadora</b>", table_cell),
+            Paragraph(f"<b>Costo Total competencia {modelo_competencia}</b>", table_cell),
             Paragraph(f"<b>{money(first['Pasarela actual'])}</b>", table_cell_right)
         ],
     ]
@@ -2526,7 +2674,7 @@ def generar_pdf_profesional_test(df_pdf):
             [Paragraph("Plan actual", table_text_style), Paragraph(modelo_actual, table_text_right)],
             [Paragraph("Ticket Promedio", table_text_style), Paragraph(money(ticket_promedio), table_text_right)],
             [Paragraph("Volumen (Número de transacciones)", table_text_style), Paragraph(number_fmt(total_tx), table_text_right)],
-            [Paragraph('<font color="#EA580C"><b>Costo Total pasarela agregadora</b></font>', table_text_style), Paragraph(f'<font color="#EA580C"><b>{money(first["Pasarela actual"])}</b></font>', table_text_right)],
+            [Paragraph(f'<font color="#EA580C"><b>Costo Total competencia {modelo_competencia}</b></font>', table_text_style), Paragraph(f'<font color="#EA580C"><b>{money(first["Pasarela actual"])}</b></font>', table_text_right)],
         ],
         colWidths=[2.05 * inch, 1.35 * inch],
         rowHeights=[0.30 * inch, 0.30 * inch, 0.30 * inch, 0.30 * inch, 0.32 * inch]
@@ -2769,6 +2917,8 @@ columnas_dinero = [
     "Costo actual TC",
     "Costo actual PSE",
     "Costo actual Bre-B",
+    "Costo pasarela competencia",
+    "Adquirencia competencia",
     "PayZen",
     "Ahorro mensual",
     "Ahorro anual",
