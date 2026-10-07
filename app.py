@@ -849,19 +849,9 @@ with st.sidebar:
             value=12.0,
             step=0.5
         )
-
-        comparar_impacto_retencion = st.checkbox(
-            "Comparar impacto económico incluyendo la retención",
-            value=False,
-            help=(
-                "Muestra una comparación adicional entre el costo económico estimado de la pasarela actual "
-                "(costo directo + costo de oportunidad) y PayZen. No modifica los cálculos principales."
-            )
-        )
     else:
         dias_retencion = 0.0
         tasa_anual_retencion = 0.0
-        comparar_impacto_retencion = False
 
     st.caption(
         "Este análisis es independiente del comparativo de costos. No se suma al costo de la competencia ni al ahorro PayZen."
@@ -1388,91 +1378,9 @@ if incluir_retencion:
         f'<div class="math-line">Días de retención: {dias_retencion:g} días</div>'
         f'<div class="math-line">Tasa anual utilizada: {percent(tasa_anual_retencion)}</div>'
         f'<div class="math-line">Fórmula: {money(ventas_mensuales_retencion)} × {percent(tasa_anual_retencion)} × ({dias_retencion:g} / 365)</div>'
-        f'<div class="math-result-orange">Costo de oportunidad estimado por {dias_retencion:g} días de retención: {money(costo_oportunidad_retencion)}</div>'
+        f'<div class="math-result-orange">Ingreso dejado de percibir estimado: {money(costo_oportunidad_retencion)}</div>'
         '</div>'
     )
-
-    # Comparación comercial adicional. IMPORTANTE: no altera ningún cálculo anterior.
-    if comparar_impacto_retencion and resultados:
-        actual_base = resultados[0]
-        costo_directo_competencia = actual_base["Pasarela actual"]
-        costo_payzen_actual = actual_base["PayZen"]
-        costo_economico_competencia = costo_directo_competencia + costo_oportunidad_retencion
-        diferencia_impacto = costo_economico_competencia - costo_payzen_actual
-
-        h('<div class="section-title">📊 Impacto económico incluyendo retención</div>')
-
-        c_ret1, c_ret2, c_ret3 = st.columns(3)
-        with c_ret1:
-            h(
-                '<div class="card-compare">'
-                '<div class="label">PASARELA ACTUAL</div>'
-                '<div class="small-text">Costo directo mensual</div>'
-                f'<div class="big-number-orange">{money(costo_directo_competencia)}</div>'
-                '</div>'
-            )
-        with c_ret2:
-            h(
-                '<div class="card-compare">'
-                '<div class="label">RETENCIÓN DE FONDOS</div>'
-                '<div class="small-text">Costo de oportunidad estimado</div>'
-                f'<div class="big-number-orange">+ {money(costo_oportunidad_retencion)}</div>'
-                f'<div class="small-text">{dias_retencion:g} días · tasa anual {percent(tasa_anual_retencion)}</div>'
-                '</div>'
-            )
-        with c_ret3:
-            h(
-                '<div class="card-saving">'
-                '<div class="label-white">COSTO ECONÓMICO ESTIMADO</div>'
-                '<div class="small-text-white">Pasarela actual + retención</div>'
-                f'<div class="big-number-white">{money(costo_economico_competencia)}</div>'
-                '</div>'
-            )
-
-        if diferencia_impacto > 0:
-            mensaje_diferencia = f'Diferencia estimada a favor de PayZen: {money(diferencia_impacto)}'
-            clase_diferencia = 'math-result'
-        elif diferencia_impacto < 0:
-            mensaje_diferencia = f'PayZen continúa siendo más costoso por: {money(abs(diferencia_impacto))}'
-            clase_diferencia = 'math-result-orange'
-        else:
-            mensaje_diferencia = 'Ambas alternativas tienen el mismo impacto económico estimado.'
-            clase_diferencia = 'math-result'
-
-        h(
-            '<div class="math-box">'
-            '<div class="math-title">Comparación económica opcional</div>'
-            f'<div class="math-line">Costo directo de la pasarela actual: {money(costo_directo_competencia)}</div>'
-            f'<div class="math-line">+ Costo de oportunidad estimado: {money(costo_oportunidad_retencion)}</div>'
-            f'<div class="math-line"><b>= Costo económico estimado actual: {money(costo_economico_competencia)}</b></div>'
-            f'<div class="math-line">PayZen + adquirencia: {money(costo_payzen_actual)}</div>'
-            f'<div class="{clase_diferencia}">{mensaje_diferencia}</div>'
-            '</div>'
-        )
-
-        fig_impacto = go.Figure()
-        fig_impacto.add_trace(go.Bar(
-            x=["Pasarela actual + retención", "PayZen + adquirencia"],
-            y=[costo_economico_competencia, costo_payzen_actual],
-            text=[money(costo_economico_competencia), money(costo_payzen_actual)],
-            textposition="outside",
-            name="Costo económico estimado"
-        ))
-        fig_impacto.update_layout(
-            title="Comparación del impacto económico estimado",
-            showlegend=False
-        )
-        grafica_base(fig_impacto, titulo_y="COP", altura=500)
-        st.plotly_chart(fig_impacto, use_container_width=True)
-
-        h(
-            '<div class="disclaimer">'
-            f'Costo de oportunidad estimado por {dias_retencion:g} días de retención: {money(costo_oportunidad_retencion)}. '
-            f'Calculado con una tasa anual de {percent(tasa_anual_retencion)}. '
-            'Este valor es una estimación informativa y no corresponde a una comisión cobrada por la pasarela. '
-            'Esta comparación adicional no modifica el ahorro, los costos ni las gráficas principales mostradas arriba.'
-            '</div>'
-        )
 
 
 # ---------------------------------------------------
