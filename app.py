@@ -828,6 +828,36 @@ with st.sidebar:
     plan = st.selectbox("Selecciona el plan", list(PAYZEN_PLANS.keys()), index=1)
 
     st.divider()
+    st.subheader("Análisis opcional por retención de fondos")
+
+    incluir_retencion = st.checkbox(
+        "Incluir análisis por retención de fondos",
+        value=False,
+        help="Actívalo únicamente cuando este análisis aplique al cliente. No modifica el ahorro ni los costos comparados."
+    )
+
+    if incluir_retencion:
+        dias_retencion = st.number_input(
+            "Días de retención de fondos",
+            min_value=0.0,
+            value=1.0,
+            step=0.5
+        )
+        tasa_anual_retencion = st.number_input(
+            "Tasa anual estimada para costo de oportunidad (%)",
+            min_value=0.0,
+            value=12.0,
+            step=0.5
+        )
+    else:
+        dias_retencion = 0.0
+        tasa_anual_retencion = 0.0
+
+    st.caption(
+        "Este análisis es independiente del comparativo de costos. No se suma al costo de la competencia ni al ahorro PayZen."
+    )
+
+    st.divider()
 
     proyecciones_texto = st.text_area(
         "Proyecciones de transacciones totales",
@@ -1320,6 +1350,37 @@ for row in resultados:
             f'<div class="math-line">Porcentaje de ahorro: <b>{percent(row["Ahorro %"])}</b></div>'
             '</div>'
         )
+
+
+# ---------------------------------------------------
+# ANÁLISIS OPCIONAL: COSTO DE OPORTUNIDAD POR RETENCIÓN
+# ---------------------------------------------------
+
+if incluir_retencion:
+    ventas_mensuales_retencion = (
+        (ticket_tc * tx_tc_actual)
+        + (ticket_pse * tx_pse_actual)
+        + (ticket_breb * tx_breb_actual)
+    )
+
+    costo_oportunidad_retencion = (
+        ventas_mensuales_retencion
+        * (tasa_anual_retencion / 100)
+        * (dias_retencion / 365)
+    )
+
+    h('<div class="section-title">⏳ Análisis opcional por retención de fondos</div>')
+    h(
+        '<div class="math-box">'
+        '<div class="math-title">Costo de oportunidad por retención</div>'
+        '<div class="math-line"><b>Este valor es informativo e independiente.</b> No se suma al costo de la competencia, al costo PayZen ni al ahorro calculado.</div>'
+        f'<div class="math-line">Ventas mensuales estimadas: {money(ventas_mensuales_retencion)}</div>'
+        f'<div class="math-line">Días de retención: {dias_retencion:g} días</div>'
+        f'<div class="math-line">Tasa anual utilizada: {percent(tasa_anual_retencion)}</div>'
+        f'<div class="math-line">Fórmula: {money(ventas_mensuales_retencion)} × {percent(tasa_anual_retencion)} × ({dias_retencion:g} / 365)</div>'
+        f'<div class="math-result-orange">Ingreso dejado de percibir estimado: {money(costo_oportunidad_retencion)}</div>'
+        '</div>'
+    )
 
 
 # ---------------------------------------------------
