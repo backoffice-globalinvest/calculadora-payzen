@@ -26,7 +26,7 @@ st.set_page_config(page_title="Simulador PayZen", page_icon="💳", layout="wide
 USERS = {
     "comercial": {
         "name": "Comercial PayZen",
-        "password_hash": "4d56be48304187c35b8616564f71980f17b78381ed4c27ff7b957656ca808be2"
+        "password_hash": "4d56be48304187c35b8616564f71980f17b78381ed4c27ff7b957656ca808be"
     },
     "director": {
         "name": "Director",
